@@ -1,7 +1,7 @@
 
 
 <div align="center">
-  <img src="assets/MAS-PromptBench_lockup.svg" alt="MAS-PromptBench" width="560">
+  <img src="https://fm8995610-ops.github.io/MAS-PromptBench/assets/MAS-PromptBench_lockup.svg" alt="MAS-PromptBench" width="560">
 </div>
 
 <h2 align="center">
@@ -24,7 +24,7 @@
 ## 📖 Introduction
 
 <div align="center">
-  <img src="assets/MAS-PromptBench_overview.png" alt="MAS-PromptBench overview" width="820">
+  <img src="https://fm8995610-ops.github.io/MAS-PromptBench/assets/MAS-PromptBench_overview.png" alt="MAS-PromptBench overview" width="820">
 </div>
 
 A reproducible benchmark for studying when prompt optimization improves multi-agent LLM systems across optimizers, tasks, topologies, communication formats, and team sizes.
