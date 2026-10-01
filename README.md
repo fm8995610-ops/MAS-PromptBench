@@ -4,6 +4,10 @@
   <img src="https://fm8995610-ops.github.io/MAS-PromptBench/assets/MAS-PromptBench_lockup.svg" alt="MAS-PromptBench" width="560">
 </div>
 
+<p align="center">
+  <a href="https://deepwiki.com/fm8995610-ops/MAS-PromptBench"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
+</p>
+
 <h2 align="center">
   A Benchmark of Prompt Optimization for Multi-Agent LLM Systems
 </h2>
