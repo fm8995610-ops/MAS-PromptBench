@@ -1,12 +1,12 @@
-"""Generate the results components used across the docs from docs_theme/data/results.json.
+"""Generate the results components used across the docs from docs/theme/data/results.json.
 
 Every number comes from the paper's published GEPA results (also shown on the project
 page). Components are plain HTML that the theme styles through CSS tokens, so they work
 in light and dark mode and need no JavaScript (a hover tooltip is a progressive extra).
 
-    python docs_theme/make_results.py
+    python docs/theme/make_results.py
 
-Writes docs/_snippets/results/*.html, which pages include with
+Writes docs/content/_snippets/results/*.html, which pages include with
 --8<-- "results/<name>.html".
 """
 import json
@@ -15,9 +15,9 @@ from pathlib import Path
 from decimal import Decimal, ROUND_HALF_UP
 from statistics import mean
 
-ROOT = Path(__file__).resolve().parents[1]
-DATA = json.loads((ROOT / "docs_theme" / "data" / "results.json").read_text())
-OUT = ROOT / "docs" / "_snippets" / "results"
+DOCS = Path(__file__).resolve().parents[1]
+DATA = json.loads((DOCS / "theme" / "data" / "results.json").read_text())
+OUT = DOCS / "content" / "_snippets" / "results"
 
 TASKS = DATA["tasks"]
 TASK = {t["id"]: t for t in TASKS}
@@ -268,7 +268,7 @@ def main():
     for name, html in files.items():
         assert "\n\n" not in html, name  # a blank line would end the raw HTML block
         (OUT / f"{name}.html").write_text(html)
-    print(f"wrote {len(files)} components to {OUT.relative_to(ROOT)}")
+    print(f"wrote {len(files)} components to {OUT.relative_to(DOCS.parent)}")
 
 
 if __name__ == "__main__":

@@ -1,13 +1,13 @@
 """Generate the five topology diagrams as theme-aware inline SVG snippets.
 
-Colours come from CSS custom properties in docs_theme/assets/docs.css (--tc is set per
+Colours come from CSS custom properties in docs/theme/assets/docs.css (--tc is set per
 diagram), so the same SVG reads correctly in light and dark themes.
-Run: python docs_theme/make_diagrams.py
+Run: python docs/theme/make_diagrams.py
 """
 import math
 from pathlib import Path
 
-OUT = Path(__file__).resolve().parents[1] / "docs" / "_snippets" / "diagrams"
+OUT = Path(__file__).resolve().parents[1] / "content" / "_snippets" / "diagrams"
 
 
 def arrow(x1, y1, x2, y2, cls="edge", head=True, both=False, size=7.5):

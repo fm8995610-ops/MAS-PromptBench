@@ -3,12 +3,14 @@ site_description: Tutorial and reference for MAS-PromptBench, a benchmark for sy
 site_url: https://fm8995610-ops.github.io/MAS-PromptBench/docs/
 repo_url: https://github.com/fm8995610-ops/MAS-PromptBench
 repo_name: fm8995610-ops/MAS-PromptBench
-edit_uri: edit/main/docs/
+edit_uri: edit/main/docs/content/
+docs_dir: content
+site_dir: site
 copyright: MAS-PromptBench is released under the MIT License.
 
 theme:
   name: null
-  custom_dir: docs_theme
+  custom_dir: theme
   locale: en
   search_index_only: true
   static_templates:
@@ -44,7 +46,7 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.snippets:
-      base_path: [docs/_snippets]
+      base_path: [!relative $config_dir/content/_snippets]
       check_paths: true
   - pymdownx.arithmatex:
       generic: true

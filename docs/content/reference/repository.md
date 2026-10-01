@@ -71,6 +71,7 @@ Runs write to `results/` (and the optimizer workspaces to their own `results/` a
 | `models/` | vLLM serve scripts for the task model and the reflection model. | `serve_qwen3_5_9b.sh`, `serve_qwen3_5_122b.sh` |
 | `frameworks/` | Agent frameworks as git submodules. `environment.yml` installs LangGraph, CrewAI and AutoGen from here in editable mode; the debate repository is a reference for the decentralized topology. | `langgraph`, `crewAI`, `autogen`, `llm_multiagent_debate` |
 | `assets/` | Logos and figures for the README and website. | `MAS-PromptBench_overview.png` |
+| `docs/` | This documentation site: MkDocs config, Markdown pages and theme. | `mkdocs.yml`, `content/`, `theme/`, `README.md` |
 
 ## Where do I change...
 
