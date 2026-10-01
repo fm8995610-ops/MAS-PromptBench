@@ -2,7 +2,7 @@
 
 These docs are a tutorial and reference for the MAS-PromptBench repository
 (github.com/fm8995610-ops/MAS-PromptBench). Pages are Markdown, built with MkDocs and a
-custom theme. Read `docs/getting-started/installation.md` as the model page before writing.
+custom theme. Read `docs/content/getting-started/installation.md` as the model page before writing.
 
 ## Voice
 
@@ -30,7 +30,7 @@ One or two sentences saying what this page covers and why it matters.
 - Aim for 300–900 words. Lead with what the reader needs to do; put detail after.
 - Link to sibling pages with relative links to the `.md` file, e.g.
   `[Sequential](../mas/sequential.md)` or `[GEPA](gepa.md#settings)`. Only link to
-  pages that exist in `mkdocs.yml`.
+  pages that exist in `docs/mkdocs.yml`.
 - Link to repo files with full GitHub URLs:
   `https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/<path>` (files) or
   `.../tree/main/<path>` (folders).
@@ -211,5 +211,5 @@ sequential, centralized, decentralized). Don't draw other diagrams.
 ## Don'ts
 
 - Keep each page to its own topic; check facts against the code before you publish.
-- Don't add pages to `mkdocs.yml`; don't create extra files (except in your own folder if asked).
+- Don't add pages to `docs/mkdocs.yml`; don't create extra files (except in your own folder if asked).
 - No placeholder text, no TODOs, no lorem ipsum.

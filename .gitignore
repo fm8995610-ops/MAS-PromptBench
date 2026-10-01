@@ -54,3 +54,8 @@ results/
 # Claude and Codex
 .claude/
 .codex
+
+# Docs: pages and snippets named "results" are source, not run outputs; the local build is not
+!/docs/content/results/
+!/docs/content/_snippets/results/
+/docs/site/
