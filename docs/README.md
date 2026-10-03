@@ -12,9 +12,8 @@ docs/
                         and AUTHORING.md (writing guide)
 ```
 
-Two files sit outside it because their tools look for them at fixed paths:
-`.github/workflows/docs.yml` (builds on push to `main` and publishes to `gh-pages:/docs`) and
-`.devin/wiki.json` (steers what DeepWiki writes).
+One file sits outside it because GitHub only reads workflows from a fixed path:
+`.github/workflows/docs.yml` (builds on push to `main` and publishes to `gh-pages:/docs`).
 
 Preview from the repository root:
 
@@ -32,7 +31,6 @@ stay as they are.
 
 1. Open https://deepwiki.com, submit `https://github.com/fm8995610-ops/MAS-PromptBench` and wait for the first build.
 2. The badge at the top of the repository `README.md` links to the wiki and keeps it refreshed.
-3. `.devin/wiki.json` tells DeepWiki which pages to write; regenerate the wiki after changing it.
 
 ## Editing
 
