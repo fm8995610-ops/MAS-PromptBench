@@ -17,7 +17,8 @@
 1. [Introduction](#-introduction)
 2. [Code Structure](#-code-structure)
 3. [Quickstart](#-quickstart)
-4. [Referenced Resources](#-referenced-resources)
+4. [How to Extend](#-how-to-extend)
+5. [Referenced Resources](#-referenced-resources)
 
 </details>
 
@@ -120,6 +121,20 @@ python -m optimizers.protocol.aggregate runs/ --out runs/summary.json   # paired
 ```
 
 See [optimizers/README.md](optimizers/README.md).
+
+---
+
+## 🧩 How to Extend
+
+Every piece is written once and reused, so an extension adds only what is new:
+
+| Add a         | What you write                                                                                                      | Guide                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **Dataset**   | a task module in `core/tasks/`, a team spec, thin runners, seed prompts, evaluation IDs and splits, a bridge loader | [Add a Dataset](https://fm8995610-ops.github.io/MAS-PromptBench/docs/extending/add-dataset/)      |
+| **Topology**  | one thin runner per dataset on top of `core/`, a team spec and prompts, bridge adapters                             | [Add a Topology](https://fm8995610-ops.github.io/MAS-PromptBench/docs/extending/add-topology/)    |
+| **Optimizer** | a package `optimizers/<method>/` whose `integration.py` is registered with the run protocol                         | [Add an Optimizer](https://fm8995610-ops.github.io/MAS-PromptBench/docs/extending/add-optimizer/) |
+
+Then run the [tests](tests/golden/README.md): refactors must leave the golden snapshots unchanged.
 
 ---
 
