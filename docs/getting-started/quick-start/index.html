@@ -38,6 +38,7 @@
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.4-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></symbol>
   <symbol id="i-wiki" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 7.2l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z" fill="currentColor"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V19a1.5 1.5 0 0 1-1.5 1.5H15v-5.5H9v5.5H5.5A1.5 1.5 0 0 1 4 19v-7.8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
@@ -55,10 +56,7 @@
     <button class="search-trigger" type="button" aria-label="Search the docs" aria-haspopup="dialog">
       <svg class="i" aria-hidden="true"><use href="#i-search"></use></svg><span class="search-placeholder">Search the docs</span><kbd>/</kbd>
     </button>
-    <nav class="topbar-links" aria-label="Project">
-      <a href="../../results/">Results</a>
-      <a href="https://fm8995610-ops.github.io/MAS-PromptBench/">Project page</a>
-    </nav>
+    <a class="deepwiki-btn project-btn" href="https://fm8995610-ops.github.io/MAS-PromptBench/" title="Project page"><svg class="i" aria-hidden="true"><use href="#i-home"></use></svg><span>Project Page</span></a>
     <a class="deepwiki-btn" href="https://deepwiki.com/fm8995610-ops/MAS-PromptBench" title="Ask questions about the code on DeepWiki"><svg class="i" aria-hidden="true"><use href="#i-wiki"></use></svg><span>Ask DeepWiki</span></a>
     <a class="icon-btn" href="https://github.com/fm8995610-ops/MAS-PromptBench" aria-label="GitHub repository"><svg class="i" aria-hidden="true"><use href="#i-github"></use></svg></a>
     <button class="icon-btn theme-toggle" type="button" aria-label="Switch color theme"><svg class="i" aria-hidden="true"><use href="#i-sun"></use></svg><svg class="i" aria-hidden="true"><use href="#i-moon"></use></svg></button>
@@ -136,22 +134,14 @@
     <span class="nav-label">Optimizers</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../../optimizers/">Overview</a></li>
-  <li><a class="nav-link" href="../../optimizers/gepa/">GEPA</a></li>
-  <li><a class="nav-link" href="../../optimizers/mipro/">MIPRO</a></li>
   <li><a class="nav-link" href="../../optimizers/running/">Run an Optimizer</a></li>
-</ul>
-  </li>
-  <li class="nav-section">
-    <span class="nav-label">Results</span>
-    <ul class="nav-list nav-l1">
-  <li><a class="nav-link" href="../../results/">Results Explorer</a></li>
 </ul>
   </li>
   <li class="nav-section">
     <span class="nav-label">Evaluation</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../../evaluation/protocol/">Evaluation Protocol</a></li>
-  <li><a class="nav-link" href="../../evaluation/results/">Read the Results</a></li>
+  <li><a class="nav-link" href="../../evaluation/outputs/">Read Run Outputs</a></li>
 </ul>
   </li>
   <li class="nav-section">
@@ -168,8 +158,6 @@
   <li><a class="nav-link" href="../../reference/cli/">Command-Line Flags</a></li>
   <li><a class="nav-link" href="../../reference/environment/">Environment Variables</a></li>
   <li><a class="nav-link" href="../../reference/repository/">Repository Map</a></li>
-  <li><a class="nav-link" href="../../reference/known-issues/">Known Issues</a></li>
-  <li><a class="nav-link" href="../../reference/deepwiki/">Ask DeepWiki</a></li>
 </ul>
   </li>
 </ul>
@@ -182,83 +170,116 @@
     </p>
     <article class="prose">
       <h1 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Link to this section">#</a></h1>
-<p class="lede">Score a system with its seed prompts, let GEPA optimize them, and read the gain <span class="arithmatex">\( \Delta \)</span>. The example is the single-agent MATH cell, then the same steps for a multi-agent cell.</p>
+<p class="lede">Score a multi-agent system with its seed prompts, let an optimizer improve them, and read the gain <span class="arithmatex">\( \Delta \)</span>. The example is the Centralized (LangGraph) team on HotpotQA, a cell every one of the eight optimizers covers.</p>
 <div class="facts">
 <div><span>Needs</span>The conda environment</div>
-<div><span>Model</span>Any OpenAI-compatible endpoint</div>
+<div><span>Models</span>Task and reflection endpoints</div>
 <div><span>Run from</span>Repository root</div>
-<div><span>Optimizer</span>GEPA</div>
+<div><span>Optimizer</span>Any of the eight</div>
 </div>
 <p>Finish <a href="../installation/">Installation</a> and <a href="../connect-a-model/">Connect a Model</a> first.</p>
 <h2 id="1-export-the-model-variables">1. Export the model variables<a class="headerlink" href="#1-export-the-model-variables" title="Link to this section">#</a></h2>
-<pre class="highlight"><code class="language-bash">export VLLM_BASE_URL=http://localhost:8000/v1   # or your provider's URL
-export MODEL_ID=Qwen/Qwen3.5-9B
-export OPENAI_API_KEY=EMPTY                      # your key, for a hosted API
+<div class="language-bash highlight"><span class="filename">Runners and optimizers</span><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">VLLM_BASE_URL</span><span class="o">=</span>http://localhost:8000/v1<span class="w">              </span><span class="c1"># task model, for the runners</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">MODEL_ID</span><span class="o">=</span>Qwen/Qwen3.5-9B
 
-export GEPA_TASK_ENDPOINTS=$VLLM_BASE_URL        # the optimizers' task model
-export GEPA_REFL_ENDPOINT=$VLLM_BASE_URL         # GEPA's reflection model
-export TASK_MODEL=$MODEL_ID REFL_MODEL=$MODEL_ID</code></pre>
+<span class="nb">export</span><span class="w"> </span><span class="nv">TASK_ENDPOINTS</span><span class="o">=</span><span class="nv">$VLLM_BASE_URL</span><span class="w">                       </span><span class="c1"># task model, for the optimizer</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">REFLECTION_MODEL_BASE_URL</span><span class="o">=</span>http://localhost:8200/v1<span class="w">  </span><span class="c1"># reflection model</span>
+</code></pre></div>
 <h2 id="2-run-a-baseline">2. Run a baseline<a class="headerlink" href="#2-run-a-baseline" title="Link to this section">#</a></h2>
 <p>Start with the smoke demo, then a real batch. Runners are started as modules from the repository root.</p>
-<pre class="highlight"><code class="language-bash"># smoke demo: one built-in problem, no dataset download
-python -m topologies.single.math.langgraph_math
+<div class="language-bash highlight"><span class="filename">Centralized · HotpotQA</span><pre><span></span><code><span class="c1"># smoke demo: one built-in question, no dataset download</span>
+python<span class="w"> </span>-m<span class="w"> </span>topologies.centralized.langgraph.hotpotqa.langgraph_hotpotqa
 
-# batch on 100 problems, predictions saved as JSONL
-python -m topologies.single.math.langgraph_math --batch --limit 100 \
-  --out results/topologies_baseline/single_math/predictions.jsonl</code></pre>
-<div class="admonition tip">
-<p class="admonition-title">Keep the predictions</p>
-<p>For GPQA, HotpotQA, MATH, LiveCodeBench and APPS, a batch without <code>--out</code> only prints its scores. BFCL, SWE-bench, ToolHop and API-Bank take <code>--out-dir</code> instead. Each task page lists its exact flags.</p>
-</div>
+<span class="c1"># the 100 evaluation questions, one record per question</span>
+python<span class="w"> </span>-m<span class="w"> </span>topologies.centralized.langgraph.hotpotqa.langgraph_hotpotqa<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/quickstart/centralized_hotpotqa
+</code></pre></div>
+<p>The batch writes <code>predictions.jsonl</code> to <code>--out-dir</code> and ends with the exact-match and F1 scores. The first 100 HotpotQA rows are exactly the evaluation IDs, so <code>--limit 100</code> scores the same set every topology reports. Each <a href="../../tasks/">task page</a> lists its flags and how to select its evaluation IDs.</p>
 <h2 id="3-optimize-the-prompts">3. Optimize the prompts<a class="headerlink" href="#3-optimize-the-prompts" title="Link to this section">#</a></h2>
-<p>GEPA runs the same runner on a train split, rewrites the prompt from the traces, and keeps the new prompt only if it scores at least as well on the validation split.</p>
-<pre class="highlight"><code class="language-bash">cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset \
-  --dataset math --topology single \
-  --train-size 25 --val-size 25 --max-full-evals 5 \
-  --out results/gepa/single_math</code></pre>
-<p>Progress is written to <code>status.json</code> in the output folder while it runs. The frozen eval IDs are excluded from the splits by default.</p>
+<p>All eight optimizers run through one command. Pick a method key and start a job:</p>
+<div class="language-bash highlight"><span class="filename">One optimizer job</span><pre><span></span><code><span class="nv">METHOD</span><span class="o">=</span>gepa<span class="w">   </span><span class="c1"># or mipro, mapro, maspo, hivemind, mamut_gepa, maspob, tavo</span>
+python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span><span class="nv">$METHOD</span><span class="w"> </span>--dataset<span class="w"> </span>hotpotqa<span class="w"> </span>--topology<span class="w"> </span>centralized<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/<span class="nv">$METHOD</span>/hotpotqa/centralized/qwen/0
+</code></pre></div>
+<p>The job runs three phases:</p>
+<ol>
+<li><strong>Optimize</strong>: the method searches for better role prompts with 600 usable rollouts of the real runner on the fixed <code>train</code> and <code>validation</code> splits.</li>
+<li><strong>Validate</strong>: seed and best prompts run on the whole validation split. The best prompts are deployed only if they score strictly higher; otherwise the seeds stay.</li>
+<li><strong>Test</strong>: seed and deployed prompts run on the held-out <code>test</code> split, the same 100 questions as the baseline.</li>
+</ol>
+<p>A full job takes many model calls, and progress goes to stderr. If a job stops during validation or test, rerun the same command to resume; an interrupted optimization phase needs a fresh <code>--out</code>. <a href="../../optimizers/running/">Run an Optimizer</a> covers budgets, phases and the method settings.</p>
 <h2 id="4-read-the-result">4. Read the result<a class="headerlink" href="#4-read-the-result" title="Link to this section">#</a></h2>
-<pre class="highlight"><code class="language-bash">python - &lt;&lt;'EOF'
-import json
-m = json.load(open("results/gepa/single_math/meta.json"))
-print(f"baseline {m['baseline_score']:.3f}  optimized {m['compiled_score']:.3f}  "
-      f"delta {100 * m['delta']:+.1f} pp  kept: {m['selected_prompt_source']}")
-EOF</code></pre>
-<p>Scores are fractions; multiply by 100 for percentage points. The paper reports Single MATH going from 49.0 to 51.0 (+2.0). If the compiled prompt loses on validation, <code>selected_prompt_source</code> is <code>baseline</code> and the seed prompt is kept. The optimized prompts are in <code>compiled/</code>, one text file per role. <a href="../../evaluation/results/">Read the Results</a> explains every file.</p>
-<h2 id="5-try-a-multi-agent-cell">5. Try a multi-agent cell<a class="headerlink" href="#5-try-a-multi-agent-cell" title="Link to this section">#</a></h2>
-<p>The same four steps work for any cell. Here is the paper's largest gain, Sequential (CrewAI) on BFCL, and its largest drop, Independent on MATH.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Sequential · BFCL</label><label for="__tabbed_1_2">Independent · MATH</label></div>
+<p>The job prints one JSON line when it ends:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>baseline_mean</code></td>
+<td>Test score of the seed prompts, as a fraction</td>
+</tr>
+<tr>
+<td><code>deployed_mean</code></td>
+<td>Test score of the deployed prompts</td>
+</tr>
+<tr>
+<td><code>delta_pp</code></td>
+<td><span class="arithmatex">\( \Delta \)</span>, in percentage points</td>
+</tr>
+<tr>
+<td><code>fallback_reason</code></td>
+<td><code>null</code> when the optimized prompts were deployed; else why the seeds stayed, such as <code>validation_tie</code> or <code>validation_regression</code></td>
+</tr>
+<tr>
+<td><code>valid_for_aggregation</code></td>
+<td><code>false</code> if a test record was unusable (an infrastructure failure); the scores are then <code>null</code></td>
+</tr>
+</tbody>
+</table>
+<p>The same values, with per-example scores, are in <code>result.json</code> under <code>--out</code>. Run seeds 1 and 2 the same way, then pair the three seeds per cell:</p>
+<div class="language-bash highlight"><span class="filename">Summarize seeds 0 to 2</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.aggregate<span class="w"> </span>runs/<span class="w"> </span>--out<span class="w"> </span>runs/summary.json
+</code></pre></div>
+<p><a href="../../evaluation/outputs/">Read Run Outputs</a> explains every file a job writes.</p>
+<h2 id="5-try-another-cell">5. Try another cell<a class="headerlink" href="#5-try-another-cell" title="Link to this section">#</a></h2>
+<p>The same steps work for any cell. The runner module picks the baseline; the protocol flags pick the same cell for the optimizer.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Sequential (CrewAI) · BFCL</label><label for="__tabbed_1_2">Team of 8 · HotpotQA</label><label for="__tabbed_1_3">Structured messages · LiveCodeBench</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<pre class="highlight"><code class="language-bash"># baseline: BFCL always runs a batch and takes --out-dir
-python -m topologies.sequential.crewai.bfcl.crewai_bfcl --limit 100 \
-  --out-dir results/topologies_baseline/sequential_crewai_bfcl
+<div class="language-bash highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>topologies.sequential.crewai.bfcl.crewai_bfcl<span class="w"> </span>--category<span class="w"> </span>simple<span class="w"> </span>--limit<span class="w"> </span><span class="m">20</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/quickstart/sequential_crewai_bfcl_simple
 
-# optimize
-cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset \
-  --dataset bfcl --topology sequential_crewai \
-  --train-size 25 --val-size 25 --max-full-evals 5 \
-  --out results/gepa/sequential_crewai_bfcl</code></pre>
+python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span><span class="nv">$METHOD</span><span class="w"> </span>--dataset<span class="w"> </span>bfcl<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--topology<span class="w"> </span>sequential<span class="w"> </span>--framework<span class="w"> </span>crewai<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/<span class="nv">$METHOD</span>/bfcl/sequential_crewai/qwen/0
+</code></pre></div>
 </div>
 <div class="tabbed-block">
-<pre class="highlight"><code class="language-bash"># baseline: four replicas, outputs aggregated
-python -m topologies.independent.math.langgraph_math --batch --limit 100 \
-  --out results/topologies_baseline/independent_math/predictions.jsonl
+<div class="language-bash highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>teamsizes.centralized.hotpotqa.hotpotqa_r8<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/quickstart/centralized_hotpotqa_r8
 
-# optimize: match the runner's four agents
-cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset \
-  --dataset math --topology independent --n-agents 4 \
-  --train-size 25 --val-size 25 --max-full-evals 5 \
-  --out results/gepa/independent_math</code></pre>
+python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span><span class="nv">$METHOD</span><span class="w"> </span>--dataset<span class="w"> </span>hotpotqa<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--topology<span class="w"> </span>centralized<span class="w"> </span>--team-size<span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/<span class="nv">$METHOD</span>/hotpotqa/centralized_r8/qwen/0
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-bash highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>communications.sequential.lcb.lcb_structured_soft<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/quickstart/sequential_lcb_structured_soft
+
+python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span><span class="nv">$METHOD</span><span class="w"> </span>--dataset<span class="w"> </span>lcb<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--topology<span class="w"> </span>sequential<span class="w"> </span>--communication<span class="w"> </span>structured_soft<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/<span class="nv">$METHOD</span>/lcb/sequential_structured_soft/qwen/0
+</code></pre></div>
 </div>
 </div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Match the team the runner uses</p>
-<p>The optimizer pilots default to <code>--n-agents 2 --n-rounds 1</code>, which they apply to Independent and Decentralized cells. The runners use 4 agents, and Decentralized runs 2 rounds. Pass <code>--n-agents 4</code> (and <code>--n-rounds 2</code> for Decentralized) to optimize the same team you evaluate.</p>
+<div class="admonition note">
+<p class="admonition-title">The experiment grid</p>
+<p>The protocol refuses a cell outside its experiment grid unless you pass <code>--allow-any-cell</code>, and such a job is reported as non-conformant. The three cells above are in the grid for GEPA, MIPRO, MAPRO and MASPO. HiveMind, MAMUT-GEPA, MASPOB and TAVO cover the four multi-agent LangGraph teams of HotpotQA, LiveCodeBench and BFCL, with freeform messages and four agents.</p>
 </div>
 <h2 id="where-to-go-next">Where to go next<a class="headerlink" href="#where-to-go-next" title="Link to this section">#</a></h2>
 <div class="cards">
@@ -268,9 +289,9 @@ python -m real_runner_gepa.pilots.run_gepa_dataset \
 <li><a href="../../mas/topologies/">Workflow Topologies</a>
   How the five topologies route work between agents.</li>
 <li><a href="../../optimizers/running/">Run an Optimizer</a>
-  Sweeps, budgets and topology names for GEPA and MIPRO.</li>
-<li><a href="../../reference/deepwiki/">Ask DeepWiki</a>
-  Ask questions about the code in plain language.</li>
+  Budgets, phases and settings for the eight optimizers.</li>
+<li><a href="../../reference/cli/">Command-Line Flags</a>
+  Every runner and run-protocol flag, with defaults.</li>
 </ul>
 </div>
     </article>
@@ -302,7 +323,7 @@ python -m real_runner_gepa.pilots.run_gepa_dataset \
       </li>
       <li><a href="#4-read-the-result">4. Read the result</a>
       </li>
-      <li><a href="#5-try-a-multi-agent-cell">5. Try a multi-agent cell</a>
+      <li><a href="#5-try-another-cell">5. Try another cell</a>
       </li>
       <li><a href="#where-to-go-next">Where to go next</a>
       </li>

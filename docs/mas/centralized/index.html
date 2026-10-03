@@ -38,6 +38,7 @@
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.4-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></symbol>
   <symbol id="i-wiki" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 7.2l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z" fill="currentColor"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V19a1.5 1.5 0 0 1-1.5 1.5H15v-5.5H9v5.5H5.5A1.5 1.5 0 0 1 4 19v-7.8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
@@ -55,10 +56,7 @@
     <button class="search-trigger" type="button" aria-label="Search the docs" aria-haspopup="dialog">
       <svg class="i" aria-hidden="true"><use href="#i-search"></use></svg><span class="search-placeholder">Search the docs</span><kbd>/</kbd>
     </button>
-    <nav class="topbar-links" aria-label="Project">
-      <a href="../../results/">Results</a>
-      <a href="https://fm8995610-ops.github.io/MAS-PromptBench/">Project page</a>
-    </nav>
+    <a class="deepwiki-btn project-btn" href="https://fm8995610-ops.github.io/MAS-PromptBench/" title="Project page"><svg class="i" aria-hidden="true"><use href="#i-home"></use></svg><span>Project Page</span></a>
     <a class="deepwiki-btn" href="https://deepwiki.com/fm8995610-ops/MAS-PromptBench" title="Ask questions about the code on DeepWiki"><svg class="i" aria-hidden="true"><use href="#i-wiki"></use></svg><span>Ask DeepWiki</span></a>
     <a class="icon-btn" href="https://github.com/fm8995610-ops/MAS-PromptBench" aria-label="GitHub repository"><svg class="i" aria-hidden="true"><use href="#i-github"></use></svg></a>
     <button class="icon-btn theme-toggle" type="button" aria-label="Switch color theme"><svg class="i" aria-hidden="true"><use href="#i-sun"></use></svg><svg class="i" aria-hidden="true"><use href="#i-moon"></use></svg></button>
@@ -136,22 +134,14 @@
     <span class="nav-label">Optimizers</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../../optimizers/">Overview</a></li>
-  <li><a class="nav-link" href="../../optimizers/gepa/">GEPA</a></li>
-  <li><a class="nav-link" href="../../optimizers/mipro/">MIPRO</a></li>
   <li><a class="nav-link" href="../../optimizers/running/">Run an Optimizer</a></li>
-</ul>
-  </li>
-  <li class="nav-section">
-    <span class="nav-label">Results</span>
-    <ul class="nav-list nav-l1">
-  <li><a class="nav-link" href="../../results/">Results Explorer</a></li>
 </ul>
   </li>
   <li class="nav-section">
     <span class="nav-label">Evaluation</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../../evaluation/protocol/">Evaluation Protocol</a></li>
-  <li><a class="nav-link" href="../../evaluation/results/">Read the Results</a></li>
+  <li><a class="nav-link" href="../../evaluation/outputs/">Read Run Outputs</a></li>
 </ul>
   </li>
   <li class="nav-section">
@@ -168,8 +158,6 @@
   <li><a class="nav-link" href="../../reference/cli/">Command-Line Flags</a></li>
   <li><a class="nav-link" href="../../reference/environment/">Environment Variables</a></li>
   <li><a class="nav-link" href="../../reference/repository/">Repository Map</a></li>
-  <li><a class="nav-link" href="../../reference/known-issues/">Known Issues</a></li>
-  <li><a class="nav-link" href="../../reference/deepwiki/">Ask DeepWiki</a></li>
 </ul>
   </li>
 </ul>
@@ -193,14 +181,14 @@
 </div>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Link to this section">#</a></h2>
 <ol>
-<li>The manager receives the task. Its seed prompt is extended with an instruction to end its final message with the word <code>TERMINATE</code>.</li>
+<li>The manager receives the task. Its seed prompt is extended with an instruction to end its final message with the word <code>TERMINATE</code> and a note naming its workers.</li>
 <li>The manager picks one worker and gives it an instruction.</li>
 <li>The worker runs, using the dataset's tools where it has them, and its reply goes back to the manager.</li>
 <li>Control returns to the manager after every worker turn. The manager may delegate again, call a task tool itself, or finish.</li>
 <li>The loop stops when the manager writes <code>TERMINATE</code> or the turn cap is reached.</li>
 <li>The runner extracts and scores the answer from the manager's final message.</li>
 </ol>
-<p>The cap is the same in both frameworks (LangGraph <code>MAX_TURNS</code>, AutoGen <code>MaxMessageTermination</code>): 16 for GPQA, 18 for MATH and HotpotQA, 24 for BFCL, 26 for LiveCodeBench and APPS, 30 for SWE-bench.</p>
+<p>The cap comes from the team spec and is the same in both frameworks (LangGraph <code>MAX_TURNS</code>, AutoGen <code>MaxMessageTermination</code>): 16 for GPQA, 18 for MATH and HotpotQA, 24 for BFCL, 26 for LiveCodeBench and APPS, 30 for SWE-bench.</p>
 <p>Workers see the shared conversation, not only the manager's latest instruction. The role descriptions in <code>roles.yaml</code> describe stricter isolation; the comment there explains that AutoGen's <code>SelectorGroupChat</code> shares one transcript, and the LangGraph runners also pass the full message state to each worker.</p>
 <h2 id="roles-and-seed-prompts">Roles and seed prompts<a class="headerlink" href="#roles-and-seed-prompts" title="Link to this section">#</a></h2>
 <p>Each dataset has a <code>manager</code> and three workers:</p>
@@ -246,7 +234,7 @@
 </tr>
 </tbody>
 </table>
-<p>Seed prompts live at <code>configs/prompts/centralized/&lt;dataset&gt;/manager.txt</code> and <code>configs/prompts/centralized/&lt;dataset&gt;/&lt;worker&gt;.txt</code>. Each folder also holds <code>manager_r8.txt</code>, <code>manager_r10.txt</code> and seven more workers, used only by the larger <a href="../team-sizes/">team sizes</a>. Role descriptions are under <code>centralized:</code> in <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/prompts/roles.yaml"><code>configs/prompts/roles.yaml</code></a>.</p>
+<p>Seed prompts live at <code>configs/prompts/centralized/&lt;dataset&gt;/manager.txt</code> and <code>configs/prompts/centralized/&lt;dataset&gt;/&lt;worker&gt;.txt</code>. Each folder also holds <code>manager_r8.txt</code>, <code>manager_r10.txt</code> and six more workers, used only by the larger <a href="../team-sizes/">team sizes</a>. The workers, their tools, the manager's tools and the turn caps come from the team spec in <code>configs/teams/&lt;dataset&gt;.yaml</code>; ToolHop and API-Bank fix their roles in code. Role descriptions are under <code>centralized:</code> in <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/prompts/roles.yaml"><code>configs/prompts/roles.yaml</code></a>.</p>
 <h2 id="implementations">Implementations<a class="headerlink" href="#implementations" title="Link to this section">#</a></h2>
 <h3 id="langgraph">LangGraph<a class="headerlink" href="#langgraph" title="Link to this section">#</a></h3>
 <p><code>topologies/centralized/langgraph/&lt;dataset&gt;/langgraph_&lt;dataset&gt;.py</code> builds a <code>StateGraph</code> with a <code>manager</code> node, a <code>manager_tools</code> node (<code>ToolNode</code>) and one node per worker. The manager is bound to one <code>delegate_to_&lt;worker&gt;</code> tool per worker and, on every dataset except BFCL, to the task tools as well. When the manager calls a delegate tool, a conditional edge routes to that worker; each worker is a <code>create_react_agent</code> node with a plain edge back to <code>manager</code>. A router ends the graph on <code>TERMINATE</code> or at <code>MAX_TURNS</code>.</p>
@@ -255,107 +243,56 @@
 <p><a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/topologies/centralized/autogen/autogen_base.py"><code>topologies/centralized/autogen/autogen_base.py</code></a> is the reference demo of this pattern: a <code>PlanningAgent</code> with <code>Researcher</code>, <code>Analyst</code> and <code>Writer</code> workers.</p>
 <div class="admonition note">
 <p class="admonition-title">ToolHop and API-Bank</p>
-<p>These runners use no framework objects, and both variants run identical code. Each worker runs once on the task, then the manager reads all three reports and writes the answer. There is no delegation loop.</p>
+<p>These runners use no framework objects, and the AutoGen runner is the LangGraph runner's code under the <code>centralized_autogen</code> label. Each worker runs once on the task, then the manager reads all three reports and writes the answer. There is no delegation loop.</p>
 </div>
 <h2 id="run-it">Run it<a class="headerlink" href="#run-it" title="Link to this section">#</a></h2>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">LangGraph</label><label for="__tabbed_1_2">AutoGen</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<pre class="highlight"><code class="language-bash">python -m topologies.centralized.langgraph.hotpotqa.langgraph_hotpotqa --batch --limit 100 \
-  --out results/topologies_baseline/centralized_langgraph_hotpotqa/predictions.jsonl</code></pre>
+<div class="language-bash highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>topologies.centralized.langgraph.hotpotqa.langgraph_hotpotqa<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/topologies_baseline/centralized_langgraph_hotpotqa
+</code></pre></div>
 </div>
 <div class="tabbed-block">
-<pre class="highlight"><code class="language-bash">python -m topologies.centralized.autogen.hotpotqa.autogen_hotpotqa --batch --limit 100 \
-  --out results/topologies_baseline/centralized_autogen_hotpotqa/predictions.jsonl</code></pre>
+<div class="language-bash highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>topologies.centralized.autogen.hotpotqa.autogen_hotpotqa<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/topologies_baseline/centralized_autogen_hotpotqa
+</code></pre></div>
 </div>
 </div>
 </div>
-<p>Drop <code>--batch</code> and the other flags to run the built-in smoke demo. BFCL, SWE-bench, ToolHop and API-Bank use <code>--out-dir</code>; see <a href="../../reference/cli/">Command-Line Flags</a>.</p>
+<p>Drop <code>--batch</code> and the other flags to run the built-in smoke demo. See the <a href="../../tasks/">task pages</a> for each dataset's options.</p>
 <h2 id="optimize-it">Optimize it<a class="headerlink" href="#optimize-it" title="Link to this section">#</a></h2>
 <table>
 <thead>
 <tr>
-<th>Optimizer topology name</th>
+<th>Protocol flags</th>
 <th>What it runs</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>centralized</code></td>
+<td><code>--topology centralized</code></td>
 <td>the LangGraph team</td>
 </tr>
 <tr>
-<td><code>centralized_autogen</code></td>
-<td>the AutoGen team</td>
+<td><code>--topology centralized --framework autogen</code></td>
+<td>the AutoGen team (<code>centralized_autogen</code>)</td>
 </tr>
 <tr>
-<td><code>centralized_r2</code>, <code>centralized_r4</code>, <code>centralized_r8</code>, <code>centralized_r10</code></td>
-<td>team-size variants (HotpotQA, LiveCodeBench, ToolHop, API-Bank)</td>
+<td><code>--topology centralized --team-size N</code></td>
+<td>the manager with N − 1 workers (<code>centralized_r&lt;N&gt;</code>)</td>
 </tr>
 <tr>
-<td><code>centralized_communications_&lt;format&gt;</code></td>
-<td><a href="../communication-protocols/">communication-protocol</a> variants (same four datasets)</td>
+<td><code>--topology centralized --communication FORMAT</code></td>
+<td>a <a href="../communication-protocols/">communication-protocol</a> variant (<code>centralized_communications_&lt;format&gt;</code>)</td>
 </tr>
 </tbody>
 </table>
-<p>The optimizer tunes the manager prompt and all three worker prompts.</p>
-<pre class="highlight"><code class="language-bash">cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset --dataset hotpotqa \
-  --topology centralized_autogen --train-size 25 --val-size 25 --max-full-evals 5 \
-  --out results/gepa/centralized_autogen_hotpotqa</code></pre>
-<h2 id="results">Results<a class="headerlink" href="#results" title="Link to this section">#</a></h2>
-<p>GEPA's gain on each of the nine tasks with the Centralized topology, as reported in the paper. Bars grow right for a gain and left for a regression, on the same scale on every topology page. <a href="../../results/">Compare all topologies</a>.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Topology study</label><label for="__tabbed_2_2">Framework study · AutoGen</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<p><div class="dbars-wrap ">
-<table class="dbars"><caption>Centralized: GEPA gain on each task, topology study. Average +1.6 points.</caption>
-<thead><tr><th scope="col">Task</th><th scope="col" class="bar-col">Gain (Δ, points)</th><th scope="col" class="num">Δ</th><th scope="col" class="num scores">Baseline → optimized</th></tr></thead>
-<tbody>
-<tr class="dgroup"><th scope="rowgroup" colspan="4">Reasoning</th></tr>
-<tr data-tip="GPQA-Diamond · Accuracy · 0.0 points"><th scope="row">GPQA-Diamond<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar zero" style="left:40.48%"></i></span></td><td class="num d-txt-z">0.0</td><td class="num scores">70.0 → 70.0</td></tr>
-<tr data-tip="HotpotQA · Exact match · −9.0 points"><th scope="row">HotpotQA<small>Exact match</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar neg" style="left:19.05%;width:21.43%"></i></span></td><td class="num d-txt-l">−9.0</td><td class="num scores">19.0 → 10.0</td></tr>
-<tr data-tip="MATH · Accuracy · +3.0 points"><th scope="row">MATH<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:7.14%"></i></span></td><td class="num d-txt-g">+3.0</td><td class="num scores">66.0 → 69.0</td></tr>
-<tr class="dgroup"><th scope="rowgroup" colspan="4">Coding</th></tr>
-<tr data-tip="LiveCodeBench · pass@1 · 0.0 points"><th scope="row">LiveCodeBench<small>pass@1</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar zero" style="left:40.48%"></i></span></td><td class="num d-txt-z">0.0</td><td class="num scores">16.0 → 16.0</td></tr>
-<tr data-tip="APPS · pass@1 · +14.0 points"><th scope="row">APPS<small>pass@1</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:33.33%"></i></span></td><td class="num d-txt-g">+14.0</td><td class="num scores">70.0 → 84.0</td></tr>
-<tr data-tip="SWE-bench Verified · Resolved · +3.3 points"><th scope="row">SWE-bench Verified<small>Resolved</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:7.86%"></i></span></td><td class="num d-txt-g">+3.3</td><td class="num scores">30.0 → 33.3</td></tr>
-<tr class="dgroup"><th scope="rowgroup" colspan="4">Tool-Calling</th></tr>
-<tr data-tip="BFCL · Accuracy · +4.0 points"><th scope="row">BFCL<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:9.52%"></i></span></td><td class="num d-txt-g">+4.0</td><td class="num scores">92.0 → 96.0</td></tr>
-<tr data-tip="ToolHop · Accuracy · +4.0 points"><th scope="row">ToolHop<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:9.52%"></i></span></td><td class="num d-txt-g">+4.0</td><td class="num scores">66.0 → 70.0</td></tr>
-<tr data-tip="API-Bank · Accuracy · −5.0 points"><th scope="row">API-Bank<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar neg" style="left:28.57%;width:11.90%"></i></span></td><td class="num d-txt-l">−5.0</td><td class="num scores">77.0 → 72.0</td></tr>
-</tbody>
-</table>
-</div></p>
-</div>
-<div class="tabbed-block">
-<p><div class="dbars-wrap ">
-<table class="dbars"><caption>Centralized (AutoGen): GEPA gain on each task, framework study. Average +2.6 points.</caption>
-<thead><tr><th scope="col">Task</th><th scope="col" class="bar-col">Gain (Δ, points)</th><th scope="col" class="num">Δ</th><th scope="col" class="num scores">Baseline → optimized</th></tr></thead>
-<tbody>
-<tr class="dgroup"><th scope="rowgroup" colspan="4">Reasoning</th></tr>
-<tr data-tip="GPQA-Diamond · Accuracy · 0.0 points"><th scope="row">GPQA-Diamond<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar zero" style="left:40.48%"></i></span></td><td class="num d-txt-z">0.0</td><td class="num scores">74.0 → 74.0</td></tr>
-<tr data-tip="HotpotQA · Exact match · +2.0 points"><th scope="row">HotpotQA<small>Exact match</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:4.76%"></i></span></td><td class="num d-txt-g">+2.0</td><td class="num scores">20.0 → 22.0</td></tr>
-<tr data-tip="MATH · Accuracy · +6.0 points"><th scope="row">MATH<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:14.29%"></i></span></td><td class="num d-txt-g">+6.0</td><td class="num scores">63.0 → 69.0</td></tr>
-<tr class="dgroup"><th scope="rowgroup" colspan="4">Coding</th></tr>
-<tr data-tip="LiveCodeBench · pass@1 · +2.0 points"><th scope="row">LiveCodeBench<small>pass@1</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:4.76%"></i></span></td><td class="num d-txt-g">+2.0</td><td class="num scores">14.0 → 16.0</td></tr>
-<tr data-tip="APPS · pass@1 · +14.0 points"><th scope="row">APPS<small>pass@1</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:33.33%"></i></span></td><td class="num d-txt-g">+14.0</td><td class="num scores">62.0 → 76.0</td></tr>
-<tr data-tip="SWE-bench Verified · Resolved · +3.3 points"><th scope="row">SWE-bench Verified<small>Resolved</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:7.86%"></i></span></td><td class="num d-txt-g">+3.3</td><td class="num scores">16.7 → 20.0</td></tr>
-<tr class="dgroup"><th scope="rowgroup" colspan="4">Tool-Calling</th></tr>
-<tr data-tip="BFCL · Accuracy · 0.0 points"><th scope="row">BFCL<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar zero" style="left:40.48%"></i></span></td><td class="num d-txt-z">0.0</td><td class="num scores">96.0 → 96.0</td></tr>
-<tr data-tip="ToolHop · Accuracy · +1.0 points"><th scope="row">ToolHop<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:2.38%"></i></span></td><td class="num d-txt-g">+1.0</td><td class="num scores">68.0 → 69.0</td></tr>
-<tr data-tip="API-Bank · Accuracy · −5.0 points"><th scope="row">API-Bank<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar neg" style="left:28.57%;width:11.90%"></i></span></td><td class="num d-txt-l">−5.0</td><td class="num scores">77.0 → 72.0</td></tr>
-</tbody>
-</table>
-</div></p>
-</div>
-</div>
-</div>
-<p>Centralized averaged +1.6 points with GEPA. The average hides how strongly the manager amplifies a prompt change in either direction. On HotpotQA, optimization gained +5.0 with two agents and lost −12.0 with ten (see <a href="../team-sizes/">Team Sizes</a>).</p>
-<div class="admonition takeaway">
-<p class="admonition-title">Takeaway</p>
-<p>A central manager amplifies both the wins and the losses of prompt optimization.</p>
-</div>
+<p>The optimizer tunes the manager prompt and every worker prompt. Any of the eight methods runs it; for example, TAVO on LiveCodeBench:</p>
+<div class="language-bash highlight"><span class="filename">TAVO on Centralized · LiveCodeBench</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span>tavo<span class="w"> </span>--dataset<span class="w"> </span>lcb<span class="w"> </span>--topology<span class="w"> </span>centralized<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/tavo/lcb/centralized/qwen/0
+</code></pre></div>
+<p>See <a href="../../optimizers/running/">Run an Optimizer</a>.</p>
     </article>
     <div class="page-meta">
       <a class="edit-link" href="https://github.com/fm8995610-ops/MAS-PromptBench/edit/main/docs/content/mas/centralized.md"><svg class="i" aria-hidden="true"><use href="#i-edit"></use></svg>Edit this page on GitHub</a>
@@ -388,8 +325,6 @@ python -m real_runner_gepa.pilots.run_gepa_dataset --dataset hotpotqa \
       <li><a href="#run-it">Run it</a>
       </li>
       <li><a href="#optimize-it">Optimize it</a>
-      </li>
-      <li><a href="#results">Results</a>
       </li>
     </ul>
   </aside>

@@ -151,9 +151,7 @@ kbd {
 }
 .search-trigger:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
 .search-trigger kbd { margin-left: auto; }
-.topbar-links { display: flex; gap: .2rem; margin-left: auto; }
-.topbar-links a { color: var(--muted); font-weight: 600; font-size: .88rem; padding: .4rem .7rem; border-radius: 999px; }
-.topbar-links a:hover { color: var(--blue); background: var(--chip-bg); text-decoration: none; }
+.project-btn { margin-left: auto; }
 .deepwiki-btn {
   display: inline-flex; align-items: center; gap: .45rem; white-space: nowrap;
   border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 600; font-size: .86rem;
@@ -197,7 +195,11 @@ kbd {
 .sidebar-head { display: none; }
 .nav-list { list-style: none; margin: 0; padding: 0; }
 .nav-l0 > li + li { margin-top: .2rem; }
-.nav-l0 > .nav-section { margin-top: 1.25rem !important; }
+/* each top-level section is its own block: a divider above, a darker label,
+   and its pages indented on a guide line so they read as that section's children */
+.nav-l0 > .nav-section { margin-top: 1rem !important; padding-top: 1rem; border-top: 1px solid var(--line); }
+.nav-l0 > .nav-section > .nav-label { color: var(--ink); }
+.nav-l0 > .nav-section > .nav-l1 { margin-left: .75rem; padding-left: .5rem; border-left: 1px solid var(--line); }
 .nav-l1 > li + li { margin-top: .05rem; }
 .nav-label {
   display: block; font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
@@ -213,7 +215,7 @@ kbd {
 .nav-l2 .nav-link { font-size: .89rem; padding-block: .34rem; }
 .sidebar details > summary {
   list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
-  color: var(--ink); font-size: .92rem; font-weight: 600; padding: .42rem .75rem; border-radius: 10px;
+  color: var(--body); font-size: .92rem; font-weight: 500; padding: .42rem .75rem; border-radius: 10px;
 }
 .sidebar details > summary::-webkit-details-marker { display: none; }
 .sidebar details > summary:hover { background: var(--surface-2); }
@@ -292,7 +294,7 @@ kbd {
 
 /* ---------- code blocks ---------- */
 .highlight {
-  position: relative; margin: 1.2rem 0 1.5rem; background: var(--code-bg); border-radius: 14px;
+  position: relative; margin: 1.2rem 0 1.5rem; background: var(--code-bg); color: var(--code-ink); border-radius: 14px;
   box-shadow: 0 1px 2px rgba(15, 27, 45, .12), 0 10px 28px rgba(15, 27, 45, .13); overflow: hidden;
 }
 .code-bar {
@@ -474,8 +476,8 @@ kbd {
   -webkit-mask: var(--wiki) center / contain no-repeat; mask: var(--wiki) center / contain no-repeat;
   --wiki: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Cpath d='M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15ZM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5'/%3E%3C/svg%3E");
 }
-.hero-meta { display: flex; flex-wrap: wrap; gap: .35rem 1.2rem; margin-top: 1.7rem; font-size: .88rem; color: var(--muted); }
-.hero-meta b { color: var(--ink); font-weight: 750; margin-right: .2rem; font-variant-numeric: tabular-nums; }
+.hero-meta { display: flex; flex-wrap: wrap; gap: .45rem 1.5rem; margin-top: 1.8rem; font-size: 1rem; color: var(--muted); }
+.hero-meta b { color: var(--ink); font-size: 1.15em; font-weight: 750; margin-right: .25rem; font-variant-numeric: tabular-nums; }
 .glance {
   display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1px; margin: 1.6rem 0 1rem;
   background: var(--line); border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
@@ -519,6 +521,23 @@ kbd {
 .topo-diagram .t-small { font-size: 11px; font-weight: 500; fill: var(--muted); }
 .topo-diagram .t-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; fill: var(--tc); }
 .topo-diagram .t-small.t-on { fill: #ffffff; opacity: .82; }
+
+/* build-in on first view and flowing messages (docs.js adds the classes; off with reduced motion) */
+.topo-diagram.is-anim rect, .topo-diagram.is-anim text, .topo-diagram.is-anim .head,
+.topo-diagram.is-anim .head-io, .topo-diagram.is-anim .edge-soft {
+  transform-box: fill-box;
+  transition: opacity .5s ease var(--d, 0ms), transform .5s cubic-bezier(.2, .7, .2, 1) var(--d, 0ms);
+}
+.topo-diagram.is-anim:not(.is-in) rect, .topo-diagram.is-anim:not(.is-in) text, .topo-diagram.is-anim:not(.is-in) .head,
+.topo-diagram.is-anim:not(.is-in) .head-io, .topo-diagram.is-anim:not(.is-in) .edge-soft { opacity: 0; transform: translateY(6px); }
+.topo-diagram.is-anim .edge, .topo-diagram.is-anim .edge-io {
+  stroke-dasharray: var(--len) var(--len); transition: stroke-dashoffset .7s cubic-bezier(.4, 0, .2, 1) var(--d, 0ms);
+}
+.topo-diagram.is-anim:not(.is-in) .edge, .topo-diagram.is-anim:not(.is-in) .edge-io { stroke-dashoffset: var(--len); }
+.topo-diagram .flow-dot { fill: var(--tc); opacity: 0; pointer-events: none; filter: drop-shadow(0 0 3px var(--tc)); }
+.topo-diagram .flow-dot-io { fill: var(--muted); filter: none; }
+.facts.is-anim > div { transition: opacity .45s ease var(--d, 0ms), transform .45s cubic-bezier(.2, .7, .2, 1) var(--d, 0ms); }
+.facts.is-anim:not(.is-in) > div { opacity: 0; transform: translateY(8px); }
 
 /* ---------- results: headline figures ---------- */
 .hfigs {
@@ -688,8 +707,6 @@ mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; padding: .
 @media (max-width: 1240px) {
   .layout, .layout.no-toc { grid-template-columns: 248px minmax(0, 1fr); gap: 40px; }
   .toc { display: none; }
-  .topbar-links { display: none; }
-  .deepwiki-btn { margin-left: auto; }
 }
 @media (max-width: 960px) {
   .layout, .layout.no-toc { grid-template-columns: minmax(0, 1fr); padding-inline: 16px; }
@@ -707,7 +724,8 @@ mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; padding: .
   .scrim { position: fixed; inset: 0; z-index: 55; background: var(--scrim); }
   .search-trigger { width: auto; margin-left: auto; padding: .42rem .7rem; }
   .search-trigger .search-placeholder, .search-trigger kbd { display: none; }
-  .deepwiki-btn { margin-left: 0; padding: .4rem .7rem; }
+  .deepwiki-btn { padding: .4rem .7rem; }
+  .project-btn { margin-left: 0; }
   .content { padding-block: 26px 40px; }
   .home-hero { padding: 10px 0 18px; }
   .home-hero::before { left: -40px; right: -40px; }

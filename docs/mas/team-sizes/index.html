@@ -38,6 +38,7 @@
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.4-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></symbol>
   <symbol id="i-wiki" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 7.2l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z" fill="currentColor"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V19a1.5 1.5 0 0 1-1.5 1.5H15v-5.5H9v5.5H5.5A1.5 1.5 0 0 1 4 19v-7.8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
@@ -55,10 +56,7 @@
     <button class="search-trigger" type="button" aria-label="Search the docs" aria-haspopup="dialog">
       <svg class="i" aria-hidden="true"><use href="#i-search"></use></svg><span class="search-placeholder">Search the docs</span><kbd>/</kbd>
     </button>
-    <nav class="topbar-links" aria-label="Project">
-      <a href="../../results/">Results</a>
-      <a href="https://fm8995610-ops.github.io/MAS-PromptBench/">Project page</a>
-    </nav>
+    <a class="deepwiki-btn project-btn" href="https://fm8995610-ops.github.io/MAS-PromptBench/" title="Project page"><svg class="i" aria-hidden="true"><use href="#i-home"></use></svg><span>Project Page</span></a>
     <a class="deepwiki-btn" href="https://deepwiki.com/fm8995610-ops/MAS-PromptBench" title="Ask questions about the code on DeepWiki"><svg class="i" aria-hidden="true"><use href="#i-wiki"></use></svg><span>Ask DeepWiki</span></a>
     <a class="icon-btn" href="https://github.com/fm8995610-ops/MAS-PromptBench" aria-label="GitHub repository"><svg class="i" aria-hidden="true"><use href="#i-github"></use></svg></a>
     <button class="icon-btn theme-toggle" type="button" aria-label="Switch color theme"><svg class="i" aria-hidden="true"><use href="#i-sun"></use></svg><svg class="i" aria-hidden="true"><use href="#i-moon"></use></svg></button>
@@ -136,22 +134,14 @@
     <span class="nav-label">Optimizers</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../../optimizers/">Overview</a></li>
-  <li><a class="nav-link" href="../../optimizers/gepa/">GEPA</a></li>
-  <li><a class="nav-link" href="../../optimizers/mipro/">MIPRO</a></li>
   <li><a class="nav-link" href="../../optimizers/running/">Run an Optimizer</a></li>
-</ul>
-  </li>
-  <li class="nav-section">
-    <span class="nav-label">Results</span>
-    <ul class="nav-list nav-l1">
-  <li><a class="nav-link" href="../../results/">Results Explorer</a></li>
 </ul>
   </li>
   <li class="nav-section">
     <span class="nav-label">Evaluation</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../../evaluation/protocol/">Evaluation Protocol</a></li>
-  <li><a class="nav-link" href="../../evaluation/results/">Read the Results</a></li>
+  <li><a class="nav-link" href="../../evaluation/outputs/">Read Run Outputs</a></li>
 </ul>
   </li>
   <li class="nav-section">
@@ -168,8 +158,6 @@
   <li><a class="nav-link" href="../../reference/cli/">Command-Line Flags</a></li>
   <li><a class="nav-link" href="../../reference/environment/">Environment Variables</a></li>
   <li><a class="nav-link" href="../../reference/repository/">Repository Map</a></li>
-  <li><a class="nav-link" href="../../reference/known-issues/">Known Issues</a></li>
-  <li><a class="nav-link" href="../../reference/deepwiki/">Ask DeepWiki</a></li>
 </ul>
   </li>
 </ul>
@@ -182,7 +170,7 @@
     </p>
     <article class="prose">
       <h1 id="team-sizes">Team Sizes<a class="headerlink" href="#team-sizes" title="Link to this section">#</a></h1>
-<p class="lede">Each multi-agent topology also runs with 2, 4, 8 and 10 agents. This page shows what grows with the team in each topology, how to run every size and how team size changes the effect of prompt optimization.</p>
+<p class="lede">Each multi-agent topology also runs with 2, 4, 8 and 10 agents. This page shows what grows with the team in each topology, and how to run and optimize every size.</p>
 <div class="facts">
 <div><span>Sizes</span>n = 2, 4, 8, 10</div>
 <div><span>Topologies</span>4</div>
@@ -190,7 +178,7 @@
 <div><span>Runners</span>144</div>
 </div>
 <h2 id="what-n-changes">What n changes<a class="headerlink" href="#what-n-changes" title="Link to this section">#</a></h2>
-<p>Single is excluded: one agent has no team size. For the other four topologies, <code>n = 4</code> is the baseline and mirrors the LangGraph design of the runners in <code>topologies/</code>.</p>
+<p>Single is excluded: one agent has no team size. For the other four topologies, <code>n = 4</code> is the baseline: the team of the LangGraph runners in <code>topologies/</code>.</p>
 <table>
 <thead>
 <tr>
@@ -237,7 +225,7 @@
 </tr>
 </tbody>
 </table>
-<p>Tools, aggregation rules and the Decentralized round count stay as in the baseline. What grows is the set of agents:</p>
+<p>For seven datasets, every size of the team is declared in the team spec, <a href="https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/configs/teams"><code>configs/teams/&lt;dataset&gt;.yaml</code></a>; ToolHop and API-Bank work differently (see below). Tools, aggregation rules and the Decentralized round count stay as in the baseline. What grows is the set of agents:</p>
 <ul>
 <li><strong>Independent and Decentralized</strong> add copies of the one shared prompt (<code>solver</code>, <code>coder</code>, <code>caller</code> or <code>patcher</code>; <code>debater</code>).</li>
 <li><strong>Sequential and Centralized</strong> add new roles. At <code>n = 2</code> the team keeps the essential tool-using role and the role that writes the answer. At <code>n = 8</code> and <code>n = 10</code> it adds specialist roles defined in <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/prompts/roles.yaml"><code>configs/prompts/roles.yaml</code></a>, whose seed prompts sit beside the baseline ones in <code>configs/prompts/&lt;topology&gt;/&lt;dataset&gt;/</code>.</li>
@@ -272,94 +260,51 @@
 </table>
 <div class="admonition warning">
 <p class="admonition-title">Shell variables override n</p>
-<p>Apart from ToolHop and API-Bank, the Independent and Decentralized runners read their size from <code>INDEPENDENT_N_AGENTS</code> or <code>DECENTRALIZED_N_AGENTS</code> and only fall back to the n in the file name. Unset both before running team-size cells.</p>
+<p>Apart from ToolHop and API-Bank, the Independent and Decentralized runners read their size from <code>INDEPENDENT_N_AGENTS</code> or <code>DECENTRALIZED_N_AGENTS</code> first and only fall back to the n of the team spec. Unset both before running team-size cells.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">ToolHop and API-Bank</p>
-<p>For these two datasets every team-size runner goes through a shared wrapper (<code>teamsizes/toolhop_common.py</code>, <code>teamsizes/apibank_common.py</code>). It runs n seeded copies of the topology's final role (<code>solver</code>, <code>verifier</code>, <code>manager</code> or <code>debater</code>) and majority-votes their answers, for all four topologies. The optimizer adapters for <code>&lt;topology&gt;_r&lt;N&gt;</code> on these datasets build the real topology with the first n roles instead.</p>
+<p>These two datasets have no team spec. For them every team-size runner goes through a shared wrapper (<code>teamsizes/toolhop_common.py</code>, <code>teamsizes/apibank_common.py</code>). It runs n seeded copies of the topology's answering role (<code>solver</code>, <code>verifier</code>, <code>manager</code> or <code>debater</code>) and majority-votes their answers, for all four topologies. The optimizer adapters for these team sizes run the real topology at size n instead.</p>
 </div>
 <h2 id="files">Files<a class="headerlink" href="#files" title="Link to this section">#</a></h2>
-<p>Runners follow <code>teamsizes/&lt;topology&gt;/&lt;dataset&gt;/&lt;dataset&gt;_r&lt;N&gt;.py</code>, for every topology, all nine datasets and N in 2, 4, 8, 10. For example, <code>teamsizes/centralized/hotpotqa/hotpotqa_r8.py</code>.</p>
+<p>Runners follow <code>teamsizes/&lt;topology&gt;/&lt;dataset&gt;/&lt;dataset&gt;_r&lt;N&gt;.py</code>, for every topology, all nine datasets and N in 2, 4, 8, 10; for example, <code>teamsizes/centralized/hotpotqa/hotpotqa_r8.py</code>. Each file is a few lines: it runs the topology's LangGraph runner from <code>topologies/</code> with the size-N team preset (<code>core/variant.py</code>), or the ToolHop and API-Bank wrapper.</p>
 <h2 id="run-a-cell">Run a cell<a class="headerlink" href="#run-a-cell" title="Link to this section">#</a></h2>
-<p>Run from the repository root. The runners' default output folders are inconsistent: some omit the team size, and several runners (all Independent cells for GPQA, HotpotQA, MATH, LiveCodeBench and APPS, plus Decentralized MATH and Sequential APPS) only print scores. Always pass an output path that names the size.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">GPQA, HotpotQA, MATH, LCB, APPS</label><label for="__tabbed_1_2">BFCL, SWE-bench</label><label for="__tabbed_1_3">ToolHop, API-Bank</label></div>
+<p>Run from the repository root. Team-size runners take the same command line as the topology runners. Their default output folders differ by runner, and some only print scores, so pass <code>--out-dir</code>:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">GPQA, HotpotQA, MATH, LCB, APPS</label><label for="__tabbed_1_2">BFCL</label><label for="__tabbed_1_3">ToolHop, API-Bank</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<pre class="highlight"><code class="language-bash">python -m teamsizes.centralized.hotpotqa.hotpotqa_r8 --batch --limit 100 \
-  --out results/teamsizes_r8/hotpotqa/centralized_r8/predictions.jsonl</code></pre>
+<div class="language-bash highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>teamsizes.centralized.hotpotqa.hotpotqa_r8<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/teamsizes/r8/centralized_hotpotqa
+</code></pre></div>
 </div>
 <div class="tabbed-block">
-<pre class="highlight"><code class="language-bash"># Always a batch: no --batch flag
-python -m teamsizes.sequential.bfcl.bfcl_r4 --limit 100 \
-  --out-dir results/teamsizes_r4/bfcl/sequential_r4</code></pre>
+<div class="language-bash highlight"><pre><span></span><code><span class="c1"># always a batch, one category at a time</span>
+python<span class="w"> </span>-m<span class="w"> </span>teamsizes.sequential.bfcl.bfcl_r4<span class="w"> </span>--category<span class="w"> </span>simple<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/teamsizes/r4/sequential_bfcl/simple
+</code></pre></div>
 </div>
 <div class="tabbed-block">
-<pre class="highlight"><code class="language-bash">export TOOLHOP_ALLOW_DATASET_EXEC=1
-python -m teamsizes.decentralized.toolhop.toolhop_r10 --limit 100 \
-  --out-dir results/teamsizes_r10/toolhop/decentralized_r10</code></pre>
+<div class="language-bash highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">TOOLHOP_ALLOW_DATASET_EXEC</span><span class="o">=</span><span class="m">1</span>
+python<span class="w"> </span>-m<span class="w"> </span>teamsizes.decentralized.toolhop.toolhop_r10<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/teamsizes/r10/decentralized_toolhop
+</code></pre></div>
 </div>
 </div>
 </div>
-<p>Without arguments, the GPQA, HotpotQA, MATH, LiveCodeBench and APPS runners play a built-in smoke demo.</p>
+<p>Without <code>--batch</code>, the GPQA, HotpotQA, MATH, LiveCodeBench and APPS runners play a built-in smoke demo. SWE-bench cells take the <a href="../../tasks/swe-bench/#flags">SWE-bench options</a>.</p>
 <h2 id="run-the-sweep">Run the sweep<a class="headerlink" href="#run-the-sweep" title="Link to this section">#</a></h2>
-<p><code>scripts/run_teamsizes.sh</code> loops over <code>RVALUES</code>, <code>TOPOLOGIES</code> and <code>DATASETS</code> (all values by default) and runs each cell as its own process with the launcher limits:</p>
-<pre class="highlight"><code class="language-bash">RVALUES="2 10" TOPOLOGIES="centralized" DATASETS="hotpotqa" \
-  bash scripts/run_teamsizes.sh</code></pre>
-<p>The script passes only <code>--batch --limit</code>. BFCL and SWE-bench cells fail on <code>--batch</code>, and the other cells write to each runner's default folder or, for the print-only runners above, nowhere. To keep results, run the cells you need with explicit paths as above.</p>
+<p><code>scripts/run_teamsizes.sh</code> loops over <code>RVALUES</code>, <code>TOPOLOGIES</code> and <code>DATASETS</code> (all values by default) and runs each cell as its own process:</p>
+<div class="language-bash highlight"><span class="filename">Sweep two sizes of Centralized on HotpotQA</span><pre><span></span><code><span class="nv">RVALUES</span><span class="o">=</span><span class="s2">&quot;2 10&quot;</span><span class="w"> </span><span class="nv">TOPOLOGIES</span><span class="o">=</span><span class="s2">&quot;centralized&quot;</span><span class="w"> </span><span class="nv">DATASETS</span><span class="o">=</span><span class="s2">&quot;hotpotqa&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>bash<span class="w"> </span>scripts/run_teamsizes.sh
+</code></pre></div>
+<p>It writes each cell to <code>results/teamsizes/r&lt;N&gt;/&lt;topology&gt;_&lt;dataset&gt;/</code> (<code>OUT_ROOT</code> changes the root; BFCL gets one subfolder per category). BFCL and SWE-bench run their eval IDs; the other datasets use the same limits as the topology sweep.</p>
 <h2 id="optimize-a-size">Optimize a size<a class="headerlink" href="#optimize-a-size" title="Link to this section">#</a></h2>
-<p>The optimizer topology names are <code>&lt;topology&gt;_r&lt;N&gt;</code>, for example <code>centralized_r8</code> or <code>decentralized_r2</code>. They exist only for HotpotQA, LiveCodeBench, ToolHop and API-Bank. The pilot takes the agent count from the name; for Decentralized, pass <code>--n-rounds 2</code> to keep the baseline's two rounds (the pilot default is 1).</p>
-<pre class="highlight"><code class="language-bash">cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset --dataset hotpotqa --topology centralized_r8 \
-  --train-size 25 --val-size 25 --max-full-evals 5 --out results/gepa/centralized_r8_hotpotqa</code></pre>
-<h2 id="what-the-paper-found">What the paper found<a class="headerlink" href="#what-the-paper-found" title="Link to this section">#</a></h2>
-<p>With GEPA, the average gain from optimization fell as teams grew:</p>
-<div class="dbars-wrap mini">
-<table class="dbars"><caption>Average gain by team size (HotpotQA and LiveCodeBench).</caption>
-<thead><tr><th scope="col">Team size</th><th scope="col" class="bar-col">Gain (Δ, points)</th><th scope="col" class="num">Δ</th></tr></thead>
-<tbody>
-<tr data-tip="n = 2 · +2.4 points"><th scope="row">n = 2</th><td class="bar-col"><span class="track"><i class="tick" style="left:12.50%"></i><i class="tick" style="left:62.50%"></i><i class="tick" style="left:87.50%"></i><i class="axis" style="left:37.50%"></i><i class="bar pos" style="left:37.50%;width:30.00%"></i></span></td><td class="num d-txt-g">+2.4</td></tr>
-<tr data-tip="n = 4 · +0.6 points"><th scope="row">n = 4</th><td class="bar-col"><span class="track"><i class="tick" style="left:12.50%"></i><i class="tick" style="left:62.50%"></i><i class="tick" style="left:87.50%"></i><i class="axis" style="left:37.50%"></i><i class="bar pos" style="left:37.50%;width:7.50%"></i></span></td><td class="num d-txt-g">+0.6</td></tr>
-<tr data-tip="n = 8 · −0.9 points"><th scope="row">n = 8</th><td class="bar-col"><span class="track"><i class="tick" style="left:12.50%"></i><i class="tick" style="left:62.50%"></i><i class="tick" style="left:87.50%"></i><i class="axis" style="left:37.50%"></i><i class="bar neg" style="left:26.25%;width:11.25%"></i></span></td><td class="num d-txt-l">−0.9</td></tr>
-<tr data-tip="n = 10 · −2.1 points"><th scope="row">n = 10</th><td class="bar-col"><span class="track"><i class="tick" style="left:12.50%"></i><i class="tick" style="left:62.50%"></i><i class="tick" style="left:87.50%"></i><i class="axis" style="left:37.50%"></i><i class="bar neg" style="left:11.25%;width:26.25%"></i></span></td><td class="num d-txt-l">−2.1</td></tr>
-</tbody>
-</table>
-</div>
-
-<p>Topologies split sharply. Centralized on HotpotQA went from +5.0 at n = 2 to −12.0 at n = 10. Decentralized on HotpotQA stayed non-negative at every size.</p>
-<div class="dgrid-wrap panels">
-<div class="dgrid-panels">
-<div class="dgrid-panel">
-<table class="dgrid narrow"><caption>HotpotQA</caption>
-<thead><tr><th scope="col" class="corner">Topology</th><th scope="col">n = 2</th><th scope="col">n = 4</th><th scope="col">n = 8</th><th scope="col">n = 10</th></tr></thead>
-<tbody>
-<tr><th scope="row">Independent</th><td class="dc d-z" data-tip="HotpotQA · Independent · n = 2"><b>0.0</b></td><td class="dc d-l1" data-tip="HotpotQA · Independent · n = 4"><b>−1.0</b></td><td class="dc d-g1" data-tip="HotpotQA · Independent · n = 8"><b>+1.0</b></td><td class="dc d-g1" data-tip="HotpotQA · Independent · n = 10"><b>+2.0</b></td></tr>
-<tr><th scope="row">Sequential</th><td class="dc d-g3" data-tip="HotpotQA · Sequential · n = 2"><b>+6.0</b></td><td class="dc d-l1" data-tip="HotpotQA · Sequential · n = 4"><b>−1.0</b></td><td class="dc d-g2" data-tip="HotpotQA · Sequential · n = 8"><b>+3.0</b></td><td class="dc d-l3" data-tip="HotpotQA · Sequential · n = 10"><b>−6.0</b></td></tr>
-<tr><th scope="row">Centralized</th><td class="dc d-g2" data-tip="HotpotQA · Centralized · n = 2"><b>+5.0</b></td><td class="dc d-l3" data-tip="HotpotQA · Centralized · n = 4"><b>−9.0</b></td><td class="dc d-l3" data-tip="HotpotQA · Centralized · n = 8"><b>−9.0</b></td><td class="dc d-l4" data-tip="HotpotQA · Centralized · n = 10"><b>−12.0</b></td></tr>
-<tr><th scope="row">Decentralized</th><td class="dc d-g3" data-tip="HotpotQA · Decentralized · n = 2"><b>+6.0</b></td><td class="dc d-g4" data-tip="HotpotQA · Decentralized · n = 4"><b>+12.0</b></td><td class="dc d-z" data-tip="HotpotQA · Decentralized · n = 8"><b>0.0</b></td><td class="dc d-g2" data-tip="HotpotQA · Decentralized · n = 10"><b>+3.0</b></td></tr>
-</tbody>
-<tfoot><tr><th scope="row">Mean</th><td class="dc avg d-g2" data-tip="HotpotQA · mean over topologies · n = 2"><b>+4.3</b></td><td class="dc avg d-g1" data-tip="HotpotQA · mean over topologies · n = 4"><b>+0.3</b></td><td class="dc avg d-l1" data-tip="HotpotQA · mean over topologies · n = 8"><b>−1.3</b></td><td class="dc avg d-l2" data-tip="HotpotQA · mean over topologies · n = 10"><b>−3.3</b></td></tr></tfoot>
-</table>
-</div>
-<div class="dgrid-panel">
-<table class="dgrid narrow"><caption>LiveCodeBench</caption>
-<thead><tr><th scope="col" class="corner">Topology</th><th scope="col">n = 2</th><th scope="col">n = 4</th><th scope="col">n = 8</th><th scope="col">n = 10</th></tr></thead>
-<tbody>
-<tr><th scope="row">Independent</th><td class="dc d-z" data-tip="LiveCodeBench · Independent · n = 2"><b>0.0</b></td><td class="dc d-g2" data-tip="LiveCodeBench · Independent · n = 4"><b>+4.0</b></td><td class="dc d-l1" data-tip="LiveCodeBench · Independent · n = 8"><b>−2.0</b></td><td class="dc d-l3" data-tip="LiveCodeBench · Independent · n = 10"><b>−6.0</b></td></tr>
-<tr><th scope="row">Sequential</th><td class="dc d-z" data-tip="LiveCodeBench · Sequential · n = 2"><b>0.0</b></td><td class="dc d-z" data-tip="LiveCodeBench · Sequential · n = 4"><b>0.0</b></td><td class="dc d-l1" data-tip="LiveCodeBench · Sequential · n = 8"><b>−2.0</b></td><td class="dc d-z" data-tip="LiveCodeBench · Sequential · n = 10"><b>0.0</b></td></tr>
-<tr><th scope="row">Centralized</th><td class="dc d-g1" data-tip="LiveCodeBench · Centralized · n = 2"><b>+2.0</b></td><td class="dc d-z" data-tip="LiveCodeBench · Centralized · n = 4"><b>0.0</b></td><td class="dc d-z" data-tip="LiveCodeBench · Centralized · n = 8"><b>0.0</b></td><td class="dc d-g1" data-tip="LiveCodeBench · Centralized · n = 10"><b>+2.0</b></td></tr>
-<tr><th scope="row">Decentralized</th><td class="dc d-z" data-tip="LiveCodeBench · Decentralized · n = 2"><b>0.0</b></td><td class="dc d-z" data-tip="LiveCodeBench · Decentralized · n = 4"><b>0.0</b></td><td class="dc d-g1" data-tip="LiveCodeBench · Decentralized · n = 8"><b>+2.0</b></td><td class="dc d-z" data-tip="LiveCodeBench · Decentralized · n = 10"><b>0.0</b></td></tr>
-</tbody>
-<tfoot><tr><th scope="row">Mean</th><td class="dc avg d-g1" data-tip="LiveCodeBench · mean over topologies · n = 2"><b>+0.5</b></td><td class="dc avg d-g1" data-tip="LiveCodeBench · mean over topologies · n = 4"><b>+1.0</b></td><td class="dc avg d-l1" data-tip="LiveCodeBench · mean over topologies · n = 8"><b>−0.5</b></td><td class="dc avg d-l1" data-tip="LiveCodeBench · mean over topologies · n = 10"><b>−1.0</b></td></tr></tfoot>
-</table>
-</div>
-</div>
-<div class="dlegend" aria-hidden="true"><span>regression</span><span class="dlegend-scale"><i class="d-l4"></i><i class="d-l3"></i><i class="d-l2"></i><i class="d-l1"></i><i class="d-z"></i><i class="d-g1"></i><i class="d-g2"></i><i class="d-g3"></i><i class="d-g4"></i></span><span>gain</span><span class="dlegend-note">Δ in points</span></div>
-</div>
-
-<div class="admonition takeaway">
-<p class="admonition-title">Takeaway</p>
-<p>Prompt optimization helps small teams and can hurt large ones, depending on the topology.</p>
-</div>
+<p>Pass <code>--team-size N</code> to the run protocol, or use the key <code>&lt;topology&gt;_r&lt;N&gt;</code>. The bridge has team-size adapters for HotpotQA, LiveCodeBench, BFCL, ToolHop and API-Bank; the experiment grid covers HotpotQA, LiveCodeBench and BFCL with GEPA, MIPRO, MAPRO and MASPO, and other cells need <code>--allow-any-cell</code>. Decentralized jobs keep 2 rounds at every size. For example, MIPRO on a Centralized team of 8:</p>
+<div class="language-bash highlight"><span class="filename">MIPRO on Centralized, 8 agents · HotpotQA</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span>mipro<span class="w"> </span>--dataset<span class="w"> </span>hotpotqa<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--topology<span class="w"> </span>centralized<span class="w"> </span>--team-size<span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/mipro/hotpotqa/centralized_r8/qwen/0
+</code></pre></div>
+<p>See <a href="../../optimizers/running/">Run an Optimizer</a>.</p>
     </article>
     <div class="page-meta">
       <a class="edit-link" href="https://github.com/fm8995610-ops/MAS-PromptBench/edit/main/docs/content/mas/team-sizes.md"><svg class="i" aria-hidden="true"><use href="#i-edit"></use></svg>Edit this page on GitHub</a>
@@ -390,8 +335,6 @@ python -m real_runner_gepa.pilots.run_gepa_dataset --dataset hotpotqa --topology
       <li><a href="#run-the-sweep">Run the sweep</a>
       </li>
       <li><a href="#optimize-a-size">Optimize a size</a>
-      </li>
-      <li><a href="#what-the-paper-found">What the paper found</a>
       </li>
     </ul>
   </aside>

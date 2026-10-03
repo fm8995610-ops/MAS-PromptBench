@@ -38,6 +38,7 @@
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.4-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></symbol>
   <symbol id="i-wiki" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 7.2l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z" fill="currentColor"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V19a1.5 1.5 0 0 1-1.5 1.5H15v-5.5H9v5.5H5.5A1.5 1.5 0 0 1 4 19v-7.8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
@@ -55,10 +56,7 @@
     <button class="search-trigger" type="button" aria-label="Search the docs" aria-haspopup="dialog">
       <svg class="i" aria-hidden="true"><use href="#i-search"></use></svg><span class="search-placeholder">Search the docs</span><kbd>/</kbd>
     </button>
-    <nav class="topbar-links" aria-label="Project">
-      <a href="../../results/">Results</a>
-      <a href="https://fm8995610-ops.github.io/MAS-PromptBench/">Project page</a>
-    </nav>
+    <a class="deepwiki-btn project-btn" href="https://fm8995610-ops.github.io/MAS-PromptBench/" title="Project page"><svg class="i" aria-hidden="true"><use href="#i-home"></use></svg><span>Project Page</span></a>
     <a class="deepwiki-btn" href="https://deepwiki.com/fm8995610-ops/MAS-PromptBench" title="Ask questions about the code on DeepWiki"><svg class="i" aria-hidden="true"><use href="#i-wiki"></use></svg><span>Ask DeepWiki</span></a>
     <a class="icon-btn" href="https://github.com/fm8995610-ops/MAS-PromptBench" aria-label="GitHub repository"><svg class="i" aria-hidden="true"><use href="#i-github"></use></svg></a>
     <button class="icon-btn theme-toggle" type="button" aria-label="Switch color theme"><svg class="i" aria-hidden="true"><use href="#i-sun"></use></svg><svg class="i" aria-hidden="true"><use href="#i-moon"></use></svg></button>
@@ -136,22 +134,14 @@
     <span class="nav-label">Optimizers</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../../optimizers/">Overview</a></li>
-  <li><a class="nav-link" href="../../optimizers/gepa/">GEPA</a></li>
-  <li><a class="nav-link" href="../../optimizers/mipro/">MIPRO</a></li>
   <li><a class="nav-link" href="../../optimizers/running/">Run an Optimizer</a></li>
-</ul>
-  </li>
-  <li class="nav-section">
-    <span class="nav-label">Results</span>
-    <ul class="nav-list nav-l1">
-  <li><a class="nav-link" href="../../results/">Results Explorer</a></li>
 </ul>
   </li>
   <li class="nav-section">
     <span class="nav-label">Evaluation</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../../evaluation/protocol/">Evaluation Protocol</a></li>
-  <li><a class="nav-link" href="../../evaluation/results/">Read the Results</a></li>
+  <li><a class="nav-link" href="../../evaluation/outputs/">Read Run Outputs</a></li>
 </ul>
   </li>
   <li class="nav-section">
@@ -168,8 +158,6 @@
   <li><a class="nav-link" href="../../reference/cli/">Command-Line Flags</a></li>
   <li><a class="nav-link" href="../../reference/environment/">Environment Variables</a></li>
   <li><a class="nav-link" href="../../reference/repository/">Repository Map</a></li>
-  <li><a class="nav-link" href="../../reference/known-issues/">Known Issues</a></li>
-  <li><a class="nav-link" href="../../reference/deepwiki/">Ask DeepWiki</a></li>
 </ul>
   </li>
 </ul>
@@ -182,21 +170,21 @@
     </p>
     <article class="prose">
       <h1 id="communication-protocols">Communication Protocols<a class="headerlink" href="#communication-protocols" title="Link to this section">#</a></h1>
-<p class="lede">The same topology can pass messages as free text, as tagged reports or as JSON. This page covers the three message formats, which cells use them, how to run them and how they change what prompt optimization achieves.</p>
+<p class="lede">The same topology can pass messages as free text, as tagged reports or as JSON. This page covers the three message formats, which cells use them, and how to run and optimize them.</p>
 <div class="facts">
 <div><span>Formats</span>3</div>
 <div><span>Topologies</span>4</div>
-<div><span>Datasets</span>5</div>
-<div><span>Runners</span>60</div>
+<div><span>Datasets</span>6</div>
+<div><span>Runners</span>72</div>
 </div>
 <h2 id="what-a-format-changes">What a format changes<a class="headerlink" href="#what-a-format-changes" title="Link to this section">#</a></h2>
 <p>A format governs only the inter-agent hand-off: the report an agent passes to the next stage, the manager, a peer or the aggregator. The model, topology, roles, tools and scorer stay the same, and the scorer-facing final answer keeps its usual form after the report.</p>
-<p>The format is applied in two places, by <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/communications/communication_formats.py"><code>communications/communication_formats.py</code></a>:</p>
+<p>Each topology runner applies the format itself through its communication policy, defined in <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/core/communication.py"><code>core/communication.py</code></a>, in two places:</p>
 <ol>
-<li><strong>In the prompts.</strong> For HotpotQA, LiveCodeBench and SWE-bench, a format contract is appended to every role's system prompt, telling the agent how to write its report and to put the final artifact after it. The ToolHop and API-Bank runners build their prompts differently and don't receive this contract.</li>
-<li><strong>In the hand-offs.</strong> Before a receiver reads another agent's output, the runner re-renders that text into the chosen format (<code>format_handoff</code>, or the report builder in the ToolHop and API-Bank runners). The receiver always gets a well-formed message, even when the sender ignored the contract.</li>
+<li><strong>In the prompts.</strong> A format contract is appended to every agent's system prompt, telling it how to write its report and to put the final artifact after it.</li>
+<li><strong>In the hand-offs.</strong> Before a receiver reads another agent's output, the runner re-renders that text in the chosen format, so the receiver always gets a well-formed message. The HotpotQA and LiveCodeBench runners, the Sequential and Centralized BFCL runners, and the ToolHop and API-Bank runners do this; the SWE-bench runners and the Decentralized BFCL runner use the prompt contract only.</li>
 </ol>
-<p>In Independent, replicas never exchange messages, so only the prompt contract applies there; Independent ToolHop and API-Bank cells run the same agents under every format. Malformed reports are never rejected or re-prompted.</p>
+<p>In Independent, replicas never exchange messages, so only the prompt contract applies there. Malformed reports are never rejected or re-prompted.</p>
 <h2 id="the-three-formats">The three formats<a class="headerlink" href="#the-three-formats" title="Link to this section">#</a></h2>
 <table>
 <thead>
@@ -225,43 +213,46 @@
 </tbody>
 </table>
 <p>In both structured formats, <code>status</code> must be one of <code>not_started</code>, <code>in_progress</code>, <code>completed</code>, <code>blocked</code>, and <code>confidence</code> one of <code>low</code>, <code>medium</code>, <code>high</code>. A Structured report parses only if the JSON is an object with all five keys and <code>payload</code> is itself an object.</p>
-<p>Here is one HotpotQA report in each format. The last line is the scorer-facing artifact from <code>topologies/output_contracts.py</code> (re-exported by <code>communications/output_contracts.py</code>), unchanged across formats.</p>
+<p>Here is one HotpotQA report in each format. The last line is the scorer-facing artifact from the output contract, unchanged across formats.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Freeform</label><label for="__tabbed_1_2">Semi-structured</label><label for="__tabbed_1_3">Structured</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<pre class="highlight"><code class="language-text">Arthur's Magazine was founded in 1844; First for Women in 1989, so Arthur's
+<div class="language-text highlight"><pre><span></span><code>Arthur&#39;s Magazine was founded in 1844; First for Women in 1989, so Arthur&#39;s
 Magazine came first.
-Answer: Arthur's Magazine</code></pre>
+Answer: Arthur&#39;s Magazine
+</code></pre></div>
 </div>
 <div class="tabbed-block">
-<pre class="highlight"><code class="language-text">[STATUS]
+<div class="language-text highlight"><pre><span></span><code>[STATUS]
 completed
 [SUMMARY]
-Arthur's Magazine (1844) predates First for Women (1989).
+Arthur&#39;s Magazine (1844) predates First for Women (1989).
 [EVIDENCE_OR_TESTS]
-Arthur's Magazine founded 1844; First for Women founded 1989.
+Arthur&#39;s Magazine founded 1844; First for Women founded 1989.
 [CONFIDENCE]
 high, both founding years confirmed from Wikipedia.
 [NEXT]
-Use Arthur's Magazine as the final answer.
+Use Arthur&#39;s Magazine as the final answer.
 [ANSWER_CANDIDATE]
-Arthur's Magazine
+Arthur&#39;s Magazine
 
-Answer: Arthur's Magazine</code></pre>
+Answer: Arthur&#39;s Magazine
+</code></pre></div>
 </div>
 <div class="tabbed-block">
-<pre class="highlight"><code class="language-text">JSON_REPORT:
+<div class="language-text highlight"><pre><span></span><code>JSON_REPORT:
 {
-  "status": "completed",
-  "summary": "Arthur's Magazine (1844) predates First for Women (1989).",
-  "confidence": "high",
-  "next": "Use Arthur's Magazine as the final answer.",
-  "payload": {"entities": ["Arthur's Magazine", "First for Women"],
-              "answer_candidate": "Arthur's Magazine"}
+  &quot;status&quot;: &quot;completed&quot;,
+  &quot;summary&quot;: &quot;Arthur&#39;s Magazine (1844) predates First for Women (1989).&quot;,
+  &quot;confidence&quot;: &quot;high&quot;,
+  &quot;next&quot;: &quot;Use Arthur&#39;s Magazine as the final answer.&quot;,
+  &quot;payload&quot;: {&quot;entities&quot;: [&quot;Arthur&#39;s Magazine&quot;, &quot;First for Women&quot;],
+              &quot;answer_candidate&quot;: &quot;Arthur&#39;s Magazine&quot;}
 }
 END_JSON_REPORT
 
-Answer: Arthur's Magazine</code></pre>
+Answer: Arthur&#39;s Magazine
+</code></pre></div>
 </div>
 </div>
 </div>
@@ -289,6 +280,12 @@ Answer: Arthur's Magazine</code></pre>
 <td>fenced <code>python</code> block</td>
 </tr>
 <tr>
+<td>BFCL</td>
+<td><code>[FUNCTION_CHOICE]</code>, <code>[ARG_PLAN]</code>, <code>[CALL_CANDIDATE]</code></td>
+<td><code>function_choice</code>, <code>arg_plan</code>, <code>call_candidate</code></td>
+<td>fenced <code>json</code> call list</td>
+</tr>
+<tr>
 <td>ToolHop</td>
 <td><code>[TOOL_CHAIN]</code>, <code>[OBSERVATIONS]</code>, <code>[ANSWER_CANDIDATE]</code></td>
 <td><code>tool_chain</code>, <code>observations</code>, <code>answer_candidate</code></td>
@@ -311,81 +308,31 @@ Answer: Arthur's Magazine</code></pre>
 <h2 id="coverage">Coverage<a class="headerlink" href="#coverage" title="Link to this section">#</a></h2>
 <p>Runners exist for every combination of:</p>
 <ul>
-<li><strong>Topologies:</strong> <code>independent</code>, <code>sequential</code>, <code>centralized</code>, <code>decentralized</code>. Each wraps the LangGraph runner of that topology.</li>
-<li><strong>Datasets:</strong> <code>hotpotqa</code>, <code>lcb</code>, <code>toolhop</code>, <code>apibank</code>, <code>swe</code>.</li>
+<li><strong>Topologies:</strong> <code>independent</code>, <code>sequential</code>, <code>centralized</code>, <code>decentralized</code>. Each runs the LangGraph runner of that topology.</li>
+<li><strong>Datasets:</strong> <code>hotpotqa</code>, <code>lcb</code>, <code>bfcl</code>, <code>toolhop</code>, <code>apibank</code>, <code>swe</code>.</li>
 <li><strong>Formats:</strong> <code>freeform</code>, <code>semi_structured</code>, <code>structured_soft</code>.</li>
 </ul>
-<p>The path pattern is <code>communications/&lt;topology&gt;/&lt;dataset&gt;/&lt;dataset&gt;_&lt;format&gt;.py</code>.</p>
+<p>The path pattern is <code>communications/&lt;topology&gt;/&lt;dataset&gt;/&lt;dataset&gt;_&lt;format&gt;.py</code>. Each file is a few lines: it calls <code>install</code> from <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/communications/communication_formats.py"><code>communications/communication_formats.py</code></a>, which loads the topology runner as a module of its own with the format preset, records its hand-offs and scores its reports.</p>
 <h2 id="run-a-cell">Run a cell<a class="headerlink" href="#run-a-cell" title="Link to this section">#</a></h2>
-<pre class="highlight"><code class="language-bash">python -m communications.centralized.hotpotqa.hotpotqa_structured_soft --batch --limit 100</code></pre>
-<p>All 60 runners share one command line: <code>--batch</code>, <code>--limit</code>, <code>--offset</code>, <code>--only</code> (repeat it once per ID) and <code>--out</code>. Results go to <code>results/communications_baseline/&lt;topology&gt;_&lt;dataset&gt;_&lt;format&gt;/results.jsonl</code> unless you pass <code>--out &lt;file.jsonl&gt;</code>; an existing file at that path is overwritten. Each row holds the dataset's usual score fields plus <code>communication_format</code> and the rendered hand-offs (<code>communication_inflight_handoffs</code>). The parse fields (<code>communication_parse_rate</code>, <code>communication_all_parse_ok</code>) are computed on the runner's re-rendered reports, so they check the rendering, not the model's own text. ToolHop cells need <code>export TOOLHOP_ALLOW_DATASET_EXEC=1</code>.</p>
-<div class="admonition warning">
-<p class="admonition-title">SWE-bench cells</p>
-<p>The shared batch loop calls each runner's <code>run_one(instance, None)</code>, but the SWE-bench topology runners also require a workdir and an output directory. Expect every SWE-bench row to be written as an error record until that call is fixed.</p>
-</div>
+<div class="language-bash highlight"><span class="filename">Centralized HotpotQA with Structured messages</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>communications.centralized.hotpotqa.hotpotqa_structured_soft<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span>
+</code></pre></div>
+<p>All 72 runners share the runners' command line (<code>--batch</code>, <code>--limit</code>, <code>--offset</code>, <code>--only</code>, <code>--out-dir</code>, <code>--out</code>); the BFCL runners add <code>--category</code>. They have no demo, and without <code>--limit</code> they run every row. Results go to <code>results/communications_baseline/&lt;topology&gt;_&lt;dataset&gt;_&lt;format&gt;/results.jsonl</code> (BFCL: one subfolder per category) unless you pass <code>--out-dir</code> or <code>--out</code>, and the file is emptied first. ToolHop cells need <code>export TOOLHOP_ALLOW_DATASET_EXEC=1</code>.</p>
+<p>Each row holds the dataset's usual score fields plus <code>communication_format</code>, the parsed reports and the rendered hand-offs (<code>communication_inflight_handoffs</code>). The parse metrics judge each agent's own text against the format: <code>communication_parse_rate</code> is the share of reports that parse as written, and <code>communication_all_parse_ok</code> is true when all do. The re-rendered reports always parse; their rate is reported separately as <code>communication_render_parse_rate</code>.</p>
 <h2 id="run-the-sweep">Run the sweep<a class="headerlink" href="#run-the-sweep" title="Link to this section">#</a></h2>
 <p><code>scripts/run_communications.sh</code> runs each selected cell as its own process, at the default output path. Choose cells with <code>TOPOLOGIES</code>, <code>DATASETS</code> and <code>FORMATS</code> (all values by default):</p>
-<pre class="highlight"><code class="language-bash">TOPOLOGIES="sequential centralized" \
-DATASETS="hotpotqa lcb" \
-FORMATS="freeform structured_soft" \
-bash scripts/run_communications.sh</code></pre>
-<p>The script uses fixed limits per dataset (HotpotQA, ToolHop and API-Bank 100, LiveCodeBench 50, SWE-bench 30), sets <code>TOOLHOP_ALLOW_DATASET_EXEC=1</code>, and reads <code>VLLM_BASE_URL</code> and <code>MODEL_ID</code> like every runner.</p>
+<div class="language-bash highlight"><span class="filename">Sweep two topologies, two datasets, two formats</span><pre><span></span><code><span class="nv">TOPOLOGIES</span><span class="o">=</span><span class="s2">&quot;sequential centralized&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="nv">DATASETS</span><span class="o">=</span><span class="s2">&quot;hotpotqa lcb&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="nv">FORMATS</span><span class="o">=</span><span class="s2">&quot;freeform structured_soft&quot;</span><span class="w"> </span><span class="se">\</span>
+bash<span class="w"> </span>scripts/run_communications.sh
+</code></pre></div>
+<p>The script runs BFCL and SWE-bench on their eval IDs (BFCL one category at a time) and the other datasets with fixed limits (HotpotQA, ToolHop and API-Bank 100, LiveCodeBench 50). It sets <code>TOOLHOP_ALLOW_DATASET_EXEC=1</code> unless you set it, and reads <code>VLLM_BASE_URL</code> and <code>MODEL_ID</code> like every runner.</p>
 <h2 id="optimize-a-cell">Optimize a cell<a class="headerlink" href="#optimize-a-cell" title="Link to this section">#</a></h2>
-<p>The optimizer topology name is <code>&lt;topology&gt;_communications_&lt;format&gt;</code>, for example <code>centralized_communications_semi_structured</code>. These names exist for HotpotQA, LiveCodeBench, ToolHop and API-Bank; SWE-bench has no optimizer adapter for protocol cells.</p>
-<pre class="highlight"><code class="language-bash">cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset --dataset hotpotqa \
-  --topology sequential_communications_structured_soft \
-  --train-size 25 --val-size 25 --max-full-evals 5 \
-  --out results/gepa/sequential_communications_structured_soft_hotpotqa</code></pre>
-<p>For Independent and Decentralized cells, add <code>--n-agents 4</code> (and <code>--n-rounds 2</code> for Decentralized) to match the baseline team; the pilot defaults are 2 agents and 1 round.</p>
-<h2 id="what-the-paper-found">What the paper found<a class="headerlink" href="#what-the-paper-found" title="Link to this section">#</a></h2>
-<p>With GEPA, the average gain from prompt optimization rose with the structure of the messages:</p>
-<div class="dbars-wrap mini">
-<table class="dbars"><caption>Average gain by communication protocol (HotpotQA and LiveCodeBench).</caption>
-<thead><tr><th scope="col">Protocol</th><th scope="col" class="bar-col">Gain (Δ, points)</th><th scope="col" class="num">Δ</th></tr></thead>
-<tbody>
-<tr data-tip="Freeform · +1.6 points"><th scope="row">Freeform</th><td class="bar-col"><span class="track"><i class="tick" style="left:12.50%"></i><i class="tick" style="left:62.50%"></i><i class="tick" style="left:87.50%"></i><i class="axis" style="left:37.50%"></i><i class="bar pos" style="left:37.50%;width:20.00%"></i></span></td><td class="num d-txt-g">+1.6</td></tr>
-<tr data-tip="Semi-structured · +2.4 points"><th scope="row">Semi-structured</th><td class="bar-col"><span class="track"><i class="tick" style="left:12.50%"></i><i class="tick" style="left:62.50%"></i><i class="tick" style="left:87.50%"></i><i class="axis" style="left:37.50%"></i><i class="bar pos" style="left:37.50%;width:30.00%"></i></span></td><td class="num d-txt-g">+2.4</td></tr>
-<tr data-tip="Structured · +4.3 points"><th scope="row">Structured</th><td class="bar-col"><span class="track"><i class="tick" style="left:12.50%"></i><i class="tick" style="left:62.50%"></i><i class="tick" style="left:87.50%"></i><i class="axis" style="left:37.50%"></i><i class="bar pos" style="left:37.50%;width:53.75%"></i></span></td><td class="num d-txt-g">+4.3</td></tr>
-</tbody>
-</table>
-</div>
-
-<p>The effect was largest on HotpotQA, where downstream agents reuse upstream evidence, and weakest on LiveCodeBench, where tests decide correctness whatever the message format. Each cell below is one topology and protocol:</p>
-<div class="dgrid-wrap panels">
-<div class="dgrid-panels">
-<div class="dgrid-panel">
-<table class="dgrid narrow"><caption>HotpotQA</caption>
-<thead><tr><th scope="col" class="corner">Topology</th><th scope="col">Freeform</th><th scope="col">Semi-structured</th><th scope="col">Structured</th></tr></thead>
-<tbody>
-<tr><th scope="row">Independent</th><td class="dc d-g3" data-tip="HotpotQA · Independent · Freeform"><b>+8.0</b></td><td class="dc d-g2" data-tip="HotpotQA · Independent · Semi-structured"><b>+4.0</b></td><td class="dc d-g3" data-tip="HotpotQA · Independent · Structured"><b>+6.0</b></td></tr>
-<tr><th scope="row">Sequential</th><td class="dc d-z" data-tip="HotpotQA · Sequential · Freeform"><b>0.0</b></td><td class="dc d-g3" data-tip="HotpotQA · Sequential · Semi-structured"><b>+7.0</b></td><td class="dc d-g3" data-tip="HotpotQA · Sequential · Structured"><b>+9.0</b></td></tr>
-<tr><th scope="row">Centralized</th><td class="dc d-g1" data-tip="HotpotQA · Centralized · Freeform"><b>+1.0</b></td><td class="dc d-g3" data-tip="HotpotQA · Centralized · Semi-structured"><b>+6.0</b></td><td class="dc d-g3" data-tip="HotpotQA · Centralized · Structured"><b>+10.0</b></td></tr>
-<tr><th scope="row">Decentralized</th><td class="dc d-l1" data-tip="HotpotQA · Decentralized · Freeform"><b>−2.0</b></td><td class="dc d-g3" data-tip="HotpotQA · Decentralized · Semi-structured"><b>+8.0</b></td><td class="dc d-g1" data-tip="HotpotQA · Decentralized · Structured"><b>+1.0</b></td></tr>
-</tbody>
-<tfoot><tr><th scope="row">Mean</th><td class="dc avg d-g1" data-tip="HotpotQA · mean over topologies · Freeform"><b>+1.8</b></td><td class="dc avg d-g3" data-tip="HotpotQA · mean over topologies · Semi-structured"><b>+6.3</b></td><td class="dc avg d-g3" data-tip="HotpotQA · mean over topologies · Structured"><b>+6.5</b></td></tr></tfoot>
-</table>
-</div>
-<div class="dgrid-panel">
-<table class="dgrid narrow"><caption>LiveCodeBench</caption>
-<thead><tr><th scope="col" class="corner">Topology</th><th scope="col">Freeform</th><th scope="col">Semi-structured</th><th scope="col">Structured</th></tr></thead>
-<tbody>
-<tr><th scope="row">Independent</th><td class="dc d-g1" data-tip="LiveCodeBench · Independent · Freeform"><b>+2.0</b></td><td class="dc d-z" data-tip="LiveCodeBench · Independent · Semi-structured"><b>0.0</b></td><td class="dc d-g2" data-tip="LiveCodeBench · Independent · Structured"><b>+4.0</b></td></tr>
-<tr><th scope="row">Sequential</th><td class="dc d-z" data-tip="LiveCodeBench · Sequential · Freeform"><b>0.0</b></td><td class="dc d-l2" data-tip="LiveCodeBench · Sequential · Semi-structured"><b>−4.0</b></td><td class="dc d-l1" data-tip="LiveCodeBench · Sequential · Structured"><b>−2.0</b></td></tr>
-<tr><th scope="row">Centralized</th><td class="dc d-g2" data-tip="LiveCodeBench · Centralized · Freeform"><b>+4.0</b></td><td class="dc d-l1" data-tip="LiveCodeBench · Centralized · Semi-structured"><b>−2.0</b></td><td class="dc d-g3" data-tip="LiveCodeBench · Centralized · Structured"><b>+6.0</b></td></tr>
-<tr><th scope="row">Decentralized</th><td class="dc d-z" data-tip="LiveCodeBench · Decentralized · Freeform"><b>0.0</b></td><td class="dc d-z" data-tip="LiveCodeBench · Decentralized · Semi-structured"><b>0.0</b></td><td class="dc d-z" data-tip="LiveCodeBench · Decentralized · Structured"><b>0.0</b></td></tr>
-</tbody>
-<tfoot><tr><th scope="row">Mean</th><td class="dc avg d-g1" data-tip="LiveCodeBench · mean over topologies · Freeform"><b>+1.5</b></td><td class="dc avg d-l1" data-tip="LiveCodeBench · mean over topologies · Semi-structured"><b>−1.5</b></td><td class="dc avg d-g1" data-tip="LiveCodeBench · mean over topologies · Structured"><b>+2.0</b></td></tr></tfoot>
-</table>
-</div>
-</div>
-<div class="dlegend" aria-hidden="true"><span>regression</span><span class="dlegend-scale"><i class="d-l4"></i><i class="d-l3"></i><i class="d-l2"></i><i class="d-l1"></i><i class="d-z"></i><i class="d-g1"></i><i class="d-g2"></i><i class="d-g3"></i><i class="d-g4"></i></span><span>gain</span><span class="dlegend-note">Δ in points</span></div>
-</div>
-
-<div class="admonition takeaway">
-<p class="admonition-title">Takeaway</p>
-<p>Prompt optimization gains grow as inter-agent messages become more structured.</p>
-</div>
+<p>Pass <code>--communication &lt;format&gt;</code> to the run protocol, or use the key <code>&lt;topology&gt;_communications_&lt;format&gt;</code>. The bridge has adapters for HotpotQA, LiveCodeBench, BFCL, ToolHop and API-Bank; the experiment grid covers HotpotQA, LiveCodeBench and BFCL with GEPA, MIPRO, MAPRO and MASPO, and other cells need <code>--allow-any-cell</code>. For example, MASPO on Sequential LiveCodeBench with Structured messages:</p>
+<div class="language-bash highlight"><span class="filename">MASPO on Sequential · LiveCodeBench · Structured</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span>maspo<span class="w"> </span>--dataset<span class="w"> </span>lcb<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--topology<span class="w"> </span>sequential<span class="w"> </span>--communication<span class="w"> </span>structured_soft<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/maspo/lcb/sequential_structured_soft/qwen/0
+</code></pre></div>
+<p>See <a href="../../optimizers/running/">Run an Optimizer</a>.</p>
     </article>
     <div class="page-meta">
       <a class="edit-link" href="https://github.com/fm8995610-ops/MAS-PromptBench/edit/main/docs/content/mas/communication-protocols.md"><svg class="i" aria-hidden="true"><use href="#i-edit"></use></svg>Edit this page on GitHub</a>
@@ -418,8 +365,6 @@ python -m real_runner_gepa.pilots.run_gepa_dataset --dataset hotpotqa \
       <li><a href="#run-the-sweep">Run the sweep</a>
       </li>
       <li><a href="#optimize-a-cell">Optimize a cell</a>
-      </li>
-      <li><a href="#what-the-paper-found">What the paper found</a>
       </li>
     </ul>
   </aside>

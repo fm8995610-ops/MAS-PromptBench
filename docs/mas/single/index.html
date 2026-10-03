@@ -38,6 +38,7 @@
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.4-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></symbol>
   <symbol id="i-wiki" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 7.2l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z" fill="currentColor"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V19a1.5 1.5 0 0 1-1.5 1.5H15v-5.5H9v5.5H5.5A1.5 1.5 0 0 1 4 19v-7.8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
@@ -55,10 +56,7 @@
     <button class="search-trigger" type="button" aria-label="Search the docs" aria-haspopup="dialog">
       <svg class="i" aria-hidden="true"><use href="#i-search"></use></svg><span class="search-placeholder">Search the docs</span><kbd>/</kbd>
     </button>
-    <nav class="topbar-links" aria-label="Project">
-      <a href="../../results/">Results</a>
-      <a href="https://fm8995610-ops.github.io/MAS-PromptBench/">Project page</a>
-    </nav>
+    <a class="deepwiki-btn project-btn" href="https://fm8995610-ops.github.io/MAS-PromptBench/" title="Project page"><svg class="i" aria-hidden="true"><use href="#i-home"></use></svg><span>Project Page</span></a>
     <a class="deepwiki-btn" href="https://deepwiki.com/fm8995610-ops/MAS-PromptBench" title="Ask questions about the code on DeepWiki"><svg class="i" aria-hidden="true"><use href="#i-wiki"></use></svg><span>Ask DeepWiki</span></a>
     <a class="icon-btn" href="https://github.com/fm8995610-ops/MAS-PromptBench" aria-label="GitHub repository"><svg class="i" aria-hidden="true"><use href="#i-github"></use></svg></a>
     <button class="icon-btn theme-toggle" type="button" aria-label="Switch color theme"><svg class="i" aria-hidden="true"><use href="#i-sun"></use></svg><svg class="i" aria-hidden="true"><use href="#i-moon"></use></svg></button>
@@ -136,22 +134,14 @@
     <span class="nav-label">Optimizers</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../../optimizers/">Overview</a></li>
-  <li><a class="nav-link" href="../../optimizers/gepa/">GEPA</a></li>
-  <li><a class="nav-link" href="../../optimizers/mipro/">MIPRO</a></li>
   <li><a class="nav-link" href="../../optimizers/running/">Run an Optimizer</a></li>
-</ul>
-  </li>
-  <li class="nav-section">
-    <span class="nav-label">Results</span>
-    <ul class="nav-list nav-l1">
-  <li><a class="nav-link" href="../../results/">Results Explorer</a></li>
 </ul>
   </li>
   <li class="nav-section">
     <span class="nav-label">Evaluation</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../../evaluation/protocol/">Evaluation Protocol</a></li>
-  <li><a class="nav-link" href="../../evaluation/results/">Read the Results</a></li>
+  <li><a class="nav-link" href="../../evaluation/outputs/">Read Run Outputs</a></li>
 </ul>
   </li>
   <li class="nav-section">
@@ -168,8 +158,6 @@
   <li><a class="nav-link" href="../../reference/cli/">Command-Line Flags</a></li>
   <li><a class="nav-link" href="../../reference/environment/">Environment Variables</a></li>
   <li><a class="nav-link" href="../../reference/repository/">Repository Map</a></li>
-  <li><a class="nav-link" href="../../reference/known-issues/">Known Issues</a></li>
-  <li><a class="nav-link" href="../../reference/deepwiki/">Ask DeepWiki</a></li>
 </ul>
   </li>
 </ul>
@@ -193,7 +181,7 @@
 </div>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Link to this section">#</a></h2>
 <ol>
-<li>The runner reads the seed prompt <code>configs/prompts/single/&lt;dataset&gt;/solver.txt</code> and wraps it with the dataset's protected output contract from <code>topologies/output_contracts.py</code> (for HotpotQA: end with one line <code>Answer: &lt;short-form&gt;</code>).</li>
+<li>The runner reads the seed prompt <code>configs/prompts/single/&lt;dataset&gt;/solver.txt</code> and wraps it with the dataset's protected output contract from <code>core/output_contracts.py</code> (for HotpotQA: end with one line <code>Answer: &lt;short-form&gt;</code>). HotpotQA and MATH also append a short format note.</li>
 <li>It builds one agent with LangGraph's prebuilt <code>create_react_agent</code>, bound to the dataset's tools: <code>wikipedia_search</code> and <code>wikipedia_page</code> for HotpotQA, <code>calculator</code> for GPQA and MATH, <code>python_exec</code> for LiveCodeBench and APPS, <code>file_read</code>, <code>file_write</code>, <code>list_dir</code>, <code>search_repo</code> and <code>shell_exec</code> for SWE-bench, and tools built from the function schemas for BFCL.</li>
 <li>The agent alternates between reasoning and tool calls. Each tool result is appended to its history. The loop ends when the model replies without a tool call, or when LangGraph's recursion limit is reached (25 steps; 100 for SWE-bench).</li>
 <li>The runner parses the final message with the dataset's extractor and scores it.</li>
@@ -215,49 +203,27 @@
 </tr>
 </tbody>
 </table>
-<p>The role descriptions the prompts were generated from are under <code>single:</code> in <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/prompts/roles.yaml"><code>configs/prompts/roles.yaml</code></a>. The optimizer reads these files and never overwrites them; it writes its compiled prompt to its own output folder.</p>
+<p>The role descriptions the prompts were generated from are under <code>single:</code> in <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/prompts/roles.yaml"><code>configs/prompts/roles.yaml</code></a>. The optimizers read these files and never overwrite them; a job keeps its prompts under its own <code>--out</code> folder.</p>
 <h2 id="implementation">Implementation<a class="headerlink" href="#implementation" title="Link to this section">#</a></h2>
 <ul>
 <li><strong>Reference scaffold:</strong> <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/topologies/single/langgraph_base.py"><code>topologies/single/langgraph_base.py</code></a> shows the pattern in 54 lines: <code>create_react_agent</code> with toy tools (<code>add</code>, <code>multiply</code>, a mock <code>web_search</code>). It is a demo, not a benchmark runner.</li>
-<li><strong>Dataset runners:</strong> <code>topologies/single/&lt;dataset&gt;/langgraph_&lt;dataset&gt;.py</code>, one per dataset. Each wires real tools, the dataset loader, the scorer and the batch loop around the same ReAct agent.</li>
-<li><strong>ToolHop and API-Bank:</strong> these two runners don't use LangGraph objects. They call the endpoint through the <code>openai</code> client in a plain tool loop (ToolHop allows 9 turns by default, <code>TOOLHOP_MAX_TURNS</code>). Every other topology's ToolHop and API-Bank runner carries a copy of the same core.</li>
+<li><strong>Dataset runners:</strong> <code>topologies/single/&lt;dataset&gt;/langgraph_&lt;dataset&gt;.py</code>, one per dataset. Each wires the real tools to the same ReAct agent; the loader, scorer and records come from the dataset's task module in <code>core/tasks/</code>.</li>
+<li><strong>ToolHop and API-Bank:</strong> these two runners don't use LangGraph objects. ToolHop runs a plain tool loop on the <code>openai</code> client (9 turns by default, <code>TOOLHOP_MAX_TURNS</code>); API-Bank makes one model call. Both live in <code>core/tasks/toolhop.py</code> and <code>core/tasks/apibank.py</code>, shared by every topology's runner.</li>
 </ul>
 <h2 id="run-it">Run it<a class="headerlink" href="#run-it" title="Link to this section">#</a></h2>
 <p>Run from the repository root with a model endpoint configured (<a href="../../getting-started/connect-a-model/">Connect a Model</a>).</p>
-<pre class="highlight"><code class="language-bash">python -m topologies.single.hotpotqa.langgraph_hotpotqa</code></pre>
-<pre class="highlight"><code class="language-bash">python -m topologies.single.hotpotqa.langgraph_hotpotqa --batch --limit 100 \
-  --out results/topologies_baseline/single_hotpotqa/predictions.jsonl</code></pre>
-<p>Other datasets follow the same module path with a different folder and file name, for example <code>topologies.single.math.langgraph_math</code>. BFCL, SWE-bench, ToolHop and API-Bank take <code>--out-dir</code> instead of <code>--out</code>, and BFCL and SWE-bench reject <code>--batch</code>. See <a href="../../reference/cli/">Command-Line Flags</a> for each family.</p>
+<div class="language-bash highlight"><span class="filename">Smoke demo (built-in example, no dataset download)</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>topologies.single.hotpotqa.langgraph_hotpotqa
+</code></pre></div>
+<div class="language-bash highlight"><span class="filename">Batch run on 100 HotpotQA questions</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>topologies.single.hotpotqa.langgraph_hotpotqa<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/topologies_baseline/single_hotpotqa
+</code></pre></div>
+<p>Other datasets follow the same module path with a different folder and file name, for example <code>topologies.single.math.langgraph_math</code>. BFCL, SWE-bench, ToolHop and API-Bank have no demo and always run a batch. See the <a href="../../tasks/">task pages</a> for each dataset's options.</p>
 <h2 id="optimize-it">Optimize it<a class="headerlink" href="#optimize-it" title="Link to this section">#</a></h2>
-<p>The optimizer topology name is <code>single</code>. It has one prompt to tune, <code>solver</code>.</p>
-<pre class="highlight"><code class="language-bash">cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset --dataset math --topology single \
-  --train-size 25 --val-size 25 --max-full-evals 5 --out results/gepa/single_math</code></pre>
+<p>The protocol topology is <code>single</code>, with one prompt to tune, <code>solver</code>. In the experiment grid, the Single topology is optimized by GEPA and MIPRO; the other six methods optimize multi-agent teams.</p>
+<div class="language-bash highlight"><span class="filename">GEPA on Single · MATH</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span>gepa<span class="w"> </span>--dataset<span class="w"> </span>math<span class="w"> </span>--topology<span class="w"> </span>single<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/gepa/math/single/qwen/0
+</code></pre></div>
 <p>See <a href="../../optimizers/running/">Run an Optimizer</a> for endpoints and outputs.</p>
-<h2 id="results">Results<a class="headerlink" href="#results" title="Link to this section">#</a></h2>
-<p>GEPA's gain on each of the nine tasks with the Single topology, as reported in the paper. Bars grow right for a gain and left for a regression, on the same scale on every topology page. <a href="../../results/">Compare all topologies</a>.</p>
-<div class="dbars-wrap ">
-<table class="dbars"><caption>Single: GEPA gain on each task, topology study. Average +4.2 points.</caption>
-<thead><tr><th scope="col">Task</th><th scope="col" class="bar-col">Gain (Δ, points)</th><th scope="col" class="num">Δ</th><th scope="col" class="num scores">Baseline → optimized</th></tr></thead>
-<tbody>
-<tr class="dgroup"><th scope="rowgroup" colspan="4">Reasoning</th></tr>
-<tr data-tip="GPQA-Diamond · Accuracy · +4.0 points"><th scope="row">GPQA-Diamond<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:9.52%"></i></span></td><td class="num d-txt-g">+4.0</td><td class="num scores">54.0 → 58.0</td></tr>
-<tr data-tip="HotpotQA · Exact match · +13.0 points"><th scope="row">HotpotQA<small>Exact match</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:30.95%"></i></span></td><td class="num d-txt-g">+13.0</td><td class="num scores">26.0 → 39.0</td></tr>
-<tr data-tip="MATH · Accuracy · +2.0 points"><th scope="row">MATH<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:4.76%"></i></span></td><td class="num d-txt-g">+2.0</td><td class="num scores">49.0 → 51.0</td></tr>
-<tr class="dgroup"><th scope="rowgroup" colspan="4">Coding</th></tr>
-<tr data-tip="LiveCodeBench · pass@1 · 0.0 points"><th scope="row">LiveCodeBench<small>pass@1</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar zero" style="left:40.48%"></i></span></td><td class="num d-txt-z">0.0</td><td class="num scores">12.0 → 12.0</td></tr>
-<tr data-tip="APPS · pass@1 · +14.0 points"><th scope="row">APPS<small>pass@1</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:33.33%"></i></span></td><td class="num d-txt-g">+14.0</td><td class="num scores">52.0 → 66.0</td></tr>
-<tr data-tip="SWE-bench Verified · Resolved · −3.3 points"><th scope="row">SWE-bench Verified<small>Resolved</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar neg" style="left:32.62%;width:7.86%"></i></span></td><td class="num d-txt-l">−3.3</td><td class="num scores">33.3 → 30.0</td></tr>
-<tr class="dgroup"><th scope="rowgroup" colspan="4">Tool-Calling</th></tr>
-<tr data-tip="BFCL · Accuracy · +4.0 points"><th scope="row">BFCL<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:9.52%"></i></span></td><td class="num d-txt-g">+4.0</td><td class="num scores">84.0 → 88.0</td></tr>
-<tr data-tip="ToolHop · Accuracy · +2.0 points"><th scope="row">ToolHop<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:4.76%"></i></span></td><td class="num d-txt-g">+2.0</td><td class="num scores">62.0 → 64.0</td></tr>
-<tr data-tip="API-Bank · Accuracy · +2.0 points"><th scope="row">API-Bank<small>Accuracy</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:16.67%"></i><i class="tick" style="left:64.29%"></i><i class="tick" style="left:88.10%"></i><i class="axis" style="left:40.48%"></i><i class="bar pos" style="left:40.48%;width:4.76%"></i></span></td><td class="num d-txt-g">+2.0</td><td class="num scores">77.0 → 79.0</td></tr>
-</tbody>
-</table>
-</div>
-
-<p>With GEPA, Single had the largest average gain of the five topologies, +4.2 points. On MATH it moved from 49.0 to 51.0 (+2.0).</p>
-<p>Every multi-agent topology gained less on average. See <a href="../topologies/#what-the-paper-found">what the paper found</a> for all five.</p>
     </article>
     <div class="page-meta">
       <a class="edit-link" href="https://github.com/fm8995610-ops/MAS-PromptBench/edit/main/docs/content/mas/single.md"><svg class="i" aria-hidden="true"><use href="#i-edit"></use></svg>Edit this page on GitHub</a>
@@ -288,8 +254,6 @@ python -m real_runner_gepa.pilots.run_gepa_dataset --dataset math --topology sin
       <li><a href="#run-it">Run it</a>
       </li>
       <li><a href="#optimize-it">Optimize it</a>
-      </li>
-      <li><a href="#results">Results</a>
       </li>
     </ul>
   </aside>

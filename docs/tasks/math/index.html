@@ -38,6 +38,7 @@
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.4-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></symbol>
   <symbol id="i-wiki" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 7.2l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z" fill="currentColor"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V19a1.5 1.5 0 0 1-1.5 1.5H15v-5.5H9v5.5H5.5A1.5 1.5 0 0 1 4 19v-7.8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
@@ -55,10 +56,7 @@
     <button class="search-trigger" type="button" aria-label="Search the docs" aria-haspopup="dialog">
       <svg class="i" aria-hidden="true"><use href="#i-search"></use></svg><span class="search-placeholder">Search the docs</span><kbd>/</kbd>
     </button>
-    <nav class="topbar-links" aria-label="Project">
-      <a href="../../results/">Results</a>
-      <a href="https://fm8995610-ops.github.io/MAS-PromptBench/">Project page</a>
-    </nav>
+    <a class="deepwiki-btn project-btn" href="https://fm8995610-ops.github.io/MAS-PromptBench/" title="Project page"><svg class="i" aria-hidden="true"><use href="#i-home"></use></svg><span>Project Page</span></a>
     <a class="deepwiki-btn" href="https://deepwiki.com/fm8995610-ops/MAS-PromptBench" title="Ask questions about the code on DeepWiki"><svg class="i" aria-hidden="true"><use href="#i-wiki"></use></svg><span>Ask DeepWiki</span></a>
     <a class="icon-btn" href="https://github.com/fm8995610-ops/MAS-PromptBench" aria-label="GitHub repository"><svg class="i" aria-hidden="true"><use href="#i-github"></use></svg></a>
     <button class="icon-btn theme-toggle" type="button" aria-label="Switch color theme"><svg class="i" aria-hidden="true"><use href="#i-sun"></use></svg><svg class="i" aria-hidden="true"><use href="#i-moon"></use></svg></button>
@@ -136,22 +134,14 @@
     <span class="nav-label">Optimizers</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../../optimizers/">Overview</a></li>
-  <li><a class="nav-link" href="../../optimizers/gepa/">GEPA</a></li>
-  <li><a class="nav-link" href="../../optimizers/mipro/">MIPRO</a></li>
   <li><a class="nav-link" href="../../optimizers/running/">Run an Optimizer</a></li>
-</ul>
-  </li>
-  <li class="nav-section">
-    <span class="nav-label">Results</span>
-    <ul class="nav-list nav-l1">
-  <li><a class="nav-link" href="../../results/">Results Explorer</a></li>
 </ul>
   </li>
   <li class="nav-section">
     <span class="nav-label">Evaluation</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../../evaluation/protocol/">Evaluation Protocol</a></li>
-  <li><a class="nav-link" href="../../evaluation/results/">Read the Results</a></li>
+  <li><a class="nav-link" href="../../evaluation/outputs/">Read Run Outputs</a></li>
 </ul>
   </li>
   <li class="nav-section">
@@ -168,8 +158,6 @@
   <li><a class="nav-link" href="../../reference/cli/">Command-Line Flags</a></li>
   <li><a class="nav-link" href="../../reference/environment/">Environment Variables</a></li>
   <li><a class="nav-link" href="../../reference/repository/">Repository Map</a></li>
-  <li><a class="nav-link" href="../../reference/known-issues/">Known Issues</a></li>
-  <li><a class="nav-link" href="../../reference/deepwiki/">Ask DeepWiki</a></li>
 </ul>
   </li>
 </ul>
@@ -186,74 +174,56 @@
 <div class="facts">
 <div><span>Domain</span>Reasoning</div>
 <div><span>Metric</span>Accuracy (is_equiv)</div>
-<div><span>Launcher limit</span>100</div>
 <div><span>Eval IDs</span>100</div>
+<div><span>Train / val</span>150 / 50</div>
 <div><span>Data</span>qwedsacf/competition_math</div>
 </div>
 <h2 id="the-task">The task<a class="headerlink" href="#the-task" title="Link to this section">#</a></h2>
-<p>Each instance is one problem statement, passed to the agents as is. Agents can call <code>calculator</code>, which evaluates a numeric Python expression with the usual math functions. The Decentralized (OpenAI SDK) runner also gives its agents <code>solve_equation</code> for one-variable equations.</p>
-<p>The final agent's output contract asks for a <code>\boxed{...}</code> line at the start, at most 12 short reasoning lines, and the same <code>\boxed{...}</code> line at the end. The scorer reads only the last boxed expression. The single-agent runner adds a format note with examples such as <code>\boxed{42}</code> and <code>\boxed{\frac{1}{2}}</code>.</p>
+<p>Each instance is one problem statement, passed to the agents as is. Agents can call <code>calculator</code>, which evaluates a numeric Python expression with the usual math functions.</p>
+<p>The answering agent's output contract asks for a <code>\boxed{...}</code> line at the start, at most 12 short reasoning lines, and the same <code>\boxed{...}</code> line at the end. The scorer reads only the last boxed expression. The Single and Independent runners also add a format note with examples such as <code>\boxed{42}</code> and <code>\boxed{\frac{1}{2}}</code>.</p>
 <h2 id="how-it-is-scored">How it is scored<a class="headerlink" href="#how-it-is-scored" title="Link to this section">#</a></h2>
 <ol>
 <li><strong>Extract</strong> the content of the last <code>\boxed{...}</code> in the final message, counting braces so nested expressions like <code>\boxed{\frac{1}{2}}</code> come out whole. No boxed answer means the instance is wrong.</li>
-<li><strong>Compare</strong> it to the gold answer with <code>is_equiv</code>, a verbatim port of Hendrycks' <code>math_equivalence.py</code>. Both strings are normalized and then compared for equality.</li>
+<li><strong>Compare</strong> it to the gold answer with <code>is_equiv</code>, a port of Hendrycks' <code>math_equivalence.py</code>. Both strings are normalized and then compared for equality.</li>
 </ol>
 <p>Normalization removes spaces, <code>\left</code> and <code>\right</code>, degree marks, <code>\$</code>, <code>\%</code> and trailing units; rewrites <code>tfrac</code> and <code>dfrac</code> as <code>frac</code>; repairs shorthand like <code>\frac12</code> and <code>\sqrt3</code>; turns <code>0.5</code> into <code>\frac{1}{2}</code> and simple <code>a/b</code> into <code>\frac{a}{b}</code>; and drops a short left-hand side such as <code>x =</code>.</p>
-<p>The batch reports <code>EM</code>, the fraction of instances judged equivalent, over all instances (a missing answer counts as wrong) and over those with an extracted answer.</p>
+<p>The batch reports <code>EM</code>, the fraction of instances judged equivalent, over all instances (a missing answer counts as wrong) and over those with an extracted answer. Independent and Decentralized teams group their agents' answers into buckets that <code>is_equiv</code> treats as equal and submit the largest bucket, ties going to the lowest agent.</p>
 <h2 id="data">Data<a class="headerlink" href="#data" title="Link to this section">#</a></h2>
-<p>The runner loads the Hugging Face dataset <code>qwedsacf/competition_math</code> (split <code>train</code>) and keeps rows whose subject is <code>Precalculus</code> and level is <code>Level 5</code>. That dataset has no answer field, so the gold answer is the last <code>\boxed{...}</code> in the reference solution; rows without one are skipped. Each row's ID is <code>math_</code> plus the first 10 hex characters of the MD5 of the problem text, so IDs match across topologies.</p>
-<p>The 100 frozen IDs are in <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/math/math_eval_ids.json"><code>benchmarks/math/math_eval_ids.json</code></a>. No setup is needed beyond Hugging Face access.</p>
-<div class="admonition note">
-<p class="admonition-title">MATH-500 in the logs</p>
-<p>Most MATH runners still say "MATH-500" in their <code>--help</code> text and log lines. All eight load the Precalculus, Level 5 slice described above.</p>
-</div>
+<p>The runner loads the Hugging Face dataset <code>qwedsacf/competition_math</code> (split <code>train</code>) and keeps the 312 rows whose subject is <code>Precalculus</code> and level is <code>Level 5</code>. That dataset has no answer field, so the gold answer is the last <code>\boxed{...}</code> in the reference solution; rows without one are skipped. Each row's ID is <code>math_</code> plus the first 10 hex characters of the MD5 of the problem text, so IDs match across topologies.</p>
+<p>The 100 eval IDs are in <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/math/math_eval_ids.json"><code>benchmarks/math/math_eval_ids.json</code></a>; they are the first 100 problems of the slice, so <code>--limit 100</code> scores exactly that set. No setup is needed beyond Hugging Face access.</p>
 <h2 id="run-it">Run it<a class="headerlink" href="#run-it" title="Link to this section">#</a></h2>
 <p>Run every command from the repository root. With no arguments, a runner solves <span class="arithmatex">\( 7!/5! \)</span> (expected <code>42</code>) and prints the extracted answer, its score and the message trace:</p>
-<pre class="highlight"><code class="language-bash">python -m topologies.single.math.langgraph_math</code></pre>
-<p>A batch needs <code>--batch</code>. Without <code>--out</code>, it only prints scores.</p>
+<div class="language-bash highlight"><span class="filename">Smoke demo</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>topologies.single.math.langgraph_math
+</code></pre></div>
+<p>A batch needs <code>--batch</code>:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Single</label><label for="__tabbed_1_2">Independent</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<pre class="highlight"><code class="language-bash">python -m topologies.single.math.langgraph_math --batch --limit 100 \
-  --out results/topologies_baseline/single_math/predictions.jsonl</code></pre>
+<div class="language-bash highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>topologies.single.math.langgraph_math<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/topologies_baseline/single_math
+</code></pre></div>
 </div>
 <div class="tabbed-block">
-<pre class="highlight"><code class="language-bash">python -m topologies.independent.math.langgraph_math --batch --limit 100 \
-  --out results/topologies_baseline/independent_math/predictions.jsonl</code></pre>
+<div class="language-bash highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>topologies.independent.math.langgraph_math<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/topologies_baseline/independent_math
+</code></pre></div>
 </div>
 </div>
 </div>
-<p>The Independent runner runs <code>INDEPENDENT_N_AGENTS</code> replicas (default 4) and takes a majority vote, grouping answers that <code>is_equiv</code> treats as equal.</p>
-<p>To score exactly the frozen set, pass its IDs to <code>--only</code>:</p>
-<pre class="highlight"><code class="language-bash">MANIFEST=benchmarks/math/math_eval_ids.json
-IDS=$(python -c "import json,sys; print(*json.load(open(sys.argv[1]))['ids'])" $MANIFEST)
-python -m topologies.single.math.langgraph_math --batch --only $IDS \
-  --out results/topologies_baseline/single_math/predictions.jsonl</code></pre>
-<p>To optimize the single-agent prompt with <a href="../../optimizers/gepa/">GEPA</a>:</p>
-<pre class="highlight"><code class="language-bash">cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset --dataset math --topology single \
-  --train-size 25 --val-size 25 --max-full-evals 5 --out results/gepa/single_math</code></pre>
+<p>The Independent runner runs <code>INDEPENDENT_N_AGENTS</code> replicas (default 4) and submits the largest equivalence bucket.</p>
+<h2 id="optimize-it">Optimize it<a class="headerlink" href="#optimize-it" title="Link to this section">#</a></h2>
+<p>Every optimizer runs through the same protocol command; change <code>--method</code> to switch. For example, MAPRO on the Independent team:</p>
+<div class="language-bash highlight"><span class="filename">MAPRO on Independent · MATH</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span>mapro<span class="w"> </span>--dataset<span class="w"> </span>math<span class="w"> </span>--topology<span class="w"> </span>independent<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/mapro/math/independent/qwen/0
+</code></pre></div>
+<p>Combinations outside the experiment grid need <code>--allow-any-cell</code>; see <a href="../#optimize-a-task">Optimize a task</a>.</p>
 <h2 id="flags">Flags<a class="headerlink" href="#flags" title="Link to this section">#</a></h2>
-<p>All eight MATH runners take the common flags and nothing else: <code>--batch</code>, <code>--limit N</code>, <code>--offset K</code>, <code>--only ID ...</code> (space-separated) and <code>--out PATH</code>. See <a href="../../reference/cli/">Command-Line Flags</a>.</p>
-<h2 id="results">Results<a class="headerlink" href="#results" title="Link to this section">#</a></h2>
-<p>GEPA's gain on MATH for each topology, as reported in the paper. Each cell shows the change in points and the accuracy before → after optimization. The framework study runs the same topologies on popular frameworks. <a href="../../results/">Compare all tasks</a>.</p>
-<div class="dgrid-wrap compact">
-<table class="dgrid"><caption>MATH: GEPA gain by topology (Accuracy)</caption>
-<thead><tr><th scope="col" class="corner">Study</th><th scope="col">Single</th><th scope="col">Independent</th><th scope="col">Sequential</th><th scope="col">Centralized</th><th scope="col">Decentralized</th></tr></thead>
-<tbody>
-<tr><th scope="row">Topology study</th><td class="dc d-g1" data-tip="MATH · Single · Accuracy"><b>+2.0</b><span>49.0 → 51.0</span></td><td class="dc d-l4" data-tip="MATH · Independent · Accuracy"><b>−16.0</b><span>76.0 → 60.0</span></td><td class="dc d-z" data-tip="MATH · Sequential · Accuracy"><b>0.0</b><span>74.0 → 74.0</span></td><td class="dc d-g2" data-tip="MATH · Centralized · Accuracy"><b>+3.0</b><span>66.0 → 69.0</span></td><td class="dc d-z" data-tip="MATH · Decentralized · Accuracy"><b>0.0</b><span>81.0 → 81.0</span></td></tr>
-<tr><th scope="row">Framework study<small>one framework per topology</small></th><td class="dc d-g1" data-tip="MATH · Single (LangGraph) · Accuracy"><b>+2.0</b><span>49.0 → 51.0</span><em>LangGraph</em></td><td class="dc d-l4" data-tip="MATH · Independent (LangGraph) · Accuracy"><b>−16.0</b><span>76.0 → 60.0</span><em>LangGraph</em></td><td class="dc d-g2" data-tip="MATH · Sequential (CrewAI) · Accuracy"><b>+4.0</b><span>58.0 → 62.0</span><em>CrewAI</em></td><td class="dc d-g3" data-tip="MATH · Centralized (AutoGen) · Accuracy"><b>+6.0</b><span>63.0 → 69.0</span><em>AutoGen</em></td><td class="dc d-z" data-tip="MATH · Decentralized (OpenAI SDK) · Accuracy"><b>0.0</b><span>66.0 → 66.0</span><em>OpenAI SDK</em></td></tr>
-</tbody>
-</table>
-<div class="dlegend" aria-hidden="true"><span>regression</span><span class="dlegend-scale"><i class="d-l4"></i><i class="d-l3"></i><i class="d-l2"></i><i class="d-l1"></i><i class="d-z"></i><i class="d-g1"></i><i class="d-g2"></i><i class="d-g3"></i><i class="d-g4"></i></span><span>gain</span><span class="dlegend-note">Δ in points · cell shows baseline → optimized</span></div>
-</div>
-
-<p>MATH shows the widest spread in the paper. GEPA lifts the Single topology from 49.0 to 51.0 (+2.0 points) but drops Independent from 76.0 to 60.0 (−16.0), the largest decrease across all task and topology pairs.</p>
+<p>All eight MATH runners take the common flags and nothing else: <code>--batch</code>, <code>--limit N</code>, <code>--offset K</code>, <code>--only ID ...</code>, <code>--out-dir DIR</code> and <code>--out PATH</code>. See <a href="../../reference/cli/">Command-Line Flags</a>.</p>
 <h2 id="related">Related<a class="headerlink" href="#related" title="Link to this section">#</a></h2>
 <ul>
 <li><a href="../gpqa/">GPQA-Diamond</a> and <a href="../hotpotqa/">HotpotQA</a>, the other reasoning tasks.</li>
 <li><a href="../../mas/independent/">Independent</a> for the majority-vote ensemble.</li>
-<li><a href="../../evaluation/protocol/">Evaluation Protocol</a> for how the frozen IDs are used.</li>
+<li><a href="../../evaluation/protocol/">Evaluation Protocol</a> for how the eval IDs and splits are used.</li>
 </ul>
     </article>
     <div class="page-meta">
@@ -284,9 +254,9 @@ python -m real_runner_gepa.pilots.run_gepa_dataset --dataset math --topology sin
       </li>
       <li><a href="#run-it">Run it</a>
       </li>
-      <li><a href="#flags">Flags</a>
+      <li><a href="#optimize-it">Optimize it</a>
       </li>
-      <li><a href="#results">Results</a>
+      <li><a href="#flags">Flags</a>
       </li>
       <li><a href="#related">Related</a>
       </li>

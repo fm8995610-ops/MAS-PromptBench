@@ -38,6 +38,7 @@
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.4-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></symbol>
   <symbol id="i-wiki" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 7.2l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z" fill="currentColor"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V19a1.5 1.5 0 0 1-1.5 1.5H15v-5.5H9v5.5H5.5A1.5 1.5 0 0 1 4 19v-7.8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
@@ -55,10 +56,7 @@
     <button class="search-trigger" type="button" aria-label="Search the docs" aria-haspopup="dialog">
       <svg class="i" aria-hidden="true"><use href="#i-search"></use></svg><span class="search-placeholder">Search the docs</span><kbd>/</kbd>
     </button>
-    <nav class="topbar-links" aria-label="Project">
-      <a href="../../results/">Results</a>
-      <a href="https://fm8995610-ops.github.io/MAS-PromptBench/">Project page</a>
-    </nav>
+    <a class="deepwiki-btn project-btn" href="https://fm8995610-ops.github.io/MAS-PromptBench/" title="Project page"><svg class="i" aria-hidden="true"><use href="#i-home"></use></svg><span>Project Page</span></a>
     <a class="deepwiki-btn" href="https://deepwiki.com/fm8995610-ops/MAS-PromptBench" title="Ask questions about the code on DeepWiki"><svg class="i" aria-hidden="true"><use href="#i-wiki"></use></svg><span>Ask DeepWiki</span></a>
     <a class="icon-btn" href="https://github.com/fm8995610-ops/MAS-PromptBench" aria-label="GitHub repository"><svg class="i" aria-hidden="true"><use href="#i-github"></use></svg></a>
     <button class="icon-btn theme-toggle" type="button" aria-label="Switch color theme"><svg class="i" aria-hidden="true"><use href="#i-sun"></use></svg><svg class="i" aria-hidden="true"><use href="#i-moon"></use></svg></button>
@@ -136,22 +134,14 @@
     <span class="nav-label">Optimizers</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../../optimizers/">Overview</a></li>
-  <li><a class="nav-link" href="../../optimizers/gepa/">GEPA</a></li>
-  <li><a class="nav-link" href="../../optimizers/mipro/">MIPRO</a></li>
   <li><a class="nav-link" href="../../optimizers/running/">Run an Optimizer</a></li>
-</ul>
-  </li>
-  <li class="nav-section">
-    <span class="nav-label">Results</span>
-    <ul class="nav-list nav-l1">
-  <li><a class="nav-link" href="../../results/">Results Explorer</a></li>
 </ul>
   </li>
   <li class="nav-section">
     <span class="nav-label">Evaluation</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../../evaluation/protocol/">Evaluation Protocol</a></li>
-  <li><a class="nav-link" href="../../evaluation/results/">Read the Results</a></li>
+  <li><a class="nav-link" href="../../evaluation/outputs/">Read Run Outputs</a></li>
 </ul>
   </li>
   <li class="nav-section">
@@ -168,8 +158,6 @@
   <li><a class="nav-link" href="../../reference/cli/">Command-Line Flags</a></li>
   <li><a class="nav-link" href="../../reference/environment/">Environment Variables</a></li>
   <li><a class="nav-link" href="../../reference/repository/">Repository Map</a></li>
-  <li><a class="nav-link" href="../../reference/known-issues/">Known Issues</a></li>
-  <li><a class="nav-link" href="../../reference/deepwiki/">Ask DeepWiki</a></li>
 </ul>
   </li>
 </ul>
@@ -186,12 +174,12 @@
 <div class="facts">
 <div><span>Domain</span>Tool calling</div>
 <div><span>Metric</span>AST match (valid rate)</div>
-<div><span>Launcher limit</span>100</div>
-<div><span>Eval IDs</span>25</div>
+<div><span>Eval IDs</span>100</div>
+<div><span>Train / val</span>150 / 50</div>
 <div><span>Data</span>gorilla-llm/Berkeley-Function-Calling-Leaderboard</div>
 </div>
 <h2 id="the-task">The task<a class="headerlink" href="#the-task" title="Link to this section">#</a></h2>
-<p>MAS-PromptBench uses the four single-turn BFCL categories that the AST checker can score. A run covers one category, chosen with <code>--category</code>:</p>
+<p>MAS-PromptBench uses the four single-turn BFCL v3 categories that the AST checker can score. A run covers one category, chosen with <code>--category</code>:</p>
 <table>
 <thead>
 <tr>
@@ -220,48 +208,52 @@
 </table>
 <p>How the agents answer depends on the runner:</p>
 <ul>
-<li><strong>Single and Independent</strong> use native tool calling. Each schema becomes a LangChain tool whose body does nothing, and an agent's answer is its first model message that contains tool calls. Later turns are ignored.</li>
-<li><strong>Sequential, Centralized and Decentralized</strong> follow the output contract: the final role ends with one fenced <code>json</code> block holding a non-empty list of calls in canonical form, <code>[{"function_name": {"arg": value}}]</code>. The runner parses the last fenced block that is a list of objects.</li>
+<li><strong>Single and Independent</strong> use native tool calling. Each schema becomes a LangChain tool whose body returns an empty string, and an agent's answer is the tool calls of its first model message that has any. Later turns are ignored.</li>
+<li><strong>Sequential, Centralized and Decentralized</strong> follow the output contract: the answering role ends with one fenced <code>json</code> block holding a non-empty list of calls in canonical form, <code>[{"function_name": {"arg": value}}]</code>. The runner parses the last fenced block that is a list of objects.</li>
 </ul>
 <h2 id="how-it-is-scored">How it is scored<a class="headerlink" href="#how-it-is-scored" title="Link to this section">#</a></h2>
 <p>The runner passes the canonical calls, with the schemas, the gold answers and the category, to <code>ast_checker</code> from the <code>bfcl-eval</code> package (Python language). The checker verifies function names and required parameters, and that each argument's type and value appear among the possible answers. For parallel categories, call order does not matter.</p>
-<p>Each line of <code>results.jsonl</code> carries <code>valid</code> (true when the checker accepts the output) and, on failure, the checker's <code>error_type</code>. The runner prints <code>valid N/M</code> at the end; the metric is the valid rate.</p>
+<p>Each line of <code>results.jsonl</code> carries <code>valid</code> (true when the checker accepts the output) and, on failure, the checker's <code>error_type</code>. The runner prints <code>valid N/M</code> at the end; the metric is the valid rate. Independent and Decentralized teams submit their agents' most common canonical call list, and only that list is checked.</p>
 <p>The runner registers your <code>MODEL_ID</code> in BFCL's model table before scoring, so dotted function names such as <code>math.factorial</code> are checked as written.</p>
 <h2 id="data">Data<a class="headerlink" href="#data" title="Link to this section">#</a></h2>
 <p>Each category is two files in the Hugging Face dataset <code>gorilla-llm/Berkeley-Function-Calling-Leaderboard</code>: <code>BFCL_v3_&lt;category&gt;.json</code> for the requests and <code>possible_answer/BFCL_v3_&lt;category&gt;.json</code> for the gold answers. The runner downloads them with <code>hf_hub_download</code>; no other setup is needed.</p>
-<p>The 25 frozen IDs in <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/bfcl/bfcl_eval_ids.json"><code>benchmarks/bfcl/bfcl_eval_ids.json</code></a> mix all four categories: <code>simple_0</code> to <code>simple_9</code>, and <code>multiple_</code>, <code>parallel_</code> and <code>parallel_multiple_</code> 0 to 4. A single run covers one category, so a plain <code>--limit</code> run, such as the launcher's <code>--limit 100</code> on the default <code>simple</code> category, does not reproduce this set.</p>
+<p>The 100 eval IDs in <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/bfcl/bfcl_eval_ids.json"><code>benchmarks/bfcl/bfcl_eval_ids.json</code></a> are a seed-0 stratified sample: 40 <code>simple</code>, 20 <code>multiple</code>, 20 <code>parallel</code> and 20 <code>parallel_multiple</code>. They are not a slice of any category, so a plain <code>--limit</code> run does not reproduce them.</p>
 <h2 id="run-it">Run it<a class="headerlink" href="#run-it" title="Link to this section">#</a></h2>
-<p>Run every command from the repository root. There is no smoke demo and no <code>--batch</code> flag; every run is a batch, and passing <code>--batch</code> is an error. With no arguments, a runner scores the first 5 <code>simple</code> instances.</p>
+<p>Run every command from the repository root. There is no smoke demo; with no arguments a runner scores the first 5 <code>simple</code> instances, and <code>--batch</code> changes nothing.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Single</label><label for="__tabbed_1_2">Sequential (CrewAI)</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<pre class="highlight"><code class="language-bash">python -m topologies.single.bfcl.langgraph_bfcl --category simple --limit 100 \
-  --out-dir results/topologies_baseline/single_bfcl</code></pre>
+<div class="language-bash highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>topologies.single.bfcl.langgraph_bfcl<span class="w"> </span>--category<span class="w"> </span>simple<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/topologies_baseline/single_bfcl/simple
+</code></pre></div>
 </div>
 <div class="tabbed-block">
-<pre class="highlight"><code class="language-bash">python -m topologies.sequential.crewai.bfcl.crewai_bfcl --category simple --limit 100 \
-  --out-dir results/topologies_baseline/sequential_crewai_bfcl</code></pre>
+<div class="language-bash highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>topologies.sequential.crewai.bfcl.crewai_bfcl<span class="w"> </span>--category<span class="w"> </span>simple<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/topologies_baseline/sequential_crewai_bfcl/simple
+</code></pre></div>
 </div>
 </div>
 </div>
-<p>To score the frozen set, run each category with all 25 IDs as repeated <code>--only</code> flags. <code>--only</code> keeps only the IDs found in the chosen category's file, so each pass picks up its own share:</p>
-<pre class="highlight"><code class="language-bash">MANIFEST=benchmarks/bfcl/bfcl_eval_ids.json
-IDS=$(python -c "import json,sys; print(*json.load(open(sys.argv[1]))['ids'])" $MANIFEST)
-ONLY=$(printf -- '--only %s ' $IDS)
-for cat in simple multiple parallel parallel_multiple; do
-  python -m topologies.single.bfcl.langgraph_bfcl --category $cat $ONLY \
-    --out-dir results/topologies_baseline/single_bfcl
-done</code></pre>
+<p>To score the eval IDs, run each category with all 100 IDs. <code>--only</code> keeps only the IDs found in the chosen category's file, so each pass picks up its own share:</p>
+<div class="language-bash highlight"><span class="filename">Score the eval IDs</span><pre><span></span><code><span class="nv">MANIFEST</span><span class="o">=</span>benchmarks/bfcl/bfcl_eval_ids.json
+<span class="nv">IDS</span><span class="o">=</span><span class="k">$(</span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import json,sys; print(*json.load(open(sys.argv[1]))[&#39;ids&#39;])&quot;</span><span class="w"> </span><span class="nv">$MANIFEST</span><span class="k">)</span>
+<span class="k">for</span><span class="w"> </span>cat<span class="w"> </span><span class="k">in</span><span class="w"> </span>simple<span class="w"> </span>multiple<span class="w"> </span>parallel<span class="w"> </span>parallel_multiple<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span>python<span class="w"> </span>-m<span class="w"> </span>topologies.single.bfcl.langgraph_bfcl<span class="w"> </span>--category<span class="w"> </span><span class="nv">$cat</span><span class="w"> </span>--only<span class="w"> </span><span class="nv">$IDS</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--out-dir<span class="w"> </span>results/topologies_baseline/single_bfcl/<span class="nv">$cat</span>
+<span class="k">done</span>
+</code></pre></div>
 <div class="admonition warning">
-<p class="admonition-title">Output files are appended</p>
-<p>BFCL runners append to <code>predictions.jsonl</code> and <code>results.jsonl</code> in <code>--out-dir</code>, and write one trace per instance to <code>traces/&lt;id&gt;.txt</code>. The loop above relies on this to collect all four categories in one place. Use a fresh <code>--out-dir</code> for each new run, or the old lines stay in the file.</p>
+<p class="admonition-title">One output folder per category</p>
+<p>A BFCL run writes <code>predictions.jsonl</code> and <code>results.jsonl</code> to <code>--out-dir</code>, emptying both first, plus one trace per instance in <code>traces/&lt;id&gt;.txt</code>. Give each category its own folder, as above, or the next category overwrites the last. <code>scripts/run_topologies.sh</code> does the same.</p>
 </div>
-<p>To optimize the single-agent prompt with <a href="../../optimizers/gepa/">GEPA</a>:</p>
-<pre class="highlight"><code class="language-bash">cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset --dataset bfcl --topology single \
-  --train-size 25 --val-size 25 --max-full-evals 5 --out results/gepa/single_bfcl</code></pre>
-<p>For the paper's best cell, use <code>--topology sequential_crewai</code>.</p>
+<h2 id="optimize-it">Optimize it<a class="headerlink" href="#optimize-it" title="Link to this section">#</a></h2>
+<p>BFCL is one of the three tasks whose experiment grid has all eight optimizers on every multi-agent LangGraph team. Swap <code>--method</code> for any key. For example, MASPOB on the Decentralized debate:</p>
+<div class="language-bash highlight"><span class="filename">MASPOB on Decentralized · BFCL</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span>maspob<span class="w"> </span>--dataset<span class="w"> </span>bfcl<span class="w"> </span>--topology<span class="w"> </span>decentralized<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/maspob/bfcl/decentralized/qwen/0
+</code></pre></div>
+<p>The protocol draws its train and validation rows from all four categories and scores them with the same AST checker. For the CrewAI pipeline, pass <code>--topology sequential --framework crewai</code>. See <a href="../../optimizers/running/">Run an Optimizer</a>.</p>
 <h2 id="flags">Flags<a class="headerlink" href="#flags" title="Link to this section">#</a></h2>
+<p>Beyond the common flags (<code>--batch</code>, <code>--limit</code>, <code>--offset</code>, <code>--only</code>, <code>--out-dir</code>, <code>--out</code>):</p>
 <table>
 <thead>
 <tr>
@@ -276,47 +268,14 @@ python -m real_runner_gepa.pilots.run_gepa_dataset --dataset bfcl --topology sin
 <td><code>simple</code></td>
 <td>One of <code>simple</code>, <code>multiple</code>, <code>parallel</code>, <code>parallel_multiple</code>.</td>
 </tr>
-<tr>
-<td><code>--limit N</code></td>
-<td><code>5</code></td>
-<td>Number of instances; ignored when <code>--only</code> is given.</td>
-</tr>
-<tr>
-<td><code>--offset K</code></td>
-<td><code>0</code></td>
-<td>Skip the first K instances.</td>
-</tr>
-<tr>
-<td><code>--only ID</code></td>
-<td>none</td>
-<td>Keep this instance ID; repeat the flag for more.</td>
-</tr>
-<tr>
-<td><code>--out-dir DIR</code></td>
-<td>a <code>results/bfcl*</code> folder, different per topology</td>
-<td>Where output files go.</td>
-</tr>
 </tbody>
 </table>
-<h2 id="results">Results<a class="headerlink" href="#results" title="Link to this section">#</a></h2>
-<p>GEPA's gain on BFCL for each topology, as reported in the paper. Each cell shows the change in points and the accuracy before → after optimization. The framework study runs the same topologies on popular frameworks. <a href="../../results/">Compare all tasks</a>.</p>
-<div class="dgrid-wrap compact">
-<table class="dgrid"><caption>BFCL: GEPA gain by topology (Accuracy)</caption>
-<thead><tr><th scope="col" class="corner">Study</th><th scope="col">Single</th><th scope="col">Independent</th><th scope="col">Sequential</th><th scope="col">Centralized</th><th scope="col">Decentralized</th></tr></thead>
-<tbody>
-<tr><th scope="row">Topology study</th><td class="dc d-g2" data-tip="BFCL · Single · Accuracy"><b>+4.0</b><span>84.0 → 88.0</span></td><td class="dc d-z" data-tip="BFCL · Independent · Accuracy"><b>0.0</b><span>88.0 → 88.0</span></td><td class="dc d-l2" data-tip="BFCL · Sequential · Accuracy"><b>−4.0</b><span>84.0 → 80.0</span></td><td class="dc d-g2" data-tip="BFCL · Centralized · Accuracy"><b>+4.0</b><span>92.0 → 96.0</span></td><td class="dc d-z" data-tip="BFCL · Decentralized · Accuracy"><b>0.0</b><span>88.0 → 88.0</span></td></tr>
-<tr><th scope="row">Framework study<small>one framework per topology</small></th><td class="dc d-g2" data-tip="BFCL · Single (LangGraph) · Accuracy"><b>+4.0</b><span>84.0 → 88.0</span><em>LangGraph</em></td><td class="dc d-z" data-tip="BFCL · Independent (LangGraph) · Accuracy"><b>0.0</b><span>88.0 → 88.0</span><em>LangGraph</em></td><td class="dc d-g4" data-tip="BFCL · Sequential (CrewAI) · Accuracy"><b>+24.0</b><span>60.0 → 84.0</span><em>CrewAI</em></td><td class="dc d-z" data-tip="BFCL · Centralized (AutoGen) · Accuracy"><b>0.0</b><span>96.0 → 96.0</span><em>AutoGen</em></td><td class="dc d-g2" data-tip="BFCL · Decentralized (OpenAI SDK) · Accuracy"><b>+4.0</b><span>84.0 → 88.0</span><em>OpenAI SDK</em></td></tr>
-</tbody>
-</table>
-<div class="dlegend" aria-hidden="true"><span>regression</span><span class="dlegend-scale"><i class="d-l4"></i><i class="d-l3"></i><i class="d-l2"></i><i class="d-l1"></i><i class="d-z"></i><i class="d-g1"></i><i class="d-g2"></i><i class="d-g3"></i><i class="d-g4"></i></span><span>gain</span><span class="dlegend-note">Δ in points · cell shows baseline → optimized</span></div>
-</div>
-
-<p>BFCL holds the largest GEPA gain in the paper: Sequential (CrewAI) rises from 60.0 to 84.0, +24.0 points.</p>
+<p><code>--limit</code> defaults to 5. Without <code>--out-dir</code>, output goes to a <code>results/bfcl*</code> folder that differs per topology.</p>
 <h2 id="related">Related<a class="headerlink" href="#related" title="Link to this section">#</a></h2>
 <ul>
 <li><a href="../toolhop/">ToolHop</a> and <a href="../api-bank/">API-Bank</a>, the other tool-calling tasks.</li>
-<li><a href="../../mas/sequential/">Sequential</a> for the CrewAI pipeline behind the best result.</li>
-<li><a href="../../evaluation/protocol/">Evaluation Protocol</a> for how the frozen IDs are used.</li>
+<li><a href="../../mas/sequential/">Sequential</a> for the CrewAI pipeline.</li>
+<li><a href="../../evaluation/protocol/">Evaluation Protocol</a> for how the eval IDs and splits are used.</li>
 </ul>
     </article>
     <div class="page-meta">
@@ -347,9 +306,9 @@ python -m real_runner_gepa.pilots.run_gepa_dataset --dataset bfcl --topology sin
       </li>
       <li><a href="#run-it">Run it</a>
       </li>
-      <li><a href="#flags">Flags</a>
+      <li><a href="#optimize-it">Optimize it</a>
       </li>
-      <li><a href="#results">Results</a>
+      <li><a href="#flags">Flags</a>
       </li>
       <li><a href="#related">Related</a>
       </li>

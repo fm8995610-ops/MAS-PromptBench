@@ -38,6 +38,7 @@
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.4-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></symbol>
   <symbol id="i-wiki" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 7.2l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z" fill="currentColor"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V19a1.5 1.5 0 0 1-1.5 1.5H15v-5.5H9v5.5H5.5A1.5 1.5 0 0 1 4 19v-7.8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
@@ -55,10 +56,7 @@
     <button class="search-trigger" type="button" aria-label="Search the docs" aria-haspopup="dialog">
       <svg class="i" aria-hidden="true"><use href="#i-search"></use></svg><span class="search-placeholder">Search the docs</span><kbd>/</kbd>
     </button>
-    <nav class="topbar-links" aria-label="Project">
-      <a href="../results/">Results</a>
-      <a href="https://fm8995610-ops.github.io/MAS-PromptBench/">Project page</a>
-    </nav>
+    <a class="deepwiki-btn project-btn" href="https://fm8995610-ops.github.io/MAS-PromptBench/" title="Project page"><svg class="i" aria-hidden="true"><use href="#i-home"></use></svg><span>Project Page</span></a>
     <a class="deepwiki-btn" href="https://deepwiki.com/fm8995610-ops/MAS-PromptBench" title="Ask questions about the code on DeepWiki"><svg class="i" aria-hidden="true"><use href="#i-wiki"></use></svg><span>Ask DeepWiki</span></a>
     <a class="icon-btn" href="https://github.com/fm8995610-ops/MAS-PromptBench" aria-label="GitHub repository"><svg class="i" aria-hidden="true"><use href="#i-github"></use></svg></a>
     <button class="icon-btn theme-toggle" type="button" aria-label="Switch color theme"><svg class="i" aria-hidden="true"><use href="#i-sun"></use></svg><svg class="i" aria-hidden="true"><use href="#i-moon"></use></svg></button>
@@ -136,22 +134,14 @@
     <span class="nav-label">Optimizers</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link is-active" href="./" aria-current="page">Overview</a></li>
-  <li><a class="nav-link" href="gepa/">GEPA</a></li>
-  <li><a class="nav-link" href="mipro/">MIPRO</a></li>
   <li><a class="nav-link" href="running/">Run an Optimizer</a></li>
-</ul>
-  </li>
-  <li class="nav-section">
-    <span class="nav-label">Results</span>
-    <ul class="nav-list nav-l1">
-  <li><a class="nav-link" href="../results/">Results Explorer</a></li>
 </ul>
   </li>
   <li class="nav-section">
     <span class="nav-label">Evaluation</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../evaluation/protocol/">Evaluation Protocol</a></li>
-  <li><a class="nav-link" href="../evaluation/results/">Read the Results</a></li>
+  <li><a class="nav-link" href="../evaluation/outputs/">Read Run Outputs</a></li>
 </ul>
   </li>
   <li class="nav-section">
@@ -168,8 +158,6 @@
   <li><a class="nav-link" href="../reference/cli/">Command-Line Flags</a></li>
   <li><a class="nav-link" href="../reference/environment/">Environment Variables</a></li>
   <li><a class="nav-link" href="../reference/repository/">Repository Map</a></li>
-  <li><a class="nav-link" href="../reference/known-issues/">Known Issues</a></li>
-  <li><a class="nav-link" href="../reference/deepwiki/">Ask DeepWiki</a></li>
 </ul>
   </li>
 </ul>
@@ -182,102 +170,184 @@
     </p>
     <article class="prose">
       <h1 id="optimizers">Optimizers<a class="headerlink" href="#optimizers" title="Link to this section">#</a></h1>
-<p class="lede">MAS-PromptBench optimizes the system prompts of a multi-agent system while the model weights stay frozen. GEPA and MIPRO both score every candidate prompt set by running the real topology runner, so the prompts they return run unchanged in the benchmark.</p>
-<h2 id="what-gets-optimized">What gets optimized<a class="headerlink" href="#what-gets-optimized" title="Link to this section">#</a></h2>
-<p>A multi-agent system <span class="arithmatex">\( M \)</span> is a topology plus a set of roles: a planner, a solver, a manager, a debater and so on. Each role has a system prompt. The seed prompts live in <code>configs/prompts/&lt;topology&gt;/&lt;dataset&gt;/&lt;role&gt;.txt</code>, one file per role. The optimizers treat the joint set <span class="arithmatex">\( \pi = (\pi_1, \dots, \pi_K) \)</span> of role prompts as the only variable. The agent model, the topology wiring, the tools and the scorer stay fixed.</p>
-<p>The quantity of interest is the prompt-optimization gain:</p>
-<div class="arithmatex">\[
-\Delta = \mathbb{E}_{(x, y) \sim \mathcal{D}}\left[\mu\big(M(x; \pi^\ast), y\big) - \mu\big(M(x; \pi^0), y\big)\right]
-\]</div>
-<p>Here <span class="arithmatex">\( \pi^0 \)</span> is the seed prompt set, <span class="arithmatex">\( \pi^\ast \)</span> the optimized set, <span class="arithmatex">\( \mu \)</span> the task scorer and <span class="arithmatex">\( (x, y) \)</span> a task instance with its reference answer. A run's <code>meta.json</code> reports the sample estimate as <code>delta = compiled_score - baseline_score</code>, both means over the same validation rows. Scores are fractions in [0, 1]; multiply by 100 for percentage points.</p>
-<p>Neither optimizer writes to <code>configs/</code>. Compiled prompts go to the run's <code>--out</code> folder.</p>
-<h2 id="the-real-runner-bridge">The real-runner bridge<a class="headerlink" href="#the-real-runner-bridge" title="Link to this section">#</a></h2>
-<p>Each optimizer has its own bridge package: <a href="https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/gepa/real_runner_gepa"><code>real_runner_gepa/</code></a> and <a href="https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/mipro/real_runner_mipro"><code>real_runner_mipro/</code></a>. They follow the same three layers.</p>
-<ol>
-<li><strong>Adapter</strong> (<code>adapters/</code>). One class per <code>(topology, dataset)</code> pair implements the <code>RealRunnerAdapter</code> protocol in <code>protocol.py</code>: <code>roles()</code>, <code>get_prompt()</code>, <code>set_prompt()</code>, <code>reset()</code>, <code>run_example()</code> and <code>format_role_trace()</code>. It loads the seed prompts, imports the real runner module (for example <code>topologies.single.hotpotqa.langgraph_hotpotqa</code>) and, for each example, patches the module's prompt loader, model client, endpoint, model name and agent or round counts before calling the runner's own solve function.</li>
-<li><strong>Program</strong> (<code>programs.py</code>, plus <code>mipro_programs.py</code> for MIPRO). A DSPy module registers one predictor per mutable role. The predictor's instruction text is the role prompt, so the optimizer finds and edits the roles through <code>named_predictors()</code>.</li>
-<li><strong>Forward pass.</strong> <code>forward()</code> copies the current instructions into the adapter, runs the real runner once, and records one trace per role for the optimizer to read.</li>
-</ol>
-<p><code>registry.py</code> maps each <code>(dataset, topology)</code> name to its adapter class. The bridge also re-attaches two things the optimizer cannot edit: the protected final-output contract for the role that emits the answer, and a few format nudges (code-first for APPS and LCB coders, patch-first for SWE). See <a href="../evaluation/protocol/#output-contracts">Evaluation Protocol</a>.</p>
-<div class="admonition note">
-<p class="admonition-title">Scoring during optimization</p>
-<p>The runner code is the real one, but the metric each optimizer maximizes lives in <code>datasets/&lt;dataset&gt;.py</code>. For LCB and APPS it runs only the first three tests, and for SWE-bench it checks that the patch is a non-trivial unified diff. <a href="../evaluation/protocol/#scorers">Evaluation Protocol</a> lists every metric.</p>
+<p class="lede">MAS-PromptBench optimizes the system prompts of a multi-agent system while the model weights stay frozen. Eight methods share one run protocol and one bridge to the real topology runners, so every method spends the same budget, is selected by the same rule and is scored on the same held-out rows.</p>
+<div class="facts">
+<div><span>Methods</span>8</div>
+<div><span>Protocol</span>mas-promptbench-v1</div>
+<div><span>Budget</span>600 rollouts</div>
+<div><span>Optimizer seeds</span>0, 1, 2</div>
 </div>
-<h2 id="gepa-and-mipro-compared">GEPA and MIPRO compared<a class="headerlink" href="#gepa-and-mipro-compared" title="Link to this section">#</a></h2>
+<h2 id="what-gets-optimized">What gets optimized<a class="headerlink" href="#what-gets-optimized" title="Link to this section">#</a></h2>
+<p>A multi-agent system <span class="arithmatex">\( M \)</span> is a topology plus a set of roles: a planner, a solver, a manager, a debater and so on. Each role has a system prompt, and the seed prompts live in <code>configs/prompts/&lt;topology&gt;/&lt;dataset&gt;/&lt;role&gt;.txt</code>. A method treats the joint set <span class="arithmatex">\( \pi = (\pi_1, \dots, \pi_K) \)</span> of role prompts as the only variable; the model, the topology wiring, the tools and the scorer stay fixed. MIPRO's few-shot demos are rendered into the role prompts, so they are part of <span class="arithmatex">\( \pi \)</span> too.</p>
+<p>The quantity of interest is the prompt-optimization gain on the held-out test split:</p>
+<div class="arithmatex">\[
+\Delta = \mathbb{E}_{(x, y) \sim \mathcal{D}_{\text{test}}}\left[\mu\big(M(x; \pi^{\text{dep}}), y\big) - \mu\big(M(x; \pi^0), y\big)\right]
+\]</div>
+<p>Here <span class="arithmatex">\( \pi^0 \)</span> is the seed prompt set, <span class="arithmatex">\( \pi^{\text{dep}} \)</span> the deployed set, <span class="arithmatex">\( \mu \)</span> the task metric and <span class="arithmatex">\( (x, y) \)</span> a test instance with its reference answer. The deployed set is the method's incumbent only if it beats the seeds on validation; otherwise it is <span class="arithmatex">\( \pi^0 \)</span> and the gain is zero. A job's <code>result.json</code> reports the estimate as <code>delta_pp</code>, in percentage points, and <a href="running/#aggregate-the-seeds">aggregation</a> averages it over the three optimizer seeds.</p>
+<p>No method writes to <code>configs/</code>. Optimized prompts stay in the job's <code>--out</code> folder.</p>
+<h2 id="the-eight-methods">The eight methods<a class="headerlink" href="#the-eight-methods" title="Link to this section">#</a></h2>
 <table>
 <thead>
 <tr>
-<th></th>
-<th>GEPA</th>
-<th>MIPRO</th>
+<th>Method</th>
+<th><code>--method</code></th>
+<th>Approach</th>
+<th>Code</th>
+<th style="text-align: right;">Grid cells</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Method</td>
+<td>GEPA</td>
+<td><code>gepa</code></td>
 <td>Reflective prompt evolution (DSPy <code>GEPA</code>)</td>
+<td><a href="https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/gepa"><code>gepa/</code></a></td>
+<td style="text-align: right;">147</td>
+</tr>
+<tr>
+<td>MIPRO</td>
+<td><code>mipro</code></td>
 <td>Instruction and few-shot demo search (DSPy <code>MIPROv2</code>)</td>
+<td><a href="https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/mipro"><code>mipro/</code></a></td>
+<td style="text-align: right;">147</td>
 </tr>
 <tr>
-<td>What changes</td>
-<td>Role instruction text</td>
-<td>Role instruction text plus selected demos, rendered into the prompt</td>
+<td>MAPRO</td>
+<td><code>mapro</code></td>
+<td>Per-role prompt pools, max-product belief propagation, blame-driven mutation</td>
+<td><a href="https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/mapro"><code>mapro/</code></a></td>
+<td style="text-align: right;">135</td>
 </tr>
 <tr>
-<td>Proposal signal</td>
-<td>Reflection model reads each role's trace and the metric's feedback text</td>
-<td>Proposal model sees the program, a data summary, tips and bootstrapped demos</td>
+<td>MASPO</td>
+<td><code>maspo</code></td>
+<td>Role-wise evolutionary beam search with pairwise judging</td>
+<td><a href="https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/maspo"><code>maspo/</code></a></td>
+<td style="text-align: right;">135</td>
 </tr>
 <tr>
-<td>Search</td>
-<td>Mutates one role or all roles per step, tracks candidates on the validation split</td>
-<td>Proposes candidates, then a Bayesian search over instruction and demo combinations</td>
+<td>HiveMind</td>
+<td><code>hivemind</code></td>
+<td>Coalition (Shapley) credit, lesson-based refinement of the lowest-credit role</td>
+<td><a href="https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/hivemind"><code>hivemind/</code></a></td>
+<td style="text-align: right;">12</td>
 </tr>
 <tr>
-<td>Budget flags</td>
-<td><code>--max-full-evals</code> or <code>--auto</code></td>
-<td><code>--num-candidates</code> and <code>--num-trials</code>, or <code>--auto</code></td>
+<td>MAMUT-GEPA</td>
+<td><code>mamut_gepa</code></td>
+<td>One joint GEPA search over all role prompts (<code>gepa</code> engine)</td>
+<td><a href="https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/mamut_gepa"><code>mamut_gepa/</code></a></td>
+<td style="text-align: right;">12</td>
 </tr>
 <tr>
-<td>Early stopping</td>
-<td><code>--early-stop-patience</code></td>
-<td>None</td>
+<td>MASPOB</td>
+<td><code>maspob</code></td>
+<td>Prompt-variant bandit with a GATv2 surrogate (LinUCB)</td>
+<td><a href="https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/maspob"><code>maspob/</code></a></td>
+<td style="text-align: right;">12</td>
 </tr>
 <tr>
-<td>Extra output</td>
-<td><code>gepa_state/</code></td>
-<td><code>mipro_state/</code>, <code>compiled_demos/</code></td>
-</tr>
-<tr>
-<td>Entry point</td>
-<td><code>real_runner_gepa.pilots.run_gepa_dataset</code></td>
-<td><code>real_runner_mipro.pilots.run_mipro_dataset</code></td>
-</tr>
-<tr>
-<td>Sweep launcher</td>
-<td><code>optimizers/gepa/run_gepa.sh</code></td>
-<td><code>optimizers/mipro/run_mipro.sh</code></td>
+<td>TAVO</td>
+<td><code>tavo</code></td>
+<td>Trajectory credit assignment and a shared verbalized-policy overlay</td>
+<td><a href="https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/tavo"><code>tavo/</code></a></td>
+<td style="text-align: right;">12</td>
 </tr>
 </tbody>
 </table>
-<p>The paper's headline results use GEPA.</p>
-<h2 id="trainval-split-and-acceptance">Train/val split and acceptance<a class="headerlink" href="#trainval-split-and-acceptance" title="Link to this section">#</a></h2>
-<p>Each run draws two disjoint splits from the dataset's optimization pool:</p>
+<p>A grid cell is one (dataset, topology, framework, communication format, team size, task model) configuration of the experiment grid in <code>optimizers/protocol/cells.py</code>, run once per optimizer seed:</p>
 <ul>
-<li><strong>Train</strong> (<code>--train-size</code>): rows the optimizer learns from. GEPA reflects on minibatches of them; MIPRO bootstraps demos and writes its data summary from them.</li>
-<li><strong>Validation</strong> (<code>--val-size</code>): rows the optimizer uses to compare candidates, and the rows the pilot uses for the before/after measurement.</li>
+<li><strong>GEPA and MIPRO</strong> cover every dataset on all five topologies, in each topology's native framework and in LangGraph, plus the communication formats and team sizes on HotpotQA, LiveCodeBench and BFCL, and those three datasets with <code>meta-llama/Llama-3.1-8B-Instruct</code>.</li>
+<li><strong>MAPRO and MASPO</strong> cover the same cells except <code>single</code>.</li>
+<li><strong>HiveMind, MAMUT-GEPA, MASPOB and TAVO</strong> cover HotpotQA, LiveCodeBench and BFCL on the four multi-agent LangGraph topologies.</li>
 </ul>
-<p>The frozen eval IDs in <code>benchmarks/&lt;dataset&gt;/&lt;dataset&gt;_eval_ids.json</code> are excluded from the pool unless you turn exclusion off. The pilot defaults are 1 train and 1 validation row, a smoke-test size; the sweeps use 25 and 25. <a href="../evaluation/protocol/#trainval-splits-for-optimization">Evaluation Protocol</a> covers the split rules.</p>
-<p>After optimization the pilot scores the seed prompts and the compiled prompts on the same validation rows and applies one rule: keep the compiled prompts when <code>compiled_score + 1e-9 &gt;= baseline_score</code>, so a tie keeps the compiled prompts. Two cases override it. If any compiled validation record shows an infrastructure error, the baseline prompts are kept. ToolHop uses a stricter rule that also rejects ties without row-level gains and prompts that memorize examples. The decision lands in <code>meta.json</code> as <code>accept_compiled_prompt</code>, <code>selected_prompt_source</code> and <code>selection_reason</code>. See <a href="../evaluation/results/#acceptance-and-selection_reason">Read the Results</a>.</p>
+<p>The built-in <code>identity</code> method returns the seed prompts without a rollout; it runs on any grid configuration and gives the seed baseline of a cell. Any method runs on any registered pair with <code>--allow-any-cell</code>, as a non-conformant job.</p>
+<h2 id="one-protocol-for-every-method">One protocol for every method<a class="headerlink" href="#one-protocol-for-every-method" title="Link to this section">#</a></h2>
+<p>Every method runs as a job of the protocol <code>mas-promptbench-v1</code>, <code>python -m optimizers.protocol.run</code>:</p>
+<ol>
+<li><strong>Optimize.</strong> The method gets the fixed, ordered train and validation rows, the frozen seed bundle and a ledger of 600 usable full-system rollouts, sampled at temperature 0.2, top-p 0.9 and up to 32,768 tokens. It returns its incumbent bundle.</li>
+<li><strong>Final validation.</strong> Uncharged and greedy: the seed and the incumbent run on the full validation split with paired per-item request seeds. The incumbent is deployed only if it is strictly better; a tie or a regression keeps the seeds. The decision is sealed in <code>selection.json</code>.</li>
+<li><strong>Test.</strong> After the lock, the seed and deployed bundles run on the held-out test split with the same paired seeds.</li>
+</ol>
+<p>The methods differ only in step 1. Their reflection or proposal calls go to <code>Qwen/Qwen3.5-122B-A10B-FP8</code> with thinking on and up to 48,000 output tokens, at temperature and top-p 1.0 unless the method sets them. <a href="../evaluation/protocol/">Evaluation Protocol</a> covers budgets, seeds and scorers in detail.</p>
+<h2 id="the-real-runner-bridge">The real-runner bridge<a class="headerlink" href="#the-real-runner-bridge" title="Link to this section">#</a></h2>
+<p>Every rollout runs through <a href="https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/bridge"><code>optimizers/bridge/</code></a>, which wraps the topology runners instead of re-implementing them, so an optimized prompt runs unchanged in the benchmark.</p>
+<ol>
+<li><strong>Adapter</strong> (<code>adapters/</code>). One class per (dataset, registry key) pair exposes the per-role prompts (<code>roles()</code>, <code>get_prompt()</code>, <code>set_prompt()</code>) and <code>run_example()</code>, one execution of the real runner. It patches the runner module's prompt loader, model client, endpoint and team size in a private copy of the module.</li>
+<li><strong>Registry</strong> (<code>registry.py</code>). Maps each dataset and key, such as <code>sequential_crewai</code> or <code>centralized_r8</code>, to its adapter class.</li>
+<li><strong>Programs</strong> (<code>programs.py</code>, <code>mipro_programs.py</code>). Register one DSPy predictor per role, so GEPA and MIPRO edit the role instructions through <code>named_predictors()</code>. The other methods pass their candidates to the protocol's runner, directly or through its <code>RunnerSession</code>, which runs the same adapter.</li>
+<li><strong>Metric</strong> (<code>datasets/&lt;dataset&gt;.py</code>). <code>load_all()</code> and <code>metric()</code>, which returns a 0 or 1 score and feedback text for reflection.</li>
+</ol>
+<p>The bridge also re-attaches what a method cannot edit: the protected final-output contract of the answering roles and a few format nudges. See <a href="../evaluation/protocol/#output-contracts">Output contracts</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Cheaper checks for code and patches</p>
+<p>The protocol scores LiveCodeBench and APPS on the first three tests only, and SWE-bench with a structural check of the diff, cheaper than the topology runners' scorers. <a href="../evaluation/protocol/#scorers">Scorers</a> lists every metric.</p>
+</div>
+<h2 id="method-settings">Method settings<a class="headerlink" href="#method-settings" title="Link to this section">#</a></h2>
+<p>Each method's knobs are one frozen dataclass; the protocol fixes everything else. Only MAPRO and TAVO also read <a href="../reference/environment/#method-settings">environment variables</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Settings</th>
+<th>Defaults</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GEPA</td>
+<td><code>gepa/integration.py: GEPAPolicy</code></td>
+<td><code>max_full_evals=5</code>, minibatch 3, Pareto selection, round-robin components, merge (at most 5), plateau patience 3, seed 0</td>
+</tr>
+<tr>
+<td>MIPRO</td>
+<td><code>mipro/integration.py: MIPROPolicy</code></td>
+<td>3 candidates, 3 trials, at most 4 bootstrapped and 0 labeled demos, no minibatch, seed 9, all proposer hints on</td>
+</tr>
+<tr>
+<td>MAPRO</td>
+<td><code>mapro/regime.py: MAPROSettings</code></td>
+<td>5 candidates per role, at most 8 rounds, patience 3, scoring batch 3, feedback 3, 12 threads</td>
+</tr>
+<tr>
+<td>MASPO</td>
+<td><code>maspo/integration.py: MASPOSettings</code></td>
+<td>beam 2, 2 offspring, minibatch 10, depth at most 9, 3 rounds per turn, 12 threads, 4 judge calls in flight</td>
+</tr>
+<tr>
+<td>HiveMind</td>
+<td><code>hivemind/regime.py: HiveMindSettings</code></td>
+<td>coalition batch 5, acceptance batch 5, at most 40 coalitions, manager every 3rd cycle, at most 6 lessons, reflection temperature 0.7, cycles until B</td>
+</tr>
+<tr>
+<td>MAMUT-GEPA</td>
+<td><code>mamut_gepa/integration.py: MAMUTGEPASettings</code></td>
+<td><code>max_metric_calls = min(600, B)</code>, Pareto, round-robin, merge, minibatch 3, reflection temperature 0.7</td>
+</tr>
+<tr>
+<td>MASPOB</td>
+<td><code>maspob/regime.py: MASPOBSettings</code></td>
+<td>20 variants per role, generation temperature 0.5, MiniLM embeddings, seed 42 (+1000 per optimizer seed), minibatch 5, at most 5 warm-up pulls</td>
+</tr>
+<tr>
+<td>TAVO</td>
+<td><code>tavo/settings.py: TAVOSettings</code></td>
+<td>train batch 6, at most 5 outer rounds, validation batch at least 3, adoption threshold 0.01, 2 attempts per round, patience 2, temperature 0.5</td>
+</tr>
+</tbody>
+</table>
+<p>The <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/optimizers/protocol/README.md#settings">run protocol README</a> keeps the full table. MASPOB also needs <code>torch</code>, <code>torch_geometric</code> and <code>sentence-transformers</code>, which <code>environment.yml</code> installs; a CPU is enough.</p>
 <h2 id="next-steps">Next steps<a class="headerlink" href="#next-steps" title="Link to this section">#</a></h2>
 <div class="cards">
 <ul>
-<li><a href="gepa/">GEPA</a>
-  The reflective loop, every flag and its default, and a worked command.</li>
-<li><a href="mipro/">MIPRO</a>
-  Instruction proposal, demo search, every flag and its default.</li>
 <li><a href="running/">Run an Optimizer</a>
-  Endpoints, topology names, sweeps and compute tips, end to end.</li>
+  Endpoints, cells, one job, smoke runs and aggregation over seeds.</li>
+<li><a href="../evaluation/protocol/">Evaluation Protocol</a>
+  Splits, budget, decoding, selection and scorers.</li>
+<li><a href="../evaluation/outputs/">Read Run Outputs</a>
+  Every file of a job folder and the aggregate summary.</li>
+<li><a href="../extending/add-optimizer/">Add an Optimizer</a>
+  The interface a ninth method implements.</li>
 </ul>
 </div>
     </article>
@@ -286,7 +356,7 @@
     </div>
     <nav class="pager" aria-label="Previous and next pages">
       <a class="pager-link prev" href="../mas/team-sizes/"><span><svg class="i" aria-hidden="true"><use href="#i-arrow-left"></use></svg>Previous</span><b>Team Sizes</b></a>
-      <a class="pager-link next" href="gepa/"><span>Next<svg class="i" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span><b>GEPA</b></a>
+      <a class="pager-link next" href="running/"><span>Next<svg class="i" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span><b>Run an Optimizer</b></a>
     </nav>
 
     <footer class="site-foot">
@@ -303,11 +373,13 @@
     <ul>
       <li><a href="#what-gets-optimized">What gets optimized</a>
       </li>
+      <li><a href="#the-eight-methods">The eight methods</a>
+      </li>
+      <li><a href="#one-protocol-for-every-method">One protocol for every method</a>
+      </li>
       <li><a href="#the-real-runner-bridge">The real-runner bridge</a>
       </li>
-      <li><a href="#gepa-and-mipro-compared">GEPA and MIPRO compared</a>
-      </li>
-      <li><a href="#trainval-split-and-acceptance">Train/val split and acceptance</a>
+      <li><a href="#method-settings">Method settings</a>
       </li>
       <li><a href="#next-steps">Next steps</a>
       </li>

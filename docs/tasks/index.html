@@ -38,6 +38,7 @@
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.4-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></symbol>
   <symbol id="i-wiki" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 7.2l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z" fill="currentColor"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V19a1.5 1.5 0 0 1-1.5 1.5H15v-5.5H9v5.5H5.5A1.5 1.5 0 0 1 4 19v-7.8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
@@ -55,10 +56,7 @@
     <button class="search-trigger" type="button" aria-label="Search the docs" aria-haspopup="dialog">
       <svg class="i" aria-hidden="true"><use href="#i-search"></use></svg><span class="search-placeholder">Search the docs</span><kbd>/</kbd>
     </button>
-    <nav class="topbar-links" aria-label="Project">
-      <a href="../results/">Results</a>
-      <a href="https://fm8995610-ops.github.io/MAS-PromptBench/">Project page</a>
-    </nav>
+    <a class="deepwiki-btn project-btn" href="https://fm8995610-ops.github.io/MAS-PromptBench/" title="Project page"><svg class="i" aria-hidden="true"><use href="#i-home"></use></svg><span>Project Page</span></a>
     <a class="deepwiki-btn" href="https://deepwiki.com/fm8995610-ops/MAS-PromptBench" title="Ask questions about the code on DeepWiki"><svg class="i" aria-hidden="true"><use href="#i-wiki"></use></svg><span>Ask DeepWiki</span></a>
     <a class="icon-btn" href="https://github.com/fm8995610-ops/MAS-PromptBench" aria-label="GitHub repository"><svg class="i" aria-hidden="true"><use href="#i-github"></use></svg></a>
     <button class="icon-btn theme-toggle" type="button" aria-label="Switch color theme"><svg class="i" aria-hidden="true"><use href="#i-sun"></use></svg><svg class="i" aria-hidden="true"><use href="#i-moon"></use></svg></button>
@@ -136,22 +134,14 @@
     <span class="nav-label">Optimizers</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../optimizers/">Overview</a></li>
-  <li><a class="nav-link" href="../optimizers/gepa/">GEPA</a></li>
-  <li><a class="nav-link" href="../optimizers/mipro/">MIPRO</a></li>
   <li><a class="nav-link" href="../optimizers/running/">Run an Optimizer</a></li>
-</ul>
-  </li>
-  <li class="nav-section">
-    <span class="nav-label">Results</span>
-    <ul class="nav-list nav-l1">
-  <li><a class="nav-link" href="../results/">Results Explorer</a></li>
 </ul>
   </li>
   <li class="nav-section">
     <span class="nav-label">Evaluation</span>
     <ul class="nav-list nav-l1">
   <li><a class="nav-link" href="../evaluation/protocol/">Evaluation Protocol</a></li>
-  <li><a class="nav-link" href="../evaluation/results/">Read the Results</a></li>
+  <li><a class="nav-link" href="../evaluation/outputs/">Read Run Outputs</a></li>
 </ul>
   </li>
   <li class="nav-section">
@@ -168,8 +158,6 @@
   <li><a class="nav-link" href="../reference/cli/">Command-Line Flags</a></li>
   <li><a class="nav-link" href="../reference/environment/">Environment Variables</a></li>
   <li><a class="nav-link" href="../reference/repository/">Repository Map</a></li>
-  <li><a class="nav-link" href="../reference/known-issues/">Known Issues</a></li>
-  <li><a class="nav-link" href="../reference/deepwiki/">Ask DeepWiki</a></li>
 </ul>
   </li>
 </ul>
@@ -190,7 +178,7 @@
 <li><strong>Coding</strong>: LiveCodeBench, APPS and SWE-bench Verified. The agents produce a program or a repository patch, and the scorer runs tests against it.</li>
 <li><strong>Tool calling</strong>: BFCL, ToolHop and API-Bank. The agents emit function or API calls against schemas given with each task, and the scorer checks the calls themselves or the answer the call chain produces.</li>
 </ul>
-<p>Each task fixes the form of the final answer with an output contract, defined in <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/topologies/output_contracts.py"><code>topologies/output_contracts.py</code></a>. The runner adds it to the final role's system prompt at load time, so an optimizer can rewrite role prompts without removing the format the scorer expects. The paper also reports its results per domain.</p>
+<p>Each task fixes the form of the final answer with an output contract, defined in <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/core/output_contracts.py"><code>core/output_contracts.py</code></a>. The runner adds it to the answering role's system prompt at load time, so an optimizer can rewrite role prompts without removing the format the scorer expects. Data loading, scoring and records live in one task module per dataset, <code>core/tasks/&lt;dataset&gt;.py</code>.</p>
 <h2 id="at-a-glance">At a glance<a class="headerlink" href="#at-a-glance" title="Link to this section">#</a></h2>
 <table>
 <thead>
@@ -199,8 +187,8 @@
 <th>CLI name</th>
 <th>Domain</th>
 <th>Metric (scorer)</th>
-<th style="text-align: right;">Launcher limit</th>
-<th style="text-align: right;">Frozen IDs</th>
+<th style="text-align: right;">Eval IDs</th>
+<th style="text-align: right;">Train / val</th>
 <th>Special setup</th>
 </tr>
 </thead>
@@ -211,7 +199,7 @@
 <td>Reasoning</td>
 <td>Accuracy (letter match)</td>
 <td style="text-align: right;">100</td>
-<td style="text-align: right;">100</td>
+<td style="text-align: right;">48 / 50</td>
 <td>Gated Hugging Face dataset</td>
 </tr>
 <tr>
@@ -220,7 +208,7 @@
 <td>Reasoning</td>
 <td>Exact match and F1 (official)</td>
 <td style="text-align: right;">100</td>
-<td style="text-align: right;">100</td>
+<td style="text-align: right;">150 / 50</td>
 <td>Network access to Wikipedia</td>
 </tr>
 <tr>
@@ -229,7 +217,7 @@
 <td>Reasoning</td>
 <td>Accuracy (Hendrycks <code>is_equiv</code>)</td>
 <td style="text-align: right;">100</td>
-<td style="text-align: right;">100</td>
+<td style="text-align: right;">150 / 50</td>
 <td>None</td>
 </tr>
 <tr>
@@ -238,7 +226,7 @@
 <td>Coding</td>
 <td>pass@1</td>
 <td style="text-align: right;">50</td>
-<td style="text-align: right;">50</td>
+<td style="text-align: right;">150 / 50</td>
 <td>Runs generated code on the host</td>
 </tr>
 <tr>
@@ -247,7 +235,7 @@
 <td>Coding</td>
 <td>Strict accuracy (pass@1)</td>
 <td style="text-align: right;">50</td>
-<td style="text-align: right;">50</td>
+<td style="text-align: right;">150 / 50</td>
 <td>Runs generated code on the host</td>
 </tr>
 <tr>
@@ -256,7 +244,7 @@
 <td>Coding</td>
 <td>Resolved rate</td>
 <td style="text-align: right;">30</td>
-<td style="text-align: right;">30</td>
+<td style="text-align: right;">146 / 50</td>
 <td>git, Singularity, per-instance images</td>
 </tr>
 <tr>
@@ -265,7 +253,7 @@
 <td>Tool calling</td>
 <td>AST match (<code>bfcl-eval</code>)</td>
 <td style="text-align: right;">100</td>
-<td style="text-align: right;">25</td>
+<td style="text-align: right;">150 / 50</td>
 <td>None</td>
 </tr>
 <tr>
@@ -274,7 +262,7 @@
 <td>Tool calling</td>
 <td>Answer accuracy</td>
 <td style="text-align: right;">100</td>
-<td style="text-align: right;">100</td>
+<td style="text-align: right;">150 / 50</td>
 <td><code>TOOLHOP_ALLOW_DATASET_EXEC=1</code></td>
 </tr>
 <tr>
@@ -283,12 +271,12 @@
 <td>Tool calling</td>
 <td>API-call accuracy (API-Bank checkers)</td>
 <td style="text-align: right;">100</td>
-<td style="text-align: right;">100</td>
+<td style="text-align: right;">150 / 50</td>
 <td>None (source ships in the repo)</td>
 </tr>
 </tbody>
 </table>
-<p>The CLI name is the task's folder name and the optimizers' <code>--dataset</code> value. The launcher limit is the <code>--limit</code> that <a href="https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/scripts/run_topologies.sh"><code>scripts/run_topologies.sh</code></a> passes. The frozen IDs, 655 in total, are the instances behind the reported scores, listed in <code>benchmarks/&lt;task&gt;/&lt;task&gt;_eval_ids.json</code>.</p>
+<p>The CLI name is the task's folder name and the optimizers' <code>--dataset</code> value. The eval IDs, 730 in total, are the instances behind the reported scores, listed in <code>benchmarks/&lt;task&gt;/&lt;task&gt;_eval_ids.json</code>. They are also the <code>test</code> split of <code>benchmarks/&lt;task&gt;/&lt;task&gt;_splits.json</code>; the <code>train</code> and <code>validation</code> splits the optimizers use are drawn from the rest, so optimization never sees a reported instance.</p>
 <div class="cards">
 <ul>
 <li><a href="gpqa/">GPQA-Diamond</a>
@@ -312,68 +300,57 @@
 </ul>
 </div>
 <h2 id="running-a-task">Running a task<a class="headerlink" href="#running-a-task" title="Link to this section">#</a></h2>
-<p>Every task has one runner per topology variant, at <code>topologies/&lt;topology&gt;/[&lt;framework&gt;/]&lt;task&gt;/&lt;framework&gt;_&lt;task&gt;.py</code>. Run them from the repository root as modules, the way the sweep launcher does:</p>
-<pre class="highlight"><code class="language-bash">python -m topologies.single.gpqa.langgraph_gpqa --batch --limit 100 \
-  --out results/topologies_baseline/single_gpqa/predictions.jsonl</code></pre>
-<div class="admonition warning">
-<p class="admonition-title">Run runners as modules</p>
-<p>Most runners import the <code>topologies</code> package before they add the repository root to <code>sys.path</code>. Started as <code>python topologies/.../&lt;file&gt;.py</code> without <code>PYTHONPATH</code> set to the repository root, they stop with <code>ModuleNotFoundError: No module named 'topologies'</code>.</p>
-</div>
-<p>The runners come in three flag families:</p>
+<p>Every task has one runner per topology variant, at <code>topologies/&lt;topology&gt;/[&lt;framework&gt;/]&lt;task&gt;/&lt;framework&gt;_&lt;task&gt;.py</code>. Run them from the repository root as modules:</p>
+<div class="language-bash highlight"><span class="filename">Run a runner as a module</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>topologies.single.gpqa.langgraph_gpqa<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out-dir<span class="w"> </span>results/topologies_baseline/single_gpqa
+</code></pre></div>
+<p>All runners share one command line, plus a few options per dataset:</p>
 <table>
 <thead>
 <tr>
-<th>Tasks</th>
-<th>Batch mode</th>
-<th>Output</th>
-<th>No-argument run</th>
+<th>Flag</th>
+<th>Effect</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>gpqa</code>, <code>hotpotqa</code>, <code>math</code>, <code>lcb</code>, <code>apps</code></td>
-<td>needs <code>--batch</code></td>
-<td><code>--out &lt;file.jsonl&gt;</code>; without it, scores are only printed</td>
-<td>a built-in smoke demo</td>
+<td><code>--batch</code></td>
+<td>Run the dataset instead of the canned demo.</td>
 </tr>
 <tr>
-<td><code>bfcl</code>, <code>swe</code></td>
-<td>always; <code>--batch</code> is rejected</td>
-<td><code>--out-dir &lt;dir&gt;</code></td>
-<td>a small batch (5 BFCL <code>simple</code> instances, 2 SWE instances)</td>
+<td><code>--limit N</code></td>
+<td>Evaluate at most N instances, after <code>--offset</code>.</td>
 </tr>
 <tr>
-<td><code>toolhop</code>, <code>apibank</code></td>
-<td>always; <code>--batch</code> is accepted and ignored</td>
-<td><code>--out-dir &lt;dir&gt;</code></td>
-<td>a small batch (5 or 2 instances)</td>
+<td><code>--offset K</code></td>
+<td>Skip the first K instances.</td>
+</tr>
+<tr>
+<td><code>--only ID ...</code></td>
+<td>Evaluate only these IDs, whatever <code>--limit</code> says; repeat the flag or list several IDs after it.</td>
+</tr>
+<tr>
+<td><code>--out-dir DIR</code></td>
+<td>Write <code>DIR/predictions.jsonl</code> and the runner's other files there.</td>
+</tr>
+<tr>
+<td><code>--out PATH</code></td>
+<td>Write the predictions to PATH instead.</td>
 </tr>
 </tbody>
 </table>
-<p>All runners take <code>--limit</code>, <code>--offset</code> and <code>--only</code>. The launcher selects instances with <code>--limit</code> alone, which takes the first rows. To score exactly the frozen IDs, pass them to <code>--only</code>; each task page shows how.</p>
-<div class="admonition note">
-<p class="admonition-title">Launcher and BFCL or SWE</p>
-<p><code>scripts/run_topologies.sh</code> passes <code>--batch</code> to every runner and <code>--out</code> to all but ToolHop and API-Bank. The BFCL and SWE runners reject both flags, so run those two tasks directly as shown on their pages.</p>
+<p>Without <code>--batch</code>, the GPQA, HotpotQA, MATH, LiveCodeBench and APPS runners play a built-in demo; the BFCL, SWE-bench, ToolHop and API-Bank runners have none and run a small batch (5, 2, 5 and 2 instances). Every output file is emptied when a batch starts. Without <code>--out-dir</code> or <code>--out</code>, some runners write to their own folder under <code>results/</code> and others only print their scores, so pass one. Progress goes to stderr; set <code>LOG_LEVEL</code> to change how much. <a href="../reference/cli/">Command-Line Flags</a> lists every option.</p>
+<div class="admonition tip">
+<p class="admonition-title">Score the evaluation IDs</p>
+<p>For seven tasks the first instances are exactly the eval IDs, so <code>--limit</code> with the eval-ID count scores the reported set. BFCL and SWE-bench are samples: pass their IDs to <code>--only</code>, as their pages show. <code>scripts/run_topologies.sh</code> runs every topology on every task this way.</p>
 </div>
-<h2 id="what-the-paper-found">What the paper found<a class="headerlink" href="#what-the-paper-found" title="Link to this section">#</a></h2>
-<p>With GEPA optimizing the prompts, the average change per domain in the framework study is:</p>
-<div class="dbars-wrap mini">
-<table class="dbars"><caption>Average gain by task domain (framework study).</caption>
-<thead><tr><th scope="col">Domain</th><th scope="col" class="bar-col">Gain (Δ, points)</th><th scope="col" class="num">Δ</th></tr></thead>
-<tbody>
-<tr data-tip="Reasoning · 3 tasks · +1.3 points"><th scope="row">Reasoning<small>3 tasks</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:12.50%"></i><i class="tick" style="left:62.50%"></i><i class="tick" style="left:87.50%"></i><i class="axis" style="left:37.50%"></i><i class="bar pos" style="left:37.50%;width:16.25%"></i></span></td><td class="num d-txt-g">+1.3</td></tr>
-<tr data-tip="Coding · 3 tasks · +3.7 points"><th scope="row">Coding<small>3 tasks</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:12.50%"></i><i class="tick" style="left:62.50%"></i><i class="tick" style="left:87.50%"></i><i class="axis" style="left:37.50%"></i><i class="bar pos" style="left:37.50%;width:46.25%"></i></span></td><td class="num d-txt-g">+3.7</td></tr>
-<tr data-tip="Tool-Calling · 3 tasks · +4.3 points"><th scope="row">Tool-Calling<small>3 tasks</small></th><td class="bar-col"><span class="track"><i class="tick" style="left:12.50%"></i><i class="tick" style="left:62.50%"></i><i class="tick" style="left:87.50%"></i><i class="axis" style="left:37.50%"></i><i class="bar pos" style="left:37.50%;width:53.75%"></i></span></td><td class="num d-txt-g">+4.3</td></tr>
-</tbody>
-</table>
-</div>
-
-<p>Single cells vary much more than these averages: Sequential (CrewAI) on BFCL gains 24.0 points, while Independent on MATH loses 16.0. The <a href="../results/">Results Explorer</a> shows every cell.</p>
-<div class="admonition takeaway">
-<p class="admonition-title">Takeaway</p>
-<p>Prompt optimization helps most on tool-calling and coding tasks and least on reasoning tasks.</p>
-</div>
-<p>See <a href="../evaluation/results/">Read the Results</a> for the full breakdown and <a href="../evaluation/protocol/">Evaluation Protocol</a> for how these numbers are produced. For the multi-agent side of each run, start at <a href="../mas/topologies/">Workflow Topologies</a>; for the optimizer, see <a href="../optimizers/gepa/">GEPA</a>.</p>
+<h2 id="optimize-a-task">Optimize a task<a class="headerlink" href="#optimize-a-task" title="Link to this section">#</a></h2>
+<p>Every optimizer runs a task through one command, with the task's CLI name as <code>--dataset</code>:</p>
+<div class="language-bash highlight"><span class="filename">One optimizer job</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span>&lt;key&gt;<span class="w"> </span>--dataset<span class="w"> </span>&lt;task&gt;<span class="w"> </span>--topology<span class="w"> </span>&lt;topology&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/&lt;key&gt;/&lt;task&gt;/&lt;topology&gt;/qwen/0
+</code></pre></div>
+<p><code>&lt;key&gt;</code> is one of <code>gepa</code>, <code>mipro</code>, <code>mapro</code>, <code>maspo</code>, <code>hivemind</code>, <code>mamut_gepa</code>, <code>maspob</code> or <code>tavo</code>. The experiment grid pairs GEPA, MIPRO, MAPRO and MASPO with every task and every topology runner, in each of its frameworks (on Single, GEPA and MIPRO only), and all eight methods with the multi-agent LangGraph teams of HotpotQA, LiveCodeBench and BFCL. Other combinations need <code>--allow-any-cell</code> and are reported as non-conformant.</p>
+<p>During optimization, every rollout is scored 0 or 1 by the task's protocol metric. Most tasks use the runner's own scorer; HotpotQA uses exact match only, LiveCodeBench and APPS run only the first 3 tests, and SWE-bench uses a structural patch check. See <a href="../optimizers/running/">Run an Optimizer</a> and <a href="../evaluation/protocol/">Evaluation Protocol</a>.</p>
     </article>
     <div class="page-meta">
       <a class="edit-link" href="https://github.com/fm8995610-ops/MAS-PromptBench/edit/main/docs/content/tasks/index.md"><svg class="i" aria-hidden="true"><use href="#i-edit"></use></svg>Edit this page on GitHub</a>
@@ -401,7 +378,7 @@
       </li>
       <li><a href="#running-a-task">Running a task</a>
       </li>
-      <li><a href="#what-the-paper-found">What the paper found</a>
+      <li><a href="#optimize-a-task">Optimize a task</a>
       </li>
     </ul>
   </aside>
