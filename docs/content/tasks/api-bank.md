@@ -6,8 +6,8 @@ API-Bank shows the agents a dialogue between a user and an assistant that calls 
 <div class="facts" markdown>
 <div><span>Domain</span>Tool calling</div>
 <div><span>Metric</span>API-call accuracy</div>
-<div><span>Launcher limit</span>100</div>
 <div><span>Eval IDs</span>100</div>
+<div><span>Train / val</span>150 / 50</div>
 <div><span>Data</span>Vendored in benchmarks/apibank</div>
 </div>
 
@@ -23,7 +23,7 @@ Each instance is a dialogue cut just before an API call. The prompt holds the di
 | 2 | Only `ToolSearcher`, plus any earlier search results in the dialogue. | Search for the right API first. |
 | 3 | Only `ToolSearcher`, as in Level 2. | Several calls may be needed; predict only the next. |
 
-Agents do not execute APIs while solving. Each agent makes one chat completion and must answer with exactly one call in brackets with keyword arguments, in the form `[ApiName(arg='value')]`. That is the API-Bank output contract. The runner takes the last bracketed call that parses.
+Agents do not execute APIs while solving. Each agent turn is one chat completion, and the answer must be exactly one call in brackets with keyword arguments, in the form `[ApiName(arg='value')]`. That is the API-Bank output contract. The runner takes the last bracketed call that parses. The Agents SDK runner also gives its peers the APIs as function tools.
 
 ## How it is scored
 
@@ -39,15 +39,15 @@ Agents do not execute APIs while solving. Each agent makes one chat completion a
 | `keyword` | level 1 | Normalized keywords equal the gold keywords. |
 | `upstream` | none | Runs API-Bank's original ToolSearcher class. |
 
-The `official` scorer needs the `sentence_transformers` package; it loads `sentence-transformers/paraphrase-MiniLM-L3-v2` on CPU by default.
+The `official` scorer uses `sentence-transformers`, which is in the environment; it loads `sentence-transformers/paraphrase-MiniLM-L3-v2` on CPU by default.
 
-Each line of `results.jsonl` has `correct`, the failing `stage` and `error`, and the predicted call. Accuracy is the fraction of `correct` lines.
+Each line of `results.jsonl` has `correct`, the failing `stage` and `error`, and the predicted call. Accuracy is the fraction of `correct` lines. Independent and Decentralized teams submit their agents' most common call, ties going to the earliest agent.
 
 ## Data
 
 The API-Bank source from `AlibabaResearch/DAMO-ConvAI` ships in the repository at [`benchmarks/apibank/apibank_upstream/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/benchmarks/apibank/apibank_upstream), under its own license, so nothing needs downloading. Set `APIBANK_ROOT` to use another checkout.
 
-With the default level, `all`, the runner reads the frozen manifest [`benchmarks/apibank/apibank_eval_ids.json`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/apibank/apibank_eval_ids.json) directly: 100 IDs, 33 from Level 1, 33 from Level 2 and 34 from Level 3. So `--limit 100` scores exactly the frozen set.
+With the default level, `all`, the runner reads the eval manifest [`benchmarks/apibank/apibank_eval_ids.json`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/apibank/apibank_eval_ids.json) directly: 100 IDs, 33 from Level 1, 33 from Level 2 and 34 from Level 3. So `--limit 100` scores exactly the eval set. The optimizers' train and validation splits come from the 445-task curated pool in `benchmarks/apibank/apibank_pool_ids.json`.
 
 For a single level, the runner builds a task list on the fly: the first tasks whose gold call replays correctly, skipping those that need `SearchEngine` or `Translate`, up to 100 for Levels 1 and 2 or 245 for Level 3.
 
@@ -59,7 +59,7 @@ Run every command from the repository root. To check the data and the gold-call 
 python -m topologies.single.apibank.langgraph_apibank --summary --limit 100
 ```
 
-Runs are always batches; `--batch` is accepted and ignored. With no arguments, a runner solves the first 2 instances.
+There is no smoke demo; with no arguments a runner solves the first 2 instances, and `--batch` changes nothing.
 
 === "Single"
 
@@ -75,19 +75,22 @@ Runs are always batches; `--batch` is accepted and ignored. With no arguments, a
       --out-dir results/topologies_baseline/centralized_langgraph_apibank
     ```
 
-The runner appends to `predictions.jsonl` and `results.jsonl` in `--out-dir` and writes one JSON trace per instance under `traces/`. Use a fresh `--out-dir` for each run. Without `--out-dir`, output goes to `results/apibank/<style>/`.
+The runner writes `predictions.jsonl` and `results.jsonl` to `--out-dir`, emptying both first, and one JSON trace per instance under `traces/`. Without `--out-dir`, output goes to `results/apibank/<style>/`. API-Bank also has [communication-protocol](../mas/communication-protocols.md) and [team-size](../mas/team-sizes.md) runners.
 
-To optimize the single-agent prompt with [GEPA](../optimizers/gepa.md):
+## Optimize it
 
-```bash title="GEPA on API-Bank"
-cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset --dataset apibank --topology single \
-  --train-size 25 --val-size 25 --max-full-evals 5 --out results/gepa/single_apibank
+Every optimizer runs through the same protocol command; change `--method` to switch. For example, MASPO on the Decentralized debate:
+
+```bash title="MASPO on Decentralized · API-Bank"
+python -m optimizers.protocol.run --method maspo --dataset apibank --topology decentralized \
+  --model qwen --seed 0 --out runs/maspo/apibank/decentralized/qwen/0
 ```
 
-For API-Bank, GEPA always keeps the 100 frozen IDs out of its training and validation splits. API-Bank also has [communication-protocol](../mas/communication-protocols.md) and [team-size](../mas/team-sizes.md) variants that GEPA can target, such as `--topology sequential_r2`.
+Combinations outside the experiment grid need `--allow-any-cell`; see [Optimize a task](index.md#optimize-a-task).
 
 ## Flags
+
+Beyond the common flags (`--batch`, `--limit`, `--offset`, `--only`, `--out-dir`, `--out`):
 
 | Flag | Default | Effect |
 | --- | --- | --- |
@@ -95,18 +98,11 @@ For API-Bank, GEPA always keeps the 100 frozen IDs out of its training and valid
 | `--summary` | off | Print a dataset summary with gold-call replay checks, then exit. |
 | `--curated-path FILE` | none | Read task IDs from another manifest (a JSON file with an `ids` list). |
 | `--toolsearcher-scorer` | by level | `official`, `upstream` or `keyword`. |
-| `--limit N` | `2` | Number of instances. Also applies with `--only`. |
-| `--only ID` | none | Keep this task ID; repeat the flag for more. |
-| `--out-dir DIR` | `results/apibank/<style>/` | Where output files go. |
 
-## Results
-
-GEPA's gain on API-Bank for each topology, as reported in the paper. Each cell shows the change in points and the accuracy before → after optimization. The framework study runs the same topologies on popular frameworks. [Compare all tasks](../results/index.md).
-
---8<-- "results/task-apibank.html"
+`--limit` defaults to 2.
 
 ## Related
 
 - [BFCL](bfcl.md) and [ToolHop](toolhop.md), the other tool-calling tasks.
 - [Workflow Topologies](../mas/topologies.md) for what each runner variant does.
-- [Evaluation Protocol](../evaluation/protocol.md) for how the frozen IDs are used.
+- [Evaluation Protocol](../evaluation/protocol.md) for how the eval IDs and splits are used.

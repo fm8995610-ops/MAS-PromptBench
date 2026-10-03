@@ -8,7 +8,7 @@ the manager is forced back into the loop after every worker turn via
 
 import asyncio
 import os
-from typing import Sequence
+from collections.abc import Sequence
 
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermination

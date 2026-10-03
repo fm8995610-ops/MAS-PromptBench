@@ -11,8 +11,8 @@ custom theme. Read `docs/content/getting-started/installation.md` as the model p
 - No marketing words, no emoji, no em-dash asides, no "Note that", no "worth noting".
 - Never invent: every command, flag, path, env var, default, number and file name must be
   checked against the code. If you can't confirm something, leave it out.
-- Paper numbers you may cite (GEPA, percentage points) are in
-  "Paper numbers" below. Don't cite any other result.
+- Don't cite benchmark results or paper numbers; the docs describe how to run and read the
+  benchmark, not its findings.
 
 ## Page shape
 
@@ -29,7 +29,7 @@ One or two sentences saying what this page covers and why it matters.
 - Exactly one `# H1`, then the `{ .lede }` paragraph. Use `##` and `###` below it.
 - Aim for 300–900 words. Lead with what the reader needs to do; put detail after.
 - Link to sibling pages with relative links to the `.md` file, e.g.
-  `[Sequential](../mas/sequential.md)` or `[GEPA](gepa.md#settings)`. Only link to
+  `[Sequential](../mas/sequential.md)` or `[Flags](swe-bench.md#flags)`. Only link to
   pages that exist in `docs/mkdocs.yml`.
 - Link to repo files with full GitHub URLs:
   `https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/<path>` (files) or
@@ -41,8 +41,8 @@ One or two sentences saying what this page covers and why it matters.
 
 ````markdown
 ```bash title="Run a baseline"
-python topologies/single/hotpotqa/langgraph_hotpotqa.py --batch --limit 100 \
-  --out results/topologies_baseline/single_hotpotqa/predictions.jsonl
+python -m topologies.single.hotpotqa.langgraph_hotpotqa --batch --limit 100 \
+  --out-dir results/topologies_baseline/single_hotpotqa
 ```
 ````
 
@@ -62,22 +62,22 @@ with `\`). Comments are welcome but short.
     Context that is useful but optional.
 
 !!! takeaway
-    The one-sentence lesson of a findings section (paper results only).
+    The one-sentence lesson of a section.
 ```
 
-**Tabs** — for alternatives (GEPA vs MIPRO, LangGraph vs CrewAI, API vs local):
+**Tabs** — for alternatives (LangGraph vs CrewAI, one cell vs another, local vs remote):
 
 ```markdown
 === "LangGraph"
 
     ```bash
-    python topologies/sequential/langgraph/bfcl/langgraph_bfcl.py --limit 100
+    python -m topologies.sequential.langgraph.bfcl.langgraph_bfcl --limit 100
     ```
 
 === "CrewAI"
 
     ```bash
-    python topologies/sequential/crewai/bfcl/crewai_bfcl.py --limit 100
+    python -m topologies.sequential.crewai.bfcl.crewai_bfcl --limit 100
     ```
 ```
 
@@ -122,91 +122,72 @@ sequential, centralized, decentralized). Don't draw other diagrams.
 ### Runner command shapes
 
 - **Run every runner as a module from the repository root**:
-  `python -m topologies.single.hotpotqa.langgraph_hotpotqa`. Most runner files import the
-  `topologies` package before adding the repo root to `sys.path`, so the file-path form
-  (`python topologies/...py`) fails with `ModuleNotFoundError` unless `PYTHONPATH=.` is set.
+  `python -m topologies.single.hotpotqa.langgraph_hotpotqa`. The runners import the shared
+  `core` package, so the file-path form fails with `ModuleNotFoundError: No module named
+  'core'` unless `PYTHONPATH=.` is set.
 - Topology runners: `topologies/<topology>/[<framework>/]<dataset>/<framework>_<dataset>.py`.
   `single` and `independent` are LangGraph-only (no framework folder). `sequential`:
   langgraph, crewai. `centralized`: langgraph, autogen. `decentralized`: langgraph,
-  openai (OpenAI SDK). Every topology × dataset pair exists (72 scripts).
+  openai_agents (OpenAI Agents SDK). Every topology × dataset pair exists (72 modules).
+  Shared code (CLI, batch loop, clients, settings, team specs, prompts, one task module per
+  dataset in `core/tasks/`) lives in `core/`.
 - Datasets (folder/CLI names): `gpqa`, `hotpotqa`, `math`, `lcb` (LiveCodeBench),
   `apps`, `swe` (SWE-bench Verified), `bfcl`, `toolhop`, `apibank`.
-- Flags differ by runner family:
-  - gpqa / hotpotqa / math / lcb / apps: `--batch`, `--limit`, `--offset`, `--only`,
-    `--out <file.jsonl>`. Without `--out`, a batch only prints scores. No-arg run = smoke demo.
-  - bfcl, swe: no `--batch` flag (they always run a batch; passing `--batch` errors).
-    Take `--limit` (bfcl default 5, swe default 2), `--offset`, `--only`, `--out-dir <dir>`.
-    bfcl has `--category` (default `simple`). swe has `--eval` (`local|singularity|none`
-    in the single runner, default `local`; `singularity|none` elsewhere, default
-    `singularity`), `--workdir-root`, `--keep-workdirs`.
-  - toolhop, apibank: accept `--batch` (ignored, always batch), `--limit` (toolhop 5,
-    apibank 2), `--offset`,
-    `--only`, `--out-dir`. apibank has `--level`, `--summary`, `--curated-path`.
-    toolhop needs `export TOOLHOP_ALLOW_DATASET_EXEC=1`.
+- One command line for every runner (`core/cli.py`): `--batch`, `--limit N`, `--offset K`,
+  `--only ID ...` (overrides `--limit`), `--out-dir DIR` (writes `DIR/predictions.jsonl`),
+  `--out PATH`. Output files are emptied when a batch starts. Dataset options: gpqa
+  `--shuffle-seed`; lcb `--difficulty` (`--platform` on LangGraph sequential, centralized,
+  decentralized); apps `--difficulty`, `--max-tests-per-row` (default 20); bfcl `--category`
+  (default `simple`); swe `--eval` (`local|singularity|none` in the single runner, default
+  `local`; `singularity|none` elsewhere, default `singularity`), `--workdir-root`,
+  `--keep-workdirs`, `--subset`; toolhop `--smoke-dataset`; apibank `--level`, `--summary`,
+  `--curated-path`, `--toolsearcher-scorer`.
+- Without `--batch`, gpqa / hotpotqa / math / lcb / apps runners play a canned demo; bfcl,
+  swe, toolhop and apibank have no demo and run a batch (default `--limit` 5, 2, 5, 2).
+- Eval IDs: `benchmarks/<ds>/<ds>_eval_ids.json` (730 in all); fixed splits:
+  `benchmarks/<ds>/<ds>_splits.json` (`test` = eval IDs). `--limit N` selects exactly the
+  eval IDs for every dataset except bfcl (stratified 100: 40/20/20/20) and swe (fixed 30),
+  which take `--only`.
+- Team specs: `configs/teams/<dataset>.yaml` (all but toolhop and apibank), team size
+  r ∈ {2, 4, 8, 10}, r = 4 for the `topologies/` runners.
 - Communication-protocol runners: `python -m communications.<topology>.<dataset>.<dataset>_<format>`
   for topologies independent/sequential/centralized/decentralized, datasets
-  hotpotqa/lcb/swe/toolhop/apibank, formats `freeform`, `semi_structured`,
-  `structured_soft` (shown to readers as Freeform / Semi-structured / Structured).
-  Shared CLI (`communications/communication_formats.py: cli_main`): `--batch`, `--limit`,
-  `--offset`, `--only`, `--out`. Default output:
-  `results/communications_baseline/<topology>_<dataset>_<format>/results.jsonl`.
+  hotpotqa/lcb/bfcl/toolhop/apibank/swe, formats `freeform`, `semi_structured`,
+  `structured_soft` (shown to readers as Freeform / Semi-structured / Structured); 72 runners.
+  Default output: `results/communications_baseline/<topology>_<dataset>_<format>/results.jsonl`.
 - Team-size runners: `teamsizes/<topology>/<dataset>/<dataset>_r<N>.py`, N ∈ {2,4,8,10},
-  topologies independent/sequential/centralized/decentralized, all 9 datasets. Same flag
-  families as topology runners (bfcl/swe: no `--batch`, `--out-dir`; toolhop/apibank:
-  `--out-dir`; others `--batch` + `--out`). Their default output paths don't include the
-  team size, so pass an explicit `--out`/`--out-dir` such as
-  `results/teamsizes_r4/hotpotqa/centralized_r4/`.
+  topologies independent/sequential/centralized/decentralized, all 9 datasets (144). They
+  run the LangGraph runner with a preset team (`core/variant.py`); toolhop and apibank vote
+  over N replicas (`teamsizes/<ds>_common.py`).
 - Sweep launchers: `scripts/run_topologies.sh`, `scripts/run_communications.sh`,
   `scripts/run_teamsizes.sh` (env: `VLLM_BASE_URL`, `MODEL_ID`, `DATASETS`, `TOPOLOGIES`,
-  `FORMATS`, `RVALUES`, `OUT_ROOT`). Known issue: `run_topologies.sh` and
-  `run_teamsizes.sh` pass `--batch` to bfcl/swe runners, which rejects it.
-- Launcher limits: gpqa 100, hotpotqa 100, math 100, lcb 50, apps 50, bfcl 100, swe 30,
-  apibank 100, toolhop 100.
+  `FORMATS`, `RVALUES`, `OUT_ROOT`). Don't run them to check a page; they start real sweeps.
+- The OpenAI Agents SDK is installed apart:
+  `pip install --target vendor/openai_agents -r requirements-openai-agents.txt`. Its runners
+  re-exec with it first on `PYTHONPATH`.
 
 ### Optimizers
 
-- GEPA: `cd optimizers/gepa && python -m real_runner_gepa.pilots.run_gepa_dataset --dataset <ds> --topology <name> --train-size 25 --val-size 25 --max-full-evals 5 --out results/gepa/<name>_<ds>`.
-- MIPRO: `cd optimizers/mipro && python -m real_runner_mipro.pilots.run_mipro_dataset --dataset <ds> --topology <name> --train-size 25 --val-size 25 --num-candidates 3 --num-trials 3 --out results/mipro/<name>_<ds>`.
-- Optimizer topology names: `single`, `independent`, `sequential`, `sequential_crewai`,
-  `centralized`, `centralized_autogen`, `decentralized`, `decentralized_openai`; plus
-  `<topo>_r<N>` and `<topo>_communications_<format>` **only for** hotpotqa, lcb, toolhop,
-  apibank. Check with `real_runner_gepa.registry.topologies(dataset)`.
-- Env: `GEPA_TASK_ENDPOINTS` / `MIPRO_TASK_ENDPOINTS` (comma-separated, runs the agents),
-  `GEPA_REFL_ENDPOINT` / `MIPRO_REFL_ENDPOINT` (reflection / proposal model), `TASK_MODEL`,
-  `REFL_MODEL` (MIPRO also reads `MIPRO_TASK_MODEL`, `MIPRO_REFL_MODEL`),
-  `GEPA_EXCLUDE_REAL_EVAL_IDS` / `MIPRO_EXCLUDE_REAL_EVAL_IDS` (**on by default**: unset
-  counts as on; `0/false/no/off` turns it off),
-  `OPENAI_API_KEY`. The optimizers do not read `VLLM_BASE_URL` for task calls; unset
-  endpoint vars fall back to built-in localhost defaults in `lm.py`.
-- The pilots default to `--n-agents 2 --n-rounds 1` (used by independent and decentralized
-  cells). Pass `--n-agents 4 --n-rounds 2` to optimize the same team the runners use.
-- GEPA needs DSPy 3 (`dspy.teleprompt.GEPA`); `environment.yml` pins `dspy<3`, so readers
-  must run `pip install -U "dspy[optuna]>=3"`.
-- Defaults in code: TASK_MODEL `Qwen/Qwen3.5-9B`, REFL_MODEL `Qwen/Qwen3.5-122B-A10B-FP8`.
-- Output dir contains `meta.json` (`baseline_score`, `compiled_score`, `delta`,
-  `accept_compiled_prompt`, `selected_prompt_source`, `compiled_prompt_files`, …),
-  `baseline_val.jsonl`, `compiled_val.jsonl`, `optimized_val.jsonl`, `compiled/<name>.txt`,
-  `compiled_raw/`, `status.json`. Scores are fractions in [0, 1]. The compiled prompt is
-  accepted when `compiled_score + eps >= baseline_score`, otherwise the baseline prompt is kept.
+- Eight methods, presented equally: GEPA, MIPRO, MAPRO, MASPO, HiveMind, MAMUT-GEPA,
+  MASPOB, TAVO (keys `gepa`, `mipro`, `mapro`, `maspo`, `hivemind`, `mamut_gepa`, `maspob`,
+  `tavo`), one package each under `optimizers/`.
+- One run protocol: `python -m optimizers.protocol.run --method <key> --dataset <ds>
+  --topology <topology> [--framework F] [--team-size N] [--communication FMT] --model qwen
+  --seed {0,1,2} --out runs/...`; `python -m optimizers.protocol.aggregate runs/`.
+- Env: `TASK_ENDPOINTS` (else `VLLM_BASE_URL`), `REFLECTION_MODEL_BASE_URL` (default
+  `http://localhost:8200/v1`). Reflection model `Qwen/Qwen3.5-122B-A10B-FP8`.
+- Cells outside the experiment grid (`optimizers/protocol/cells.py`) need `--allow-any-cell`.
+- A job writes `result.json` under `--out`; `test.delta_pp` is Δ in percentage points.
 - Seed prompts: `configs/prompts/<topology>/<dataset>/<role>.txt` (read-only for optimizers).
 
 ### Model connection
 
-- All runners use one OpenAI-compatible endpoint: `VLLM_BASE_URL`, `MODEL_ID`,
-  `OPENAI_API_KEY` (runners default the key to `EMPTY`).
-- `models/serve_qwen3_5_9b.sh` (one replica per GPU from port 8000; `VLLM_BASE_PORT`),
-  `models/serve_qwen3_5_122b.sh` (TP=4, FP8-capable GPUs).
-
-### Paper numbers (GEPA, percentage points, baseline / optimized)
-
-- Biggest gain: Sequential (CrewAI) BFCL 60.0 → 84.0, +24.0. Biggest drop: Independent
-  MATH 76.0 → 60.0, −16.0. Single MATH 49.0 → 51.0, +2.0.
-- Domain averages: coding +3.7, tool-calling +4.3, reasoning +1.3.
-- Topology averages: Single +4.2, Independent −0.5, Sequential +0.5, Centralized +1.6,
-  Decentralized +2.3.
-- Protocol averages: Freeform +1.6, Semi-structured +2.4, Structured +4.3.
-- Team size averages: +2.4 at n=2 down to −2.1 at n=10. Centralized HotpotQA
-  +5.0 (n=2) → −12.0 (n=10); Decentralized HotpotQA stays non-negative at every size.
+- All runners use one OpenAI-compatible endpoint: `VLLM_BASE_URL` (default
+  `http://localhost:8000/v1`), `MODEL_ID` (default `Qwen/Qwen3.5-9B`), `OPENAI_API_KEY`
+  (default `EMPTY`). Decoding: temperature 0.0, top-p 0.9, at most 32,768 output tokens.
+- `models/serve_qwen3_5_9b.sh` (one replica per GPU from port 8000),
+  `models/serve_llama3_1_8b.sh` (gated; from port 8100), `models/serve_qwen3_5_122b.sh`
+  (reflection model; TP=4, port 8200).
 
 ## Don'ts
 

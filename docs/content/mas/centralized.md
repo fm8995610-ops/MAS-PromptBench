@@ -14,14 +14,14 @@ One manager plans the work, delegates each step to a specialist worker and write
 
 ## How it works
 
-1. The manager receives the task. Its seed prompt is extended with an instruction to end its final message with the word `TERMINATE`.
+1. The manager receives the task. Its seed prompt is extended with an instruction to end its final message with the word `TERMINATE` and a note naming its workers.
 2. The manager picks one worker and gives it an instruction.
 3. The worker runs, using the dataset's tools where it has them, and its reply goes back to the manager.
 4. Control returns to the manager after every worker turn. The manager may delegate again, call a task tool itself, or finish.
 5. The loop stops when the manager writes `TERMINATE` or the turn cap is reached.
 6. The runner extracts and scores the answer from the manager's final message.
 
-The cap is the same in both frameworks (LangGraph `MAX_TURNS`, AutoGen `MaxMessageTermination`): 16 for GPQA, 18 for MATH and HotpotQA, 24 for BFCL, 26 for LiveCodeBench and APPS, 30 for SWE-bench.
+The cap comes from the team spec and is the same in both frameworks (LangGraph `MAX_TURNS`, AutoGen `MaxMessageTermination`): 16 for GPQA, 18 for MATH and HotpotQA, 24 for BFCL, 26 for LiveCodeBench and APPS, 30 for SWE-bench.
 
 Workers see the shared conversation, not only the manager's latest instruction. The role descriptions in `roles.yaml` describe stricter isolation; the comment there explains that AutoGen's `SelectorGroupChat` shares one transcript, and the LangGraph runners also pass the full message state to each worker.
 
@@ -40,7 +40,7 @@ Each dataset has a `manager` and three workers:
 | `toolhop` | `planner_worker`, `caller_worker`, `validator_worker` |
 | `apibank` | `inspector_worker`, `caller_worker`, `validator_worker` |
 
-Seed prompts live at `configs/prompts/centralized/<dataset>/manager.txt` and `configs/prompts/centralized/<dataset>/<worker>.txt`. Each folder also holds `manager_r8.txt`, `manager_r10.txt` and seven more workers, used only by the larger [team sizes](team-sizes.md). Role descriptions are under `centralized:` in [`configs/prompts/roles.yaml`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/prompts/roles.yaml).
+Seed prompts live at `configs/prompts/centralized/<dataset>/manager.txt` and `configs/prompts/centralized/<dataset>/<worker>.txt`. Each folder also holds `manager_r8.txt`, `manager_r10.txt` and six more workers, used only by the larger [team sizes](team-sizes.md). The workers, their tools, the manager's tools and the turn caps come from the team spec in `configs/teams/<dataset>.yaml`; ToolHop and API-Bank fix their roles in code. Role descriptions are under `centralized:` in [`configs/prompts/roles.yaml`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/prompts/roles.yaml).
 
 ## Implementations
 
@@ -55,7 +55,7 @@ Seed prompts live at `configs/prompts/centralized/<dataset>/manager.txt` and `co
 [`topologies/centralized/autogen/autogen_base.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/topologies/centralized/autogen/autogen_base.py) is the reference demo of this pattern: a `PlanningAgent` with `Researcher`, `Analyst` and `Writer` workers.
 
 !!! note "ToolHop and API-Bank"
-    These runners use no framework objects, and both variants run identical code. Each worker runs once on the task, then the manager reads all three reports and writes the answer. There is no delegation loop.
+    These runners use no framework objects, and the AutoGen runner is the LangGraph runner's code under the `centralized_autogen` label. Each worker runs once on the task, then the manager reads all three reports and writes the answer. There is no delegation loop.
 
 ## Run it
 
@@ -63,49 +63,32 @@ Seed prompts live at `configs/prompts/centralized/<dataset>/manager.txt` and `co
 
     ```bash
     python -m topologies.centralized.langgraph.hotpotqa.langgraph_hotpotqa --batch --limit 100 \
-      --out results/topologies_baseline/centralized_langgraph_hotpotqa/predictions.jsonl
+      --out-dir results/topologies_baseline/centralized_langgraph_hotpotqa
     ```
 
 === "AutoGen"
 
     ```bash
     python -m topologies.centralized.autogen.hotpotqa.autogen_hotpotqa --batch --limit 100 \
-      --out results/topologies_baseline/centralized_autogen_hotpotqa/predictions.jsonl
+      --out-dir results/topologies_baseline/centralized_autogen_hotpotqa
     ```
 
-Drop `--batch` and the other flags to run the built-in smoke demo. BFCL, SWE-bench, ToolHop and API-Bank use `--out-dir`; see [Command-Line Flags](../reference/cli.md).
+Drop `--batch` and the other flags to run the built-in smoke demo. See the [task pages](../tasks/index.md) for each dataset's options.
 
 ## Optimize it
 
-| Optimizer topology name | What it runs |
+| Protocol flags | What it runs |
 | --- | --- |
-| `centralized` | the LangGraph team |
-| `centralized_autogen` | the AutoGen team |
-| `centralized_r2`, `centralized_r4`, `centralized_r8`, `centralized_r10` | team-size variants (HotpotQA, LiveCodeBench, ToolHop, API-Bank) |
-| `centralized_communications_<format>` | [communication-protocol](communication-protocols.md) variants (same four datasets) |
+| `--topology centralized` | the LangGraph team |
+| `--topology centralized --framework autogen` | the AutoGen team (`centralized_autogen`) |
+| `--topology centralized --team-size N` | the manager with N − 1 workers (`centralized_r<N>`) |
+| `--topology centralized --communication FORMAT` | a [communication-protocol](communication-protocols.md) variant (`centralized_communications_<format>`) |
 
-The optimizer tunes the manager prompt and all three worker prompts.
+The optimizer tunes the manager prompt and every worker prompt. Any of the eight methods runs it; for example, TAVO on LiveCodeBench:
 
-```bash title="GEPA on Centralized (AutoGen) / HotpotQA"
-cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset --dataset hotpotqa \
-  --topology centralized_autogen --train-size 25 --val-size 25 --max-full-evals 5 \
-  --out results/gepa/centralized_autogen_hotpotqa
+```bash title="TAVO on Centralized · LiveCodeBench"
+python -m optimizers.protocol.run --method tavo --dataset lcb --topology centralized \
+  --model qwen --seed 0 --out runs/tavo/lcb/centralized/qwen/0
 ```
 
-## Results
-
-GEPA's gain on each of the nine tasks with the Centralized topology, as reported in the paper. Bars grow right for a gain and left for a regression, on the same scale on every topology page. [Compare all topologies](../results/index.md).
-
-=== "Topology study"
-
-    --8<-- "results/topology-centralized.html"
-
-=== "Framework study · AutoGen"
-
-    --8<-- "results/topology-centralized-framework.html"
-
-Centralized averaged +1.6 points with GEPA. The average hides how strongly the manager amplifies a prompt change in either direction. On HotpotQA, optimization gained +5.0 with two agents and lost −12.0 with ten (see [Team Sizes](team-sizes.md)).
-
-!!! takeaway
-    A central manager amplifies both the wins and the losses of prompt optimization.
+See [Run an Optimizer](../optimizers/running.md).

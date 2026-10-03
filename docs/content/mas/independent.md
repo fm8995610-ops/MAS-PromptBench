@@ -1,6 +1,6 @@
 # Independent
 
-Several copies of one agent answer the same input in parallel and never see each other's work. A fixed rule then picks one answer. It measures what an ensemble adds without any communication.
+Several copies of one agent answer the same input in parallel and never see each other's work. A majority vote then picks one answer. It measures what an ensemble adds without any communication.
 { .lede }
 
 --8<-- "diagrams/independent.svg"
@@ -9,27 +9,30 @@ Several copies of one agent answer the same input in parallel and never see each
 <div><span>Agents</span>4 replicas</div>
 <div><span>Rounds</span>1</div>
 <div><span>Frameworks</span>LangGraph</div>
-<div><span>Aggregation</span>Vote or best-of-N</div>
+<div><span>Aggregation</span>Majority vote</div>
 </div>
 
 ## How it works
 
 1. The runner reads one seed prompt for the dataset and gives it, unchanged, to every replica.
 2. A LangGraph `StateGraph` fans out from `START`: a conditional edge returns one `Send` per replica (`agent_0` to `agent_3`). Each node runs a ReAct agent built with `create_react_agent` and the dataset's tools.
-3. Replicas differ only by sampling seed. Replica `i` uses seed `i` at temperature 0.2, so the four runs diverge without any change to the prompt.
+3. Replica `i` sends its requests with seed `i`; otherwise the replicas are identical.
 4. All nodes edge to `END`. Their answers are merged into one list by an `operator.add` reducer. No replica reads another's output at any point.
-5. The runner aggregates the list with the dataset's rule:
+5. The runner submits the majority answer, without looking at the gold answer or the tests:
 
-| Datasets | Rule |
+| Datasets | Vote over |
 | --- | --- |
-| GPQA, HotpotQA | Majority vote over normalized answers; ties go to the lowest replica index. |
-| MATH | Majority over buckets of equivalent `\boxed{}` answers. |
-| BFCL | Majority over canonical function-call forms. |
-| LiveCodeBench, APPS | Run each program on the problem's tests; return the first that passes all, else the highest pass rate. |
-| SWE-bench | Evaluate each patch; return the first resolved one, else the best fail-to-pass × pass-to-pass rate. |
-| ToolHop, API-Bank | Majority over normalized final answers or canonical API calls. |
+| GPQA | extracted letters |
+| HotpotQA | normalized short-form answers |
+| MATH | buckets of `\boxed{}` answers that `is_equiv` treats as equal |
+| BFCL | canonical function-call lists |
+| LiveCodeBench, APPS | programs, compared with whitespace normalized; only the winner is tested |
+| SWE-bench | non-empty patches, compared with whitespace normalized; only the winner is evaluated |
+| ToolHop, API-Bank | final answers or API calls |
 
-Change the number of replicas with `INDEPENDENT_N_AGENTS` (default `4`). The ToolHop and API-Bank runners read `TOOLHOP_INDEPENDENT_N_AGENTS` or `APIBANK_INDEPENDENT_N_AGENTS` first. For the 2, 8 and 10 replica variants used in the paper, see [Team Sizes](team-sizes.md).
+The largest bucket wins, ties go to the bucket with the lowest replica, and replicas without an answer abstain. The shared rule is in [`core/voting.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/core/voting.py).
+
+The replica count comes from the team spec (4) and `INDEPENDENT_N_AGENTS` overrides it. The ToolHop and API-Bank runners read `TOOLHOP_INDEPENDENT_N_AGENTS` or `APIBANK_INDEPENDENT_N_AGENTS` first. For the 2, 8 and 10 replica variants, see [Team Sizes](team-sizes.md).
 
 ## Agent role and seed prompt
 
@@ -47,8 +50,8 @@ Because every replica reads the same file, optimizing this topology means tuning
 ## Implementation
 
 - **Reference scaffold:** [`topologies/independent/langgraph_base.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/topologies/independent/langgraph_base.py) shows the `Send` fan-out and fan-in with four agents. Its demo agents have different personas; the benchmark runners use one shared prompt instead.
-- **Dataset runners:** `topologies/independent/<dataset>/langgraph_<dataset>.py`. The GPQA, HotpotQA and MATH runners cap each row at 120 s of wall-clock time and the LiveCodeBench and APPS runners at 180 s, so one stuck replica can't stall a batch.
-- **ToolHop and API-Bank:** no LangGraph graph. The runner calls the shared tool loop once per seed in plain Python and votes over the results.
+- **Dataset runners:** `topologies/independent/<dataset>/langgraph_<dataset>.py`. The GPQA, HotpotQA and MATH runners cap each row at 120 s of wall-clock time and the LiveCodeBench and APPS runners at 180 s, so one stuck replica can't stall a batch. On SWE-bench, each replica edits its own clone of the repository.
+- **ToolHop and API-Bank:** no LangGraph graph. The runner calls the shared tool loop (ToolHop) or model call (API-Bank) once per seed in plain Python and votes over the results.
 
 ## Run it
 
@@ -58,7 +61,7 @@ python -m topologies.independent.hotpotqa.langgraph_hotpotqa
 
 ```bash title="Batch run with the default 4 replicas"
 python -m topologies.independent.hotpotqa.langgraph_hotpotqa --batch --limit 100 \
-  --out results/topologies_baseline/independent_hotpotqa/predictions.jsonl
+  --out-dir results/topologies_baseline/independent_hotpotqa
 ```
 
 ```bash title="ToolHop with 8 replicas"
@@ -67,34 +70,15 @@ INDEPENDENT_N_AGENTS=8 python -m topologies.independent.toolhop.langgraph_toolho
   --limit 100 --out-dir results/topologies_baseline/independent_toolhop_n8
 ```
 
-Flag families differ by dataset; see [Command-Line Flags](../reference/cli.md).
+See the [task pages](../tasks/index.md) for each dataset's options.
 
 ## Optimize it
 
-| Optimizer topology name | What it runs |
-| --- | --- |
-| `independent` | the runners on this page |
-| `independent_r2`, `independent_r4`, `independent_r8`, `independent_r10` | [team-size](team-sizes.md) variants (HotpotQA, LiveCodeBench, ToolHop, API-Bank) |
-| `independent_communications_<format>` | [communication-protocol](communication-protocols.md) variants (same four datasets) |
+The protocol topology is `independent`; add `--team-size` or `--communication` for the [team-size](team-sizes.md) and [communication-protocol](communication-protocols.md) variants. The optimizer tunes the one shared prompt. Any of the eight methods runs it; for example, MAMUT-GEPA on HotpotQA:
 
-The optimizer pilot sets the replica count itself with `--n-agents`, which defaults to `2`. Pass `--n-agents 4` to optimize the same team the baseline runs:
-
-```bash title="GEPA on Independent / MATH with 4 replicas"
-cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset --dataset math --topology independent \
-  --n-agents 4 --train-size 25 --val-size 25 --max-full-evals 5 \
-  --out results/gepa/independent_math
+```bash title="MAMUT-GEPA on Independent · HotpotQA"
+python -m optimizers.protocol.run --method mamut_gepa --dataset hotpotqa --topology independent \
+  --model qwen --seed 0 --out runs/mamut_gepa/hotpotqa/independent/qwen/0
 ```
 
-## Results
-
-GEPA's gain on each of the nine tasks with the Independent topology, as reported in the paper. Bars grow right for a gain and left for a regression, on the same scale on every topology page. [Compare all topologies](../results/index.md).
-
---8<-- "results/topology-independent.html"
-
-Independent had the lowest topology average with GEPA, −0.5 points, and the benchmark's largest single drop: MATH fell from 76.0 to 60.0 (−16.0).
-
-All replicas share the one optimized prompt, so a prompt change reaches every vote at once. A prompt that helps a single agent can lose that gain once its copies run in parallel and are voted together.
-
-!!! takeaway
-    Parallel agents can erase the gains a prompt brings to a single agent.
+See [Run an Optimizer](../optimizers/running.md).

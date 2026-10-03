@@ -20,6 +20,10 @@ if [ "${CONDA_DEFAULT_ENV:-}" != "${CONDA_ENV}" ]; then
 fi
 
 # --- Model cache ---
+# HF_HOME and MODEL_PATH (vLLM's --download-dir) default to $HOME/models, a flat
+# download directory with the models--<org>--<name>/ folders right under it, not
+# the standard ~/.cache/huggingface/hub layout. To serve from an existing Hugging
+# Face cache, set HF_HOME to it and MODEL_PATH / TRANSFORMERS_CACHE to <HF_HOME>/hub.
 export HF_HOME=${HF_HOME:-$HOME/models}
 export MODEL_PATH=${MODEL_PATH:-$HF_HOME}
 export TRANSFORMERS_CACHE=${TRANSFORMERS_CACHE:-$HF_HOME}
@@ -39,7 +43,7 @@ KV_CACHE_DTYPE=${KV_CACHE_DTYPE:-fp8}         # ~halves per-token KV footprint
 # Use VLLM_HOST / VLLM_PORT to override; raw HOST/PORT are reserved by conda's
 # gcc activation scripts (they set HOST=x86_64-conda-linux-gnu).
 HOST=${VLLM_HOST:-0.0.0.0}
-PORT=${VLLM_PORT:-8000}
+PORT=${VLLM_PORT:-8200}
 
 # --- Log dir ---
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)

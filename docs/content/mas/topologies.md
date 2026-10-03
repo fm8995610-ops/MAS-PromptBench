@@ -19,21 +19,21 @@ Prompt optimization changes only the prompts \( s_1, \dots, s_n \). The model, t
 | \( s_i \) | Seed prompts in `configs/prompts/<topology>/<dataset>/<role>.txt` |
 | \( G \) | The runners in [`topologies/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/topologies), one per topology, framework and dataset |
 | \( P \) | Free text by default; the formats in [Communication Protocols](communication-protocols.md) |
-| \( n \) | Fixed per topology; varied in [Team Sizes](team-sizes.md) |
+| \( n \) | The team specs in [`configs/teams/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/configs/teams), 4 agents by default; varied in [Team Sizes](team-sizes.md) |
 
-The seed prompts were written by an LLM from the role catalog in [`configs/prompts/roles.yaml`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/prompts/roles.yaml), the domain and tool lists next to it, and the template `configs/prompts/meta_prompt.txt`. Optimizers read them and never overwrite them.
+The seed prompts were written by an LLM from the role catalog in [`configs/prompts/roles.yaml`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/prompts/roles.yaml), the domain and tool lists next to it, and the template `configs/prompts/meta_prompt.txt`. Optimizers read them and never overwrite them. A team spec, `configs/teams/<dataset>.yaml`, names each topology's roles, their tools and order, and the turn caps, for every team size; ToolHop and API-Bank fix their roles in code instead.
 
 ## The five topologies
 
-| Topology | Shape | Who talks to whom | Frameworks | Default size | Optimizer names |
+| Topology | Shape | Who talks to whom | Frameworks | Default size | Protocol `--topology` |
 | --- | --- | --- | --- | --- | --- |
 | [Single](single.md) | One ReAct loop | The agent and its tools only | LangGraph | 1 agent | `single` |
-| [Independent](independent.md) | Parallel fan-out, fan-in | Nobody; a fixed rule picks one answer | LangGraph | 4 replicas, 1 round | `independent` |
+| [Independent](independent.md) | Parallel fan-out, fan-in | Nobody; a majority vote picks one answer | LangGraph | 4 replicas, 1 round | `independent` |
 | [Sequential](sequential.md) | Linear pipeline | Each stage reads all earlier stages | LangGraph, CrewAI | 4 stages, 1 pass | `sequential`, `sequential_crewai` |
 | [Centralized](centralized.md) | Hub and spoke | Manager and each worker; workers never address each other | LangGraph, AutoGen | 1 manager + 3 workers, until `TERMINATE` or a turn cap | `centralized`, `centralized_autogen` |
-| [Decentralized](decentralized.md) | Peer debate | Every peer reads every other peer's previous answer | LangGraph, OpenAI SDK | 4 peers, 2 rounds | `decentralized`, `decentralized_openai` |
+| [Decentralized](decentralized.md) | Peer debate | Every peer reads every other peer's previous answer | LangGraph, OpenAI Agents SDK | 4 peers, 2 rounds | `decentralized`, `decentralized_openai_agents` |
 
-For HotpotQA, LiveCodeBench, ToolHop and API-Bank, the four multi-agent topologies also have optimizer names for team-size variants (`<topology>_r<N>`) and protocol variants (`<topology>_communications_<format>`). List every name for a dataset with `real_runner_gepa.registry.topologies(dataset)`.
+The last column is what `python -m optimizers.protocol.run --topology` takes; `--topology sequential --framework crewai` is the same as `sequential_crewai`. Team-size and protocol variants of the four multi-agent topologies take `--team-size` and `--communication`, or keys such as `centralized_r8` and `sequential_communications_structured_soft`. See [Run an Optimizer](../optimizers/running.md).
 
 <div class="cards" markdown>
 
@@ -52,20 +52,20 @@ For HotpotQA, LiveCodeBench, ToolHop and API-Bank, the four multi-agent topologi
 
 ## Framework by topology
 
-Every topology runs on every one of the nine datasets: 72 runner scripts in all. Single and Independent have one implementation each; the three multi-agent topologies have two, so you can compare frameworks on the same task.
+Every topology runs on every one of the nine datasets: 72 runner modules in all. Single and Independent have one implementation each; Sequential, Centralized and Decentralized have two, so you can compare frameworks on the same task.
 
-| Topology | LangGraph | CrewAI | AutoGen | OpenAI SDK |
+| Topology | LangGraph | CrewAI | AutoGen | OpenAI Agents SDK |
 | --- | --- | --- | --- | --- |
 | Single | `single/<ds>/langgraph_<ds>.py` | | | |
 | Independent | `independent/<ds>/langgraph_<ds>.py` | | | |
 | Sequential | `sequential/langgraph/<ds>/langgraph_<ds>.py` | `sequential/crewai/<ds>/crewai_<ds>.py` | | |
 | Centralized | `centralized/langgraph/<ds>/langgraph_<ds>.py` | | `centralized/autogen/<ds>/autogen_<ds>.py` | |
-| Decentralized | `decentralized/langgraph/<ds>/langgraph_<ds>.py` | | | `decentralized/openai/<ds>/openai_<ds>.py` |
+| Decentralized | `decentralized/langgraph/<ds>/langgraph_<ds>.py` | | | `decentralized/openai_agents/<ds>/openai_agents_<ds>.py` |
 
-Paths are under `topologies/`. `<ds>` is the dataset folder: `gpqa`, `hotpotqa`, `math`, `lcb`, `apps`, `swe`, `bfcl`, `toolhop` or `apibank`.
+Paths are under `topologies/`. `<ds>` is the dataset folder: `gpqa`, `hotpotqa`, `math`, `lcb`, `apps`, `swe`, `bfcl`, `toolhop` or `apibank`. The runners are thin: the command line, batch loop, model clients, team specs, prompts and one task module per dataset live in the shared `core/` package. See [Repository Map](../reference/repository.md).
 
-!!! note "ToolHop and API-Bank don't use the frameworks"
-    The ToolHop and API-Bank runners are self-contained. Each calls the endpoint through the `openai` client and builds its topology in plain Python, so the two framework variants of a topology run identical code under a different `STYLE` label.
+!!! note "ToolHop and API-Bank"
+    The ToolHop and API-Bank runners call the endpoint through the `openai` client and build their topology in plain Python. Their CrewAI and AutoGen variants run the LangGraph runner's code under another `STYLE` label; the Agents SDK variant runs the SDK debate engine.
 
 ## Run a topology
 
@@ -73,23 +73,7 @@ Run every command from the repository root, using the module form:
 
 ```bash title="Run one topology on 100 HotpotQA questions"
 python -m topologies.centralized.autogen.hotpotqa.autogen_hotpotqa --batch --limit 100 \
-  --out results/topologies_baseline/centralized_autogen_hotpotqa/predictions.jsonl
+  --out-dir results/topologies_baseline/centralized_autogen_hotpotqa
 ```
 
-!!! tip "Use `python -m` from the repository root"
-    The runners import the `topologies` package, which the module form puts on Python's import path. To run a file by its path instead, set `PYTHONPATH=.` first.
-
-To sweep all eight topology variants over all nine datasets, use `scripts/run_topologies.sh` (it passes `--batch` and `--out` to the BFCL and SWE-bench runners, which accept neither, so run those cells by hand). Each topology page shows the commands for its frameworks; [Command-Line Flags](../reference/cli.md) lists the flags per dataset family.
-
-## What the paper found
-
-With GEPA as the optimizer, the paper reports these average changes per topology across the nine tasks:
-
---8<-- "results/summary-topologies.html"
-
-The same optimizer that helps one agent most adds little or nothing once agents run in parallel or in a pipeline. The extremes sit in the multi-agent cells: Sequential (CrewAI) on BFCL gained +24.0, while Independent on MATH lost −16.0. How agents are connected changes what a prompt edit does.
-
-!!! takeaway
-    Multi-agent systems need topology-aware prompt optimizers.
-
-Every task and topology cell is in the [Results Explorer](../results/index.md).
+Every runner takes the same command line; the [task pages](../tasks/index.md) list each dataset's extra options and how to select its eval IDs. To sweep all eight topology variants over all nine datasets on the eval IDs, run `scripts/run_topologies.sh`. It reads `VLLM_BASE_URL`, `MODEL_ID`, `DATASETS` and `OUT_ROOT` (default `results/topologies_baseline`) and runs each cell as its own process.

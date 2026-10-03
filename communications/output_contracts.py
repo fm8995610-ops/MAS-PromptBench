@@ -5,9 +5,10 @@ runners. Communication-format prompts are layered separately in
 ``communications.communication_formats`` so final HotpotQA/LCB artifacts remain
 compatible with the existing evaluators.
 """
+
 from __future__ import annotations
 
-from topologies.output_contracts import (  # noqa: F401
+from core.output_contracts import (  # noqa: F401
     CONTRACT_GUARD,
     DATASET_CONTRACTS,
     OUTPUT_CONTRACT_VERSION,
@@ -15,4 +16,3 @@ from topologies.output_contracts import (  # noqa: F401
     append_output_contract_from_path,
     output_contract,
 )
-

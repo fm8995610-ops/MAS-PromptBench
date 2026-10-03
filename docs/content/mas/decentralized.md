@@ -8,7 +8,7 @@ Peer agents debate over several rounds with no coordinator. Each peer answers al
 <div class="facts" markdown>
 <div><span>Agents</span>4 peers</div>
 <div><span>Rounds</span>2</div>
-<div><span>Frameworks</span>LangGraph, OpenAI SDK</div>
+<div><span>Frameworks</span>LangGraph, OpenAI Agents SDK</div>
 <div><span>Aggregation</span>Final-round vote</div>
 </div>
 
@@ -16,41 +16,43 @@ Peer agents debate over several rounds with no coordinator. Each peer answers al
 
 The design follows multi-agent debate (Du et al. 2023, [arXiv:2305.14325](https://arxiv.org/abs/2305.14325)).
 
-1. Every peer gets the same `debater` seed prompt and the task. Each peer keeps its own message history across rounds; in the ToolHop and API-Bank runners it gets its previous answer back as context instead.
+1. Every peer gets the same `debater` seed prompt and the task.
 2. **Round 0.** Each peer answers independently, using the dataset's tools.
-3. **Round 1.** Each peer receives one new message holding the other peers' final answers from round 0, with an instruction to revise only if a peer's reasoning or evidence is stronger. It then answers again.
+3. **Round 1.** Each peer receives the other peers' final answers from round 0, with an instruction to revise only if a peer's reasoning or evidence is stronger. It then answers again.
 4. Later rounds repeat step 3 with the previous round's answers. Peers inside a round run one after another, but each reads only the previous round, so no peer sees a same-round answer.
-5. After the last round, the runner aggregates the peers' final answers:
+5. After the last round, the runner submits the majority of the peers' final answers, without looking at the gold answer or the tests:
 
-| Datasets | Rule |
+| Datasets | Vote over |
 | --- | --- |
-| GPQA, HotpotQA, ToolHop, API-Bank | Majority over normalized answers; ties go to the lowest peer index. |
-| MATH | Majority over buckets of equivalent `\boxed{}` answers. |
-| LiveCodeBench, APPS | Run each program on the problem's tests; first that passes all, else the highest pass rate. |
-| SWE-bench | First resolved patch, else the best fail-to-pass × pass-to-pass rate. |
-| BFCL | First call the BFCL AST checker accepts, else the first peer with a call. |
+| GPQA | extracted letters |
+| HotpotQA | normalized short-form answers |
+| MATH | buckets of `\boxed{}` answers that `is_equiv` treats as equal |
+| BFCL | canonical function-call lists |
+| LiveCodeBench, APPS | programs, compared with whitespace normalized; only the winner is tested |
+| SWE-bench | non-empty patches, compared with whitespace normalized; only the winner is evaluated |
+| ToolHop, API-Bank | final answers or API calls |
+
+Ties go to the lowest peer index. The Agents SDK runners vote the same way over each peer's whole final output, compared with whitespace normalized.
 
 From round 1 on, each peer reads the other `n - 1` peers' answers, so what it reads grows with team size.
 
-Set the shape with `DECENTRALIZED_N_AGENTS` (default `4`) and `DECENTRALIZED_N_ROUNDS` (default `2`, counting round 0). The ToolHop and API-Bank runners read `TOOLHOP_`- or `APIBANK_`-prefixed versions of both first.
+The team spec sets 4 peers and 2 rounds (counting round 0); `DECENTRALIZED_N_AGENTS` and `DECENTRALIZED_N_ROUNDS` override them. The ToolHop and API-Bank runners read `TOOLHOP_`- or `APIBANK_`-prefixed versions of both first.
 
 ## Role and seed prompt
 
-One role, `debater`, shared by every peer: `configs/prompts/decentralized/<dataset>/debater.txt` for all nine datasets. One exception: the OpenAI SDK runner for MATH reads `configs/prompts/decentralized_openai/math/debater.txt`, a separately generated prompt that also lists a `solve_equation` tool which only that runner provides.
+One role, `debater`, shared by every peer: `configs/prompts/decentralized/<dataset>/debater.txt` for all nine datasets. Both frameworks read the same file.
 
 ## Implementations
 
 ### LangGraph
 
-`topologies/decentralized/langgraph/<dataset>/langgraph_<dataset>.py` builds a `StateGraph` with a single `round` node and a conditional edge that loops back to it until `N_ROUNDS` rounds are done. The state holds every peer's message history and every round's final answers. On most datasets each peer turn invokes one shared `create_react_agent` on that peer's history.
+`topologies/decentralized/langgraph/<dataset>/langgraph_<dataset>.py` builds a `StateGraph` with a single `round` node and a conditional edge that loops back to it until the last round is done. The state holds every peer's message history and every round's final answers. On most datasets each peer turn invokes one shared `create_react_agent` on that peer's history, and the other peers' answers arrive as one new user message. On SWE-bench, each peer edits its own clone of the repository.
 
-### OpenAI SDK
+### OpenAI Agents SDK
 
-`topologies/decentralized/openai/<dataset>/openai_<dataset>.py` uses the `openai` Python client directly: each peer turn is a `chat.completions.create` tool loop over a plain list of messages, and the peer message is appended as a user turn.
+`topologies/decentralized/openai_agents/<dataset>/openai_agents_<dataset>.py` supplies the prompt, tools and scoring; the debate engine is [`agents_sdk_base.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/topologies/decentralized/openai_agents/agents_sdk_base.py) next to them. Every peer turn is one Agents SDK run with the dataset's function tools and no handoffs. From round 1 on, its input is the original task, the peer's own previous answer and the other peers' answers from the previous round. Each peer turn sends its own request seed.
 
-[`topologies/decentralized/openai/debate_base.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/topologies/decentralized/openai/debate_base.py) is the 70-line reference, adapted from `frameworks/llm_multiagent_debate`. Its demo defaults to 3 agents and 2 rounds; the benchmark runners use 4 and 2.
-
-ToolHop and API-Bank runners use no framework objects. Both variants run the same plain-Python debate loop and differ only in their `STYLE` label.
+These runners need the isolated SDK install from [Installation](../getting-started/installation.md#install-the-openai-agents-sdk); they restart themselves with it first on `PYTHONPATH`.
 
 ## Run it
 
@@ -58,54 +60,38 @@ ToolHop and API-Bank runners use no framework objects. Both variants run the sam
 
     ```bash
     python -m topologies.decentralized.langgraph.hotpotqa.langgraph_hotpotqa --batch --limit 100 \
-      --out results/topologies_baseline/decentralized_langgraph_hotpotqa/predictions.jsonl
+      --out-dir results/topologies_baseline/decentralized_langgraph_hotpotqa
     ```
 
-=== "OpenAI SDK"
+=== "OpenAI Agents SDK"
 
     ```bash
-    python -m topologies.decentralized.openai.hotpotqa.openai_hotpotqa --batch --limit 100 \
-      --out results/topologies_baseline/decentralized_openai_hotpotqa/predictions.jsonl
+    python -m topologies.decentralized.openai_agents.hotpotqa.openai_agents_hotpotqa \
+      --batch --limit 100 \
+      --out-dir results/topologies_baseline/decentralized_openai_agents_hotpotqa
     ```
 
 ```bash title="Three rounds instead of two"
 DECENTRALIZED_N_ROUNDS=3 python -m topologies.decentralized.langgraph.math.langgraph_math \
-  --batch --limit 100 --out results/decentralized_math_3rounds/predictions.jsonl
+  --batch --limit 100 --out-dir results/decentralized_math_3rounds
 ```
 
-BFCL, SWE-bench, ToolHop and API-Bank use `--out-dir`; see [Command-Line Flags](../reference/cli.md).
+See the [task pages](../tasks/index.md) for each dataset's options.
 
 ## Optimize it
 
-| Optimizer topology name | What it runs |
+| Protocol flags | What it runs |
 | --- | --- |
-| `decentralized` | the LangGraph debate |
-| `decentralized_openai` | the OpenAI SDK debate |
-| `decentralized_r2`, `decentralized_r4`, `decentralized_r8`, `decentralized_r10` | [team-size](team-sizes.md) variants (HotpotQA, LiveCodeBench, ToolHop, API-Bank) |
-| `decentralized_communications_<format>` | [communication-protocol](communication-protocols.md) variants (same four datasets) |
+| `--topology decentralized` | the LangGraph debate |
+| `--topology decentralized --framework openai_agents` | the Agents SDK debate (`decentralized_openai_agents`) |
+| `--topology decentralized --team-size N` | N peers (`decentralized_r<N>`), still 2 rounds |
+| `--topology decentralized --communication FORMAT` | a [communication-protocol](communication-protocols.md) variant (`decentralized_communications_<format>`) |
 
-The optimizer tunes the one `debater` prompt that every peer uses.
+The optimizer tunes the one `debater` prompt that every peer uses, and the job runs the same 4 peers and 2 rounds as the baseline. Any of the eight methods runs it; for example, HiveMind on BFCL:
 
-!!! warning "Set the debate shape on the optimizer"
-    The optimizer pilots default to `--n-agents 2 --n-rounds 1`. With one round, peers never read each other. Pass `--n-agents 4 --n-rounds 2` to optimize the debate the baseline runs.
-
-```bash title="GEPA on Decentralized / HotpotQA"
-cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset --dataset hotpotqa --topology decentralized \
-  --n-agents 4 --n-rounds 2 --train-size 25 --val-size 25 --max-full-evals 5 \
-  --out results/gepa/decentralized_hotpotqa
+```bash title="HiveMind on Decentralized · BFCL"
+python -m optimizers.protocol.run --method hivemind --dataset bfcl --topology decentralized \
+  --model qwen --seed 0 --out runs/hivemind/bfcl/decentralized/qwen/0
 ```
 
-## Results
-
-GEPA's gain on each of the nine tasks with the Decentralized topology, as reported in the paper. Bars grow right for a gain and left for a regression, on the same scale on every topology page. [Compare all topologies](../results/index.md).
-
-=== "Topology study"
-
-    --8<-- "results/topology-decentralized.html"
-
-=== "Framework study · OpenAI SDK"
-
-    --8<-- "results/topology-decentralized-framework.html"
-
-Decentralized averaged +2.3 points with GEPA, the largest gain of the four multi-agent topologies. On HotpotQA its gain stayed non-negative at every team size from 2 to 10 agents, while Centralized on the same task fell from +5.0 to −12.0 (see [Team Sizes](team-sizes.md)).
+An Agents SDK job restarts itself with the SDK install first on `PYTHONPATH`, like the runners. See [Run an Optimizer](../optimizers/running.md).

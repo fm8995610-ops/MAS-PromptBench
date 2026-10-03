@@ -290,4 +290,67 @@
       e.preventDefault(); openSearch();
     }
   });
+
+  /* ---------- topology diagrams and fact strips: build in on first view, then
+     send a dot along every solid edge, left to right, to show messages moving ---------- */
+  (function () {
+    if (reduceMotion || !('IntersectionObserver' in window)) return;
+    var NS = 'http://www.w3.org/2000/svg';
+    var SPREAD = 1600, DUR = 900, REST = 1000, CYCLE = SPREAD + DUR + REST;
+
+    function ease(t) { return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+
+    function setup(svg) {
+      var box = svg.viewBox.baseVal, W = (box && box.width) || 620;
+      svg.querySelectorAll('rect, text, path').forEach(function (p) {
+        var x = 0;
+        try { x = p.getBBox().x; } catch (e) {}
+        p.style.setProperty('--d', Math.round(Math.max(0, x) / W * 700) + 'ms');
+        if (p.matches('.edge, .edge-io')) p.style.setProperty('--len', p.getTotalLength().toFixed(1));
+      });
+      var flows = Array.prototype.map.call(svg.querySelectorAll('.edge, .edge-io'), function (edge) {
+        var dot = doc.createElementNS(NS, 'circle');
+        dot.setAttribute('r', '3.4');
+        dot.setAttribute('class', 'flow-dot' + (edge.classList.contains('edge-io') ? ' flow-dot-io' : ''));
+        svg.appendChild(dot);
+        return { edge: edge, dot: dot, len: edge.getTotalLength(), t0: Math.max(0, edge.getPointAtLength(0).x) / W * SPREAD };
+      });
+      svg.classList.add('is-anim');
+      return { svg: svg, flows: flows, raf: 0, start: 0, visible: false };
+    }
+
+    function frame(st, now) {
+      if (!st.start) st.start = now;
+      var t = (now - st.start) % CYCLE;
+      st.flows.forEach(function (f) {
+        var local = t - f.t0;
+        if (local < 0 || local > DUR) { f.dot.style.opacity = 0; return; }
+        var p = local / DUR, pt = f.edge.getPointAtLength(ease(p) * f.len);
+        f.dot.setAttribute('cx', pt.x.toFixed(1)); f.dot.setAttribute('cy', pt.y.toFixed(1));
+        f.dot.style.opacity = Math.min(1, p * 6, (1 - p) * 6).toFixed(2);
+      });
+      st.raf = requestAnimationFrame(function (n) { frame(st, n); });
+    }
+    function play(st) { if (!st.raf && st.visible && !doc.hidden) st.raf = requestAnimationFrame(function (n) { frame(st, n); }); }
+    function pause(st) { if (st.raf) { cancelAnimationFrame(st.raf); st.raf = 0; } }
+
+    var states = Array.prototype.map.call(doc.querySelectorAll('.topo-diagram'), setup);
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var st = states.filter(function (s) { return s.svg === en.target; })[0];
+        if (en.isIntersecting) en.target.classList.add('is-in');
+        if (!st) return;
+        st.visible = en.isIntersecting;
+        if (st.visible) setTimeout(function () { play(st); }, st.start ? 0 : 1100); else pause(st);
+      });
+    }, { threshold: 0.35 });
+    states.forEach(function (st) { io.observe(st.svg); });
+    doc.addEventListener('visibilitychange', function () { states.forEach(function (st) { doc.hidden ? pause(st) : play(st); }); });
+
+    doc.querySelectorAll('.facts').forEach(function (strip) {
+      Array.prototype.forEach.call(strip.children, function (c, i) { c.style.setProperty('--d', (i * 80) + 'ms'); });
+      strip.classList.add('is-anim');
+      io.observe(strip);
+    });
+  })();
 })();

@@ -6,16 +6,16 @@ ToolHop asks multi-hop questions that need a chain of tool calls, where each too
 <div class="facts" markdown>
 <div><span>Domain</span>Tool calling</div>
 <div><span>Metric</span>Answer accuracy</div>
-<div><span>Launcher limit</span>100</div>
 <div><span>Eval IDs</span>100</div>
+<div><span>Train / val</span>150 / 50</div>
 <div><span>Data</span>bytedance-research/ToolHop</div>
 </div>
 
 ## The task
 
-Each row has a question, a gold answer, OpenAI-style tool schemas and the Python source of those tools. The agents run a standard tool-calling loop against your OpenAI-compatible endpoint: the model calls tools, the runner executes them locally and returns the results, and the loop repeats until the model answers without a tool call or reaches `TOOLHOP_MAX_TURNS` turns (default 9). Tool results longer than `TOOLHOP_TOOL_RESULT_CHAR_BUDGET` characters (default 6,000) are cut.
+Each row has a question, a gold answer, OpenAI-style tool schemas and the Python source of those tools. An agent runs a standard tool-calling loop against your OpenAI-compatible endpoint: the model calls tools, the runner executes them locally and returns the results, and the loop repeats until the model answers without a tool call or reaches `TOOLHOP_MAX_TURNS` turns (default 9). Tool results longer than `TOOLHOP_TOOL_RESULT_CHAR_BUDGET` characters (default 6,000) are cut.
 
-The user prompt fixes the answer format: dates as `YYYY-MM-DD`, names as `Firstname Lastname`, numbers as digits with no leading zeros. The output contract asks the final role to end with one short answer wrapped as `<answer>...</answer>`. If the final role stops without one, the runner makes one more short call that asks the model for its final answer in that format.
+The user prompt fixes the answer format: dates as `YYYY-MM-DD`, names as `Firstname Lastname`, numbers as digits with no leading zeros. The output contract asks the answering role to end with one short answer wrapped as `<answer>...</answer>`. If an answering role stops without one, the runner makes one more short call that asks the model for its final answer in that format.
 
 ## How it is scored
 
@@ -25,11 +25,11 @@ The runner takes the text after the last `<answer>` tag in the final message, up
 2. Otherwise, it is correct when the gold answer, lowercased, appears inside the answer, lowercased with commas removed. A trailing `.0` is dropped on both sides.
 3. In either case, it also counts as correct when the gold answer appears in the last tool result before the final message.
 
-Each line of `results.jsonl` has `correct` and `predicted_answer`; accuracy is the fraction of `correct` lines. The runner does not print a summary score.
+Each line of `results.jsonl` has `correct` and `predicted_answer`; accuracy is the fraction of `correct` lines. Independent and Decentralized teams submit their agents' most common answer, ties going to the earliest agent.
 
 ## Data and setup
 
-The runner downloads `data/ToolHop.json` from the Hugging Face dataset `bytedance-research/ToolHop`. Row IDs are the dataset's integer IDs; the 100 frozen IDs are `0` to `99`, listed in [`benchmarks/toolhop/toolhop_eval_ids.json`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/toolhop/toolhop_eval_ids.json).
+The runner downloads `data/ToolHop.json` from the Hugging Face dataset `bytedance-research/ToolHop`. Row IDs are the dataset's integer IDs; the 100 eval IDs are `0` to `99`, listed in [`benchmarks/toolhop/toolhop_eval_ids.json`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/toolhop/toolhop_eval_ids.json). They are the first 100 rows, so `--limit 100` scores exactly that set.
 
 Before it runs a tool, the runner reduces its source to function definitions, replaces the builtins with a restricted set, and allows imports only from a fixed list of modules (such as `math`, `datetime`, `re`, `json`, `numpy` and `sympy`). It still executes code from the dataset, so it refuses unless you opt in:
 
@@ -37,7 +37,7 @@ Before it runs a tool, the runner reduces its source to function definitions, re
 export TOOLHOP_ALLOW_DATASET_EXEC=1
 ```
 
-Without it, the runner raises an error on every instance and scores each one as wrong. `scripts/run_topologies.sh` sets this variable to `1` unless you set it yourself.
+Without it, every instance fails with an error that names the variable and counts as wrong. The sweep scripts set it to `1` unless you set it yourself.
 
 ## Run it
 
@@ -47,7 +47,7 @@ Run every command from the repository root. To check the download and the datase
 python -m topologies.single.toolhop.langgraph_toolhop --smoke-dataset --limit 100
 ```
 
-Runs are always batches; `--batch` is accepted and ignored. With no arguments, a runner solves the first 5 rows.
+There is no smoke demo; with no arguments a runner solves the first 5 rows, and `--batch` changes nothing.
 
 === "Single"
 
@@ -56,50 +56,36 @@ Runs are always batches; `--batch` is accepted and ignored. With no arguments, a
       --out-dir results/topologies_baseline/single_toolhop
     ```
 
-=== "Decentralized (OpenAI SDK)"
+=== "Decentralized (Agents SDK)"
 
     ```bash
-    python -m topologies.decentralized.openai.toolhop.openai_toolhop --limit 100 \
-      --out-dir results/topologies_baseline/decentralized_openai_toolhop
+    python -m topologies.decentralized.openai_agents.toolhop.openai_agents_toolhop --limit 100 \
+      --out-dir results/topologies_baseline/decentralized_openai_agents_toolhop
     ```
 
-To score exactly the frozen set, pass each ID as its own `--only` flag. `--only` overrides `--limit`:
+The runner writes `predictions.jsonl` and `results.jsonl` to `--out-dir`, emptying both first, and one trace per instance under `traces/`. Without `--out-dir`, output goes to `results/toolhop/<style>/`, for example `results/toolhop/single_langgraph/`. ToolHop also has [communication-protocol](../mas/communication-protocols.md) and [team-size](../mas/team-sizes.md) runners.
 
-```bash title="Score the frozen eval IDs"
-MANIFEST=benchmarks/toolhop/toolhop_eval_ids.json
-IDS=$(python -c "import json,sys; print(*json.load(open(sys.argv[1]))['ids'])" $MANIFEST)
-python -m topologies.single.toolhop.langgraph_toolhop $(printf -- '--only %s ' $IDS) \
-  --out-dir results/topologies_baseline/single_toolhop
+## Optimize it
+
+Every optimizer runs through the same protocol command; change `--method` to switch. For example, GEPA on the Centralized team:
+
+```bash title="GEPA on Centralized · ToolHop"
+export TOOLHOP_ALLOW_DATASET_EXEC=1
+python -m optimizers.protocol.run --method gepa --dataset toolhop --topology centralized \
+  --model qwen --seed 0 --out runs/gepa/toolhop/centralized/qwen/0
 ```
 
-The runner appends to `predictions.jsonl` and `results.jsonl` in `--out-dir` and writes one trace per instance under `traces/`. Use a fresh `--out-dir` for each run. Without `--out-dir`, output goes to `results/toolhop/<style>/`, for example `results/toolhop/single_langgraph/`.
-
-To optimize the single-agent prompt with [GEPA](../optimizers/gepa.md):
-
-```bash title="GEPA on ToolHop"
-cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset --dataset toolhop --topology single \
-  --train-size 25 --val-size 25 --max-full-evals 5 --out results/gepa/single_toolhop
-```
-
-For ToolHop, GEPA always keeps the 100 frozen IDs out of its training and validation splits. ToolHop also has [communication-protocol](../mas/communication-protocols.md) and [team-size](../mas/team-sizes.md) variants that GEPA can target, such as `--topology decentralized_r8`.
+Combinations outside the experiment grid need `--allow-any-cell`; see [Optimize a task](index.md#optimize-a-task).
 
 ## Flags
 
+Beyond the common flags (`--batch`, `--limit`, `--offset`, `--only`, `--out-dir`, `--out`):
+
 | Flag | Default | Effect |
 | --- | --- | --- |
-| `--limit N` | `5` | Number of rows; ignored when `--only` is given. |
-| `--offset K` | `0` | Skip the first K rows. |
-| `--only ID` | none | Keep this row ID; repeat the flag for more. |
-| `--out-dir DIR` | `results/toolhop/<style>/` | Where output files go. |
 | `--smoke-dataset` | off | Validate the dataset and exit; no model calls, no tool execution. |
-| `--batch` | off | Accepted for uniformity; has no effect. |
 
-## Results
-
-GEPA's gain on ToolHop for each topology, as reported in the paper. Each cell shows the change in points and the accuracy before → after optimization. The framework study runs the same topologies on popular frameworks. [Compare all tasks](../results/index.md).
-
---8<-- "results/task-toolhop.html"
+`--limit` defaults to 5.
 
 ## Related
 

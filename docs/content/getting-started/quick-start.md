@@ -1,13 +1,13 @@
 # Quick Start
 
-Score a system with its seed prompts, let GEPA optimize them, and read the gain \( \Delta \). The example is the single-agent MATH cell, then the same steps for a multi-agent cell.
+Score a multi-agent system with its seed prompts, let an optimizer improve them, and read the gain \( \Delta \). The example is the Centralized (LangGraph) team on HotpotQA, a cell every one of the eight optimizers covers.
 { .lede }
 
 <div class="facts" markdown>
 <div><span>Needs</span>The conda environment</div>
-<div><span>Model</span>Any OpenAI-compatible endpoint</div>
+<div><span>Models</span>Task and reflection endpoints</div>
 <div><span>Run from</span>Repository root</div>
-<div><span>Optimizer</span>GEPA</div>
+<div><span>Optimizer</span>Any of the eight</div>
 </div>
 
 Finish [Installation](installation.md) and [Connect a Model](connect-a-model.md) first.
@@ -15,94 +15,105 @@ Finish [Installation](installation.md) and [Connect a Model](connect-a-model.md)
 ## 1. Export the model variables
 
 ```bash title="Runners and optimizers"
-export VLLM_BASE_URL=http://localhost:8000/v1   # or your provider's URL
+export VLLM_BASE_URL=http://localhost:8000/v1              # task model, for the runners
 export MODEL_ID=Qwen/Qwen3.5-9B
-export OPENAI_API_KEY=EMPTY                      # your key, for a hosted API
 
-export GEPA_TASK_ENDPOINTS=$VLLM_BASE_URL        # the optimizers' task model
-export GEPA_REFL_ENDPOINT=$VLLM_BASE_URL         # GEPA's reflection model
-export TASK_MODEL=$MODEL_ID REFL_MODEL=$MODEL_ID
+export TASK_ENDPOINTS=$VLLM_BASE_URL                       # task model, for the optimizer
+export REFLECTION_MODEL_BASE_URL=http://localhost:8200/v1  # reflection model
 ```
 
 ## 2. Run a baseline
 
 Start with the smoke demo, then a real batch. Runners are started as modules from the repository root.
 
-```bash title="Single agent · MATH"
-# smoke demo: one built-in problem, no dataset download
-python -m topologies.single.math.langgraph_math
+```bash title="Centralized · HotpotQA"
+# smoke demo: one built-in question, no dataset download
+python -m topologies.centralized.langgraph.hotpotqa.langgraph_hotpotqa
 
-# batch on 100 problems, predictions saved as JSONL
-python -m topologies.single.math.langgraph_math --batch --limit 100 \
-  --out results/topologies_baseline/single_math/predictions.jsonl
+# the 100 evaluation questions, one record per question
+python -m topologies.centralized.langgraph.hotpotqa.langgraph_hotpotqa --batch --limit 100 \
+  --out-dir results/quickstart/centralized_hotpotqa
 ```
 
-!!! tip "Keep the predictions"
-    For GPQA, HotpotQA, MATH, LiveCodeBench and APPS, a batch without `--out` only prints its scores. BFCL, SWE-bench, ToolHop and API-Bank take `--out-dir` instead. Each task page lists its exact flags.
+The batch writes `predictions.jsonl` to `--out-dir` and ends with the exact-match and F1 scores. The first 100 HotpotQA rows are exactly the evaluation IDs, so `--limit 100` scores the same set every topology reports. Each [task page](../tasks/index.md) lists its flags and how to select its evaluation IDs.
 
 ## 3. Optimize the prompts
 
-GEPA runs the same runner on a train split, rewrites the prompt from the traces, and keeps the new prompt only if it scores at least as well on the validation split.
+All eight optimizers run through one command. Pick a method key and start a job:
 
-```bash title="GEPA · Single · MATH"
-cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset \
-  --dataset math --topology single \
-  --train-size 25 --val-size 25 --max-full-evals 5 \
-  --out results/gepa/single_math
+```bash title="One optimizer job"
+METHOD=gepa   # or mipro, mapro, maspo, hivemind, mamut_gepa, maspob, tavo
+python -m optimizers.protocol.run --method $METHOD --dataset hotpotqa --topology centralized \
+  --model qwen --seed 0 --out runs/$METHOD/hotpotqa/centralized/qwen/0
 ```
 
-Progress is written to `status.json` in the output folder while it runs. The frozen eval IDs are excluded from the splits by default.
+The job runs three phases:
+
+1. **Optimize**: the method searches for better role prompts with 600 usable rollouts of the real runner on the fixed `train` and `validation` splits.
+2. **Validate**: seed and best prompts run on the whole validation split. The best prompts are deployed only if they score strictly higher; otherwise the seeds stay.
+3. **Test**: seed and deployed prompts run on the held-out `test` split, the same 100 questions as the baseline.
+
+A full job takes many model calls, and progress goes to stderr. If a job stops during validation or test, rerun the same command to resume; an interrupted optimization phase needs a fresh `--out`. [Run an Optimizer](../optimizers/running.md) covers budgets, phases and the method settings.
 
 ## 4. Read the result
 
-```bash title="Print the gain"
-python - <<'EOF'
-import json
-m = json.load(open("results/gepa/single_math/meta.json"))
-print(f"baseline {m['baseline_score']:.3f}  optimized {m['compiled_score']:.3f}  "
-      f"delta {100 * m['delta']:+.1f} pp  kept: {m['selected_prompt_source']}")
-EOF
+The job prints one JSON line when it ends:
+
+| Field | Meaning |
+| --- | --- |
+| `baseline_mean` | Test score of the seed prompts, as a fraction |
+| `deployed_mean` | Test score of the deployed prompts |
+| `delta_pp` | \( \Delta \), in percentage points |
+| `fallback_reason` | `null` when the optimized prompts were deployed; else why the seeds stayed, such as `validation_tie` or `validation_regression` |
+| `valid_for_aggregation` | `false` if a test record was unusable (an infrastructure failure); the scores are then `null` |
+
+The same values, with per-example scores, are in `result.json` under `--out`. Run seeds 1 and 2 the same way, then pair the three seeds per cell:
+
+```bash title="Summarize seeds 0 to 2"
+python -m optimizers.protocol.aggregate runs/ --out runs/summary.json
 ```
 
-Scores are fractions; multiply by 100 for percentage points. The paper reports Single MATH going from 49.0 to 51.0 (+2.0). If the compiled prompt loses on validation, `selected_prompt_source` is `baseline` and the seed prompt is kept. The optimized prompts are in `compiled/`, one text file per role. [Read the Results](../evaluation/results.md) explains every file.
+[Read Run Outputs](../evaluation/outputs.md) explains every file a job writes.
 
-## 5. Try a multi-agent cell
+## 5. Try another cell
 
-The same four steps work for any cell. Here is the paper's largest gain, Sequential (CrewAI) on BFCL, and its largest drop, Independent on MATH.
+The same steps work for any cell. The runner module picks the baseline; the protocol flags pick the same cell for the optimizer.
 
-=== "Sequential · BFCL"
-
-    ```bash
-    # baseline: BFCL always runs a batch and takes --out-dir
-    python -m topologies.sequential.crewai.bfcl.crewai_bfcl --limit 100 \
-      --out-dir results/topologies_baseline/sequential_crewai_bfcl
-
-    # optimize
-    cd optimizers/gepa
-    python -m real_runner_gepa.pilots.run_gepa_dataset \
-      --dataset bfcl --topology sequential_crewai \
-      --train-size 25 --val-size 25 --max-full-evals 5 \
-      --out results/gepa/sequential_crewai_bfcl
-    ```
-
-=== "Independent · MATH"
+=== "Sequential (CrewAI) · BFCL"
 
     ```bash
-    # baseline: four replicas, outputs aggregated
-    python -m topologies.independent.math.langgraph_math --batch --limit 100 \
-      --out results/topologies_baseline/independent_math/predictions.jsonl
+    python -m topologies.sequential.crewai.bfcl.crewai_bfcl --category simple --limit 20 \
+      --out-dir results/quickstart/sequential_crewai_bfcl_simple
 
-    # optimize: match the runner's four agents
-    cd optimizers/gepa
-    python -m real_runner_gepa.pilots.run_gepa_dataset \
-      --dataset math --topology independent --n-agents 4 \
-      --train-size 25 --val-size 25 --max-full-evals 5 \
-      --out results/gepa/independent_math
+    python -m optimizers.protocol.run --method $METHOD --dataset bfcl \
+      --topology sequential --framework crewai \
+      --model qwen --seed 0 --out runs/$METHOD/bfcl/sequential_crewai/qwen/0
     ```
 
-!!! warning "Match the team the runner uses"
-    The optimizer pilots default to `--n-agents 2 --n-rounds 1`, which they apply to Independent and Decentralized cells. The runners use 4 agents, and Decentralized runs 2 rounds. Pass `--n-agents 4` (and `--n-rounds 2` for Decentralized) to optimize the same team you evaluate.
+=== "Team of 8 · HotpotQA"
+
+    ```bash
+    python -m teamsizes.centralized.hotpotqa.hotpotqa_r8 --batch --limit 100 \
+      --out-dir results/quickstart/centralized_hotpotqa_r8
+
+    python -m optimizers.protocol.run --method $METHOD --dataset hotpotqa \
+      --topology centralized --team-size 8 \
+      --model qwen --seed 0 --out runs/$METHOD/hotpotqa/centralized_r8/qwen/0
+    ```
+
+=== "Structured messages · LiveCodeBench"
+
+    ```bash
+    python -m communications.sequential.lcb.lcb_structured_soft --batch --limit 50 \
+      --out-dir results/quickstart/sequential_lcb_structured_soft
+
+    python -m optimizers.protocol.run --method $METHOD --dataset lcb \
+      --topology sequential --communication structured_soft \
+      --model qwen --seed 0 --out runs/$METHOD/lcb/sequential_structured_soft/qwen/0
+    ```
+
+!!! note "The experiment grid"
+    The protocol refuses a cell outside its experiment grid unless you pass `--allow-any-cell`, and such a job is reported as non-conformant. The three cells above are in the grid for GEPA, MIPRO, MAPRO and MASPO. HiveMind, MAMUT-GEPA, MASPOB and TAVO cover the four multi-agent LangGraph teams of HotpotQA, LiveCodeBench and BFCL, with freeform messages and four agents.
 
 ## Where to go next
 
@@ -113,8 +124,8 @@ The same four steps work for any cell. Here is the paper's largest gain, Sequent
 - [Workflow Topologies](../mas/topologies.md)
   How the five topologies route work between agents.
 - [Run an Optimizer](../optimizers/running.md)
-  Sweeps, budgets and topology names for GEPA and MIPRO.
-- [Ask DeepWiki](../reference/deepwiki.md)
-  Ask questions about the code in plain language.
+  Budgets, phases and settings for the eight optimizers.
+- [Command-Line Flags](../reference/cli.md)
+  Every runner and run-protocol flag, with defaults.
 
 </div>

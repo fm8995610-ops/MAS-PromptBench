@@ -1,27 +1,17 @@
 # Connect a Model
 
-Every agent in every topology calls the same OpenAI-compatible chat endpoint. Point it at a hosted API, or serve Qwen yourself with vLLM.
+Every agent in every topology calls the same OpenAI-compatible chat endpoint. Serve the task model with vLLM, or point the runners at another server that accepts vLLM's sampling fields.
 { .lede }
 
 ## Three variables
 
-| Variable | What it sets | Runner default |
+| Variable | What it sets | Default |
 | --- | --- | --- |
-| `VLLM_BASE_URL` | The endpoint URL, hosted or local | a lab-internal host; always set it |
+| `VLLM_BASE_URL` | The endpoint URL | `http://localhost:8000/v1` |
 | `MODEL_ID` | The model every agent uses | `Qwen/Qwen3.5-9B` |
-| `OPENAI_API_KEY` | The key, if your provider needs one | `EMPTY` |
+| `OPENAI_API_KEY` | The key, if the server needs one | `EMPTY` |
 
-The runners read these when they start, so export them in the shell you run from. The built-in `VLLM_BASE_URL` defaults differ between runners (`http://localhost:8000/v1` or `http://localhost:8001/v1`), so set it explicitly.
-
-=== "Hosted API (no GPU)"
-
-    ```bash title="Any OpenAI-compatible provider"
-    export VLLM_BASE_URL=https://api.openai.com/v1
-    export MODEL_ID=<model-name>
-    export OPENAI_API_KEY=<your-key>
-    ```
-
-    Any provider that speaks the OpenAI chat-completions API works, as long as the model supports tool calling: most topologies give agents tools.
+The runners read these when they start, so export them in the shell you run from.
 
 === "Local vLLM"
 
@@ -34,24 +24,46 @@ The runners read these when they start, so export them in the shell you run from
 
     No API key is needed for a local endpoint; the runners send `EMPTY`.
 
-!!! warning "The repository has no `.env` file"
-    The README mentions a `.env` file with provider blocks, but none is included. Export the variables directly as shown, or keep them in your own `.env` and load it with `set -a && source .env && set +a`.
+=== "Another server"
+
+    ```bash title="Any compatible server"
+    export VLLM_BASE_URL=<server-url>/v1
+    export MODEL_ID=<model-name>
+    export OPENAI_API_KEY=<your-key>
+    ```
+
+    The server must support tool calling, since most topologies give agents tools, and accept the vLLM fields described below.
+
+## Decoding
+
+The runners send one decoding protocol with each request, read from the environment:
+
+| Setting | Value | Override |
+| --- | --- | --- |
+| Temperature | `0.0` | `TASK_MODEL_TEMPERATURE` |
+| Top-p | `0.9` | `TASK_MODEL_TOP_P` |
+| Output tokens per call | at most `32768` | `TASK_MODEL_MAX_TOKENS` |
+| Request seed | `0` | `REQUEST_SEED` |
+| vLLM extras | `repetition_penalty` 1.05, thinking off (`enable_thinking: false`) | none |
+
+Independent replicas, and the debate peers of the ToolHop, API-Bank and Agents SDK runners, send their own request seeds; the Agents SDK runners leave out `repetition_penalty`. Serve a context window larger than the output cap; the 9B script serves 131,072 tokens. Optimizer rollouts sample at temperature 0.2 instead; the protocol sets that itself.
 
 ## Serve models locally
 
-The two scripts in `models/` start vLLM's OpenAI-compatible server inside the `mas-promptbench` environment.
+The three scripts in `models/` start vLLM's OpenAI-compatible server inside the `mas-promptbench` environment.
 
 | Script | Model | Serving | GPUs |
 | --- | --- | --- | --- |
-| [`serve_qwen3_5_9b.sh`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/models/serve_qwen3_5_9b.sh) | `Qwen/Qwen3.5-9B` | one replica per GPU, consecutive ports | ≥ 1 CUDA GPU |
-| [`serve_qwen3_5_122b.sh`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/models/serve_qwen3_5_122b.sh) | `Qwen/Qwen3.5-122B-A10B-FP8` | tensor-parallel, TP = 4 | 4 FP8-capable GPUs (Hopper or Blackwell) |
+| [`serve_qwen3_5_9b.sh`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/models/serve_qwen3_5_9b.sh) | `Qwen/Qwen3.5-9B` (task model) | one replica per GPU, ports 8000+ | ≥ 1 CUDA GPU |
+| [`serve_llama3_1_8b.sh`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/models/serve_llama3_1_8b.sh) | `meta-llama/Llama-3.1-8B-Instruct` (task model) | one replica per GPU, ports 8100+ | ≥ 1 CUDA GPU |
+| [`serve_qwen3_5_122b.sh`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/models/serve_qwen3_5_122b.sh) | `Qwen/Qwen3.5-122B-A10B-FP8` (reflection model) | tensor-parallel (TP = 4), port 8200 | 4 FP8-capable GPUs (Hopper or Blackwell) |
 
-The 9B script is configured through environment variables:
+The two replica scripts share their settings:
 
 | Variable | Default | Effect |
 | --- | --- | --- |
 | `VLLM_GPU_LIST` | all visible GPUs | Comma-separated GPU indices, one replica each |
-| `VLLM_BASE_PORT` | `8000` | Port of the first replica; the rest follow |
+| `VLLM_BASE_PORT` | `8000` (Qwen), `8100` (Llama) | Port of the first replica; the rest follow |
 | `VLLM_HOST` | `0.0.0.0` | Bind address |
 | `HF_HOME` | `$HOME/models` | Model cache |
 | `MAX_MODEL_LEN` | `131072` | Context length |
@@ -59,19 +71,21 @@ The 9B script is configured through environment variables:
 | `KV_CACHE_DTYPE` | `auto` | Set `fp8` on Hopper or Blackwell to roughly halve KV memory |
 | `CONDA_ENV` | `mas-promptbench` | Environment the script activates |
 
-With four GPUs you get four endpoints, on ports 8000 to 8003. The runners use one endpoint (`VLLM_BASE_URL`); the [optimizers](../optimizers/running.md) can spread calls across all of them.
+With four GPUs, the Qwen script gives four endpoints, on ports 8000 to 8003. A runner uses one endpoint (`VLLM_BASE_URL`); an optimizer job can spread its calls across all of them. The 122B script listens on `VLLM_PORT` (default 8200). See [Environment Variables](../reference/environment.md) for every serving setting.
+
+!!! note "Llama is gated"
+    Accept the model's license on Hugging Face and export `HF_TOKEN` before the first download, or serve a downloaded copy with `HF_HUB_OFFLINE=1`.
 
 ## Endpoints for the optimizers
 
-GEPA and MIPRO don't read `VLLM_BASE_URL`. They take their own variables, and they use two models: a **task model** that runs the agents and a **reflection model** (GEPA) or **proposal model** (MIPRO) that writes new prompts.
+An optimizer job uses two models: the **task model** that runs the agents and the **reflection model** that proposes new prompts. Every one of the eight optimizers reads the same two settings:
 
-```bash title="Reuse one endpoint for both roles"
-export GEPA_TASK_ENDPOINTS=$VLLM_BASE_URL     # comma-separated list is allowed
-export GEPA_REFL_ENDPOINT=$VLLM_BASE_URL
-export TASK_MODEL=$MODEL_ID REFL_MODEL=$MODEL_ID
+```bash title="Task and reflection endpoints"
+export TASK_ENDPOINTS=http://localhost:8000/v1             # comma-separated list is allowed
+export REFLECTION_MODEL_BASE_URL=http://localhost:8200/v1  # the 122B script's port
 ```
 
-MIPRO reads `MIPRO_TASK_ENDPOINTS` and `MIPRO_REFL_ENDPOINT` and falls back to the GEPA names. If you leave these unset, the optimizers send requests to built-in defaults (a fixed list of local ports) and fail unless your servers listen there. The code's defaults pair Qwen3.5-9B agents with Qwen3.5-122B for reflection. See [Environment Variables](../reference/environment.md) for the full list.
+`TASK_ENDPOINTS` falls back to `VLLM_BASE_URL`, and `--task-endpoints` overrides both. `REFLECTION_MODEL_BASE_URL` defaults to `http://localhost:8200/v1`. The job picks the task model with `--model qwen` or `--model llama`. The reflection model is `Qwen/Qwen3.5-122B-A10B-FP8`; another `REFLECTION_MODEL_ID` makes a job non-conformant. See [Run an Optimizer](../optimizers/running.md).
 
 ## Check the connection
 

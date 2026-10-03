@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import os
-import re
 import sys
 import time
 from pathlib import Path
@@ -12,8 +11,8 @@ from pathlib import Path
 import yaml
 from openai import OpenAI
 
-
 PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
+
 
 def strip_thinking(text: str) -> str:
     """Remove Qwen3-style reasoning from a model reply.
@@ -25,7 +24,7 @@ def strip_thinking(text: str) -> str:
     """
     index = text.lower().rfind("</think>")
     if index >= 0:
-        text = text[index + len("</think>"):]
+        text = text[index + len("</think>") :]
     return text.strip()
 
 
@@ -47,7 +46,7 @@ def main() -> int:
     # PROMPT_GEN_BASE_URL / PROMPT_GEN_MODEL if needed.
     parser.add_argument(
         "--base-url",
-        default=os.environ.get("PROMPT_GEN_BASE_URL", "http://localhost:8000/v1"),
+        default=os.environ.get("PROMPT_GEN_BASE_URL", "http://localhost:8200/v1"),
     )
     parser.add_argument(
         "--api-key",
@@ -91,8 +90,7 @@ def main() -> int:
     run_start_time = time.time()
 
     print(
-        f"generator: model={args.model}  base_url={args.base_url}  "
-        f"temperature={args.temperature}  seed={args.seed}",
+        f"generator: model={args.model}  base_url={args.base_url}  temperature={args.temperature}  seed={args.seed}",
         file=sys.stderr,
     )
 

@@ -4,11 +4,12 @@ Everything for the documentation site lives in this folder:
 
 ```text
 docs/
-├── mkdocs.yml          site config and navigation (38 pages)
+├── mkdocs.yml          site config and navigation (33 pages)
 ├── requirements.txt    mkdocs + pymdown-extensions (pinned)
-├── content/            the Markdown pages; diagrams and result charts in content/_snippets/
-└── theme/              the custom theme (main.html, docs.css, docs.js), make_diagrams.py,
-                        make_results.py, data/results.json and AUTHORING.md (writing guide)
+├── content/            the Markdown pages; topology diagrams in content/_snippets/
+│                       (reference/ is the configuration and CLI reference the READMEs link to)
+└── theme/              the custom theme (main.html, docs.css, docs.js), make_diagrams.py
+                        and AUTHORING.md (writing guide)
 ```
 
 Two files sit outside it because their tools look for them at fixed paths:
@@ -36,10 +37,9 @@ stay as they are.
 ## Editing
 
 - Add a page: create the `.md` file under `docs/content/` and add it to `nav` in `docs/mkdocs.yml`.
+- The repository READMEs link into `docs/content/` with relative paths and anchors; find them with
+  `grep -rn 'docs/content/' --include='*.md' .` before you rename a page or a heading.
 - Change a topology diagram: edit `docs/theme/make_diagrams.py` and run `python docs/theme/make_diagrams.py`.
-- Change or add results: edit `docs/theme/data/results.json` (the paper's published GEPA numbers) and run
-  `python docs/theme/make_results.py`. It rewrites every heatmap and bar chart in `docs/content/_snippets/results/`,
-  so the Results Explorer, the task pages and the topology pages stay consistent.
 - Follow `docs/theme/AUTHORING.md` for voice, page shape and the Markdown features the theme styles
   (fact strips, card grids, callouts, tabs, code titles).
 

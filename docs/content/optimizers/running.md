@@ -1,145 +1,121 @@
 # Run an Optimizer
 
-This page takes one `(topology, dataset)` cell from endpoints to a finished `meta.json`, then scales up to sweeps. The commands are the same for GEPA and MIPRO apart from the module name and the budget flags.
+This page takes one cell from served endpoints to a finished `result.json`, then pairs the three optimizer seeds into a summary. The commands are the same for all eight methods; only `--method` changes.
 { .lede }
 
 ## Before you start
 
-Both pilots run from their workspace folder, `optimizers/gepa/` or `optimizers/mipro/`. A relative `--out` path resolves from there, so `--out results/gepa/single_math` writes to `optimizers/gepa/results/gepa/single_math/`. The `results/` and `cache/` folders inside each workspace are gitignored.
+A job talks to two models: the task model, which runs every agent, and the reflection model, which the method uses to propose prompts. Serve both with the scripts in `models/` ([Connect a Model](../getting-started/connect-a-model.md)), then point the job at them from the repository root:
 
-!!! warning "DSPy version"
-    `environment.yml` pins `dspy>=2.6,<3`, but no DSPy 2.x release ships `dspy.teleprompt.GEPA`, which the GEPA pilot imports. If that import fails, install a DSPy 3 release with the `optuna` extra that DSPy 3's MIPROv2 needs: `pip install -U "dspy[optuna]>=3"`.
+```bash title="Endpoints"
+export TASK_ENDPOINTS=http://localhost:8000/v1,http://localhost:8001/v1   # task model replicas
+export REFLECTION_MODEL_BASE_URL=http://localhost:8200/v1                 # reflection model
+```
 
-## Export the endpoints
+- `TASK_ENDPOINTS` takes a comma-separated list, used round robin; `--task-endpoints` overrides it, and `VLLM_BASE_URL` is the fallback. Every endpoint must serve the task model under its model ID. The job sets `MODEL_ID` from `--model` itself.
+- `REFLECTION_MODEL_BASE_URL` defaults to `http://localhost:8200/v1`, the port of `models/serve_qwen3_5_122b.sh`. A reflection model other than `Qwen/Qwen3.5-122B-A10B-FP8` (`REFLECTION_MODEL_ID`) makes the job non-conformant.
+- Cells on the OpenAI Agents SDK need its [isolated install](../reference/environment.md#openai-agents-sdk). The job restarts itself with the SDK first on `PYTHONPATH`, and exits with status 2 when the SDK is unusable.
 
-Each optimizer needs a task endpoint for the agents and a reflection or proposal endpoint for the optimizer model. The optimizers ignore `VLLM_BASE_URL`, and their built-in endpoint defaults are fixed ports and hostnames, so set both explicitly.
+## Choose a cell
 
-=== "GEPA"
+A cell is a dataset plus a runtime: topology, framework, communication format, team size and task model. `--topology` takes a base topology, refined by the other flags, or a registry key that names the whole runtime:
 
-    ```bash
-    export GEPA_TASK_ENDPOINTS=http://localhost:8000/v1,http://localhost:8001/v1
-    export GEPA_REFL_ENDPOINT=http://localhost:9000/v1
-    export TASK_MODEL=Qwen/Qwen3.5-9B
-    export REFL_MODEL=Qwen/Qwen3.5-122B-A10B-FP8
-    export GEPA_EXCLUDE_REAL_EVAL_IDS=1   # already the default; keeps intent explicit
-    ```
+| Runtime | Flags |
+| --- | --- |
+| Centralized, LangGraph, 4 agents | `--topology centralized` |
+| Sequential on CrewAI | `--topology sequential_crewai`, or `--topology sequential --framework crewai` |
+| Decentralized on the OpenAI Agents SDK | `--topology decentralized_openai_agents` |
+| Independent with 8 agents | `--topology independent_r8`, or `--topology independent --team-size 8` |
+| Centralized with structured reports | `--topology centralized_communications_structured_soft` |
+| Llama as the task model | `--model llama` (`meta-llama/Llama-3.1-8B-Instruct`; `qwen` is `Qwen/Qwen3.5-9B`) |
 
-=== "MIPRO"
+Team-size and communication runtimes exist for HotpotQA, LiveCodeBench, BFCL, API-Bank and ToolHop; [Command-Line Flags](../reference/cli.md#run-protocol) lists every key. A cell outside a method's part of the experiment grid stops with an error unless you pass `--allow-any-cell`; [Optimizers](index.md#the-eight-methods) says which cells each method covers.
 
-    ```bash
-    export MIPRO_TASK_ENDPOINTS=http://localhost:8000/v1,http://localhost:8001/v1
-    export MIPRO_REFL_ENDPOINT=http://localhost:9000/v1
-    export MIPRO_TASK_MODEL=Qwen/Qwen3.5-9B
-    export MIPRO_REFL_MODEL=Qwen/Qwen3.5-122B-A10B-FP8
-    export MIPRO_EXCLUDE_REAL_EVAL_IDS=1
-    ```
+## Run a job
 
-For a hosted API, set `OPENAI_API_KEY`; the same key is sent to both endpoints. If `MODEL_ID` is set in your shell, the agents request that model name instead of `TASK_MODEL`.
+```bash title="One job"
+python -m optimizers.protocol.run --method mapro --dataset hotpotqa --topology centralized \
+  --model qwen --seed 0 --out runs/mapro/hotpotqa/centralized/qwen/0
+```
 
-## Choose a topology name
+The job runs its three phases in order: optimization on the 600-rollout budget, final validation of the seed and incumbent bundles, then the test split. Progress goes to stderr, including a line every 10 charged rollouts with the charged, attempted and infrastructure-failure counts. Stdout carries one JSON line with `status`, `cell_id`, `baseline_mean`, `deployed_mean`, `delta_pp`, `valid_for_aggregation` and `fallback_reason`. A job, evaluation or installation error exits with status 2.
 
-A cell is a dataset plus a topology name from the optimizer registry:
+The `--out` folder holds `job.json`, `optimization.json`, `selection.json`, `test.json` and `result.json`; [Read Run Outputs](../evaluation/outputs.md) explains each file.
 
-| Topology name | Datasets | What runs |
+### Phases and resuming
+
+`--phase` runs one phase from the saved artifacts: `optimize`, `validate` (needs `optimization.json`) or `test` (needs `selection.json`). The default, `all`, runs whatever is missing, so rerunning a finished job prints its saved summary.
+
+- `job.json` seals the job's identity. Reusing an `--out` folder for another job, or after the code or data changed, stops with an error.
+- An interrupted optimization is never restarted silently: start again with a fresh `--out`.
+- Evaluations are journaled per item and resume where they stopped.
+
+## Smoke runs
+
+A `--budget` below 600 makes a non-conformant smoke run, which aggregation skips by default. Methods charge rollouts before they propose anything, so a small budget can end a job before any search. The smallest budget that scores one proposed candidate, with 150 train and 50 validation rows:
+
+| Method | Smallest budget | With less |
 | --- | --- | --- |
-| `single`, `independent`, `sequential`, `centralized`, `decentralized` | all nine | The LangGraph topology runner |
-| `sequential_crewai`, `centralized_autogen`, `decentralized_openai` | all nine | The CrewAI, AutoGen or OpenAI SDK runner |
-| `<base>_r<N>` | `hotpotqa`, `lcb`, `toolhop`, `apibank` | [Team-size](../mas/team-sizes.md) variant with N agents |
-| `<base>_communications_<format>` | `hotpotqa`, `lcb`, `toolhop`, `apibank` | [Communication-protocol](../mas/communication-protocols.md) variant |
+| `identity` | 1 | not applicable |
+| `gepa` | 56 (106 to validate a winner) | `rollout_budget_spent`, seed kept |
+| `mipro` | bootstrap + 100: 105 to 400 | unrun rows fail; `rollout_budget_spent` |
+| `mamut_gepa` | 56 (106) | `metric_call_cap`, seed kept |
+| `mapro` | 2 × train: 300 | `budget` after the seed pass; an error below one pass |
+| `hivemind` | 18 (centralized 10) with 1-row batches; 90 (50) at full size | no cycle, `budget`, seed kept |
+| `maspo` | 20 (30 for both candidates) | unrun rows score 0; `budget` |
+| `maspob` | 10 for one LinUCB pull (30 after 5 warm-ups) | warm-up only; `rollout_budget_spent` |
+| `tavo` | 12 | `budget_before_outer_round`, seed kept; fails below 3 |
 
-Here `<base>` is `independent`, `sequential`, `centralized` or `decentralized`, `<N>` is 2, 4, 8 or 10, and `<format>` is `freeform`, `semi_structured` or `structured_soft` (Freeform, Semi-structured, Structured). There is no `single_r<N>`. Team-size and communication runners exist for more datasets, but the optimizers register these variants for the four datasets above only. Print the exact list for a dataset:
+GPQA (48 train rows) and SWE-bench (146) shift the budgets that scale with the training split. The [run protocol README](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/optimizers/protocol/README.md#smoke-budgets) shows what each method charges.
 
-```bash title="List topology names"
-cd optimizers/gepa
-python -c "from real_runner_gepa.registry import topologies; print(topologies('lcb'))"
+```bash title="Smoke-test one method on one cell"
+python -m optimizers.protocol.run --method gepa --dataset math --topology single \
+  --model qwen --seed 0 --budget 56 --phase optimize --out runs/smoke/gepa_math_single
 ```
 
-An unregistered name stops the pilot with `unknown topology ... for dataset ...`.
+`--phase optimize` stops before the uncharged evaluations, which always run on the full validation and test splits; check that `job.json`, `optimization.json` and `optimization/optimizer_result.json` exist.
 
-## Run the cell
+## Run the three seeds
 
-```bash title="One GEPA cell"
-cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset \
-  --dataset math --topology single --train-size 25 --val-size 25 \
-  --max-full-evals 5 --out results/gepa/single_math
+A reported cell needs optimizer seeds 0, 1 and 2. Run jobs in parallel as separate processes; rollouts inside one process are serialized.
+
+```bash title="Three seeds"
+for seed in 0 1 2; do
+  python -m optimizers.protocol.run --method gepa --dataset hotpotqa --topology centralized \
+    --model qwen --seed "$seed" --evaluation-cache runs/evaluations \
+    --out "runs/gepa/hotpotqa/centralized/qwen/$seed" &
+done
+wait
 ```
 
-For MIPRO, run `python -m real_runner_mipro.pilots.run_mipro_dataset` from `optimizers/mipro` with `--num-candidates 3 --num-trials 3` in place of `--max-full-evals`. For Independent and Decentralized cells add `--n-agents 4 --n-rounds 2` to match the runner defaults. [GEPA](gepa.md#flags) and [MIPRO](mipro.md#flags) list every flag.
+Evaluations are content-addressed and do not depend on the method, so a shared `--evaluation-cache` lets jobs of different methods on the same cell and seed reuse one seed-bundle evaluation. Concurrent jobs lock each evaluation they write.
 
-## Watch status.json
+## Aggregate the seeds
 
-The pilot rewrites `status.json` at each phase and prints the same payload to stdout as a `{"status": ...}` line:
-
-```bash
-watch -n 30 cat results/gepa/single_math/status.json
+```bash title="Paired summary"
+python -m optimizers.protocol.aggregate runs/ --out runs/summary.json
 ```
 
-The `phase` field moves through `started`, `loading_dataset`, `baseline_eval_started`, `baseline_eval_done`, `gepa_compile_started`, `gepa_compile_done` (MIPRO: `mipro_compile_started`, `mipro_compile_done`), `compiled_eval_started` and `complete`. A crash writes `failed` with `error_type`, `error` and `traceback`. The search itself runs between the two `compile` phases and takes most of the time.
+`aggregate` finds every `result.json` under the given roots, groups the jobs by cell and prints a tab-separated table to stdout:
 
-## Read meta.json
+| Column | Content |
+| --- | --- |
+| `method`, `task`, `runtime`, `model` | The cell; `runtime` is its registry key. |
+| `seeds` | `0,1,2` for a complete cell. |
+| `base`, `deployed` | Test means of the seed and deployed bundles, averaged over seeds. |
+| `delta_pp`, `std_pp` | Mean and standard deviation of the per-seed gain, in percentage points. |
+| `ci95_pp` | Seed-stratified paired bootstrap 95% interval of the gain. |
+| `fallbacks` | Seeds that kept the seed bundle, out of 3. |
+| `min_p_holm` | Smallest Holm-adjusted per-seed exact McNemar p-value, for binary scores. |
 
-```bash title="Headline numbers"
-python -c "import json; m = json.load(open('results/gepa/single_math/meta.json')); \
-print({k: m[k] for k in ('baseline_score', 'compiled_score', 'delta', \
-'selected_prompt_source', 'selection_reason')})"
-```
+One detail line per seed follows each cell. A cell with a missing seed or infrastructure-invalid test data prints as `incomplete` with the reason. Skipped files, such as non-conformant jobs, are logged as warnings.
 
-Scores are fractions of the validation rows. The optimized prompts are in `compiled/<role>.txt`. [Read the Results](../evaluation/results.md) explains every field.
+- `--family` sets the Holm family: `task` (dataset × model, the default), `method` or `none`.
+- `--bootstrap` sets the replicates (10,000 by default).
+- `--include-nonconformant` adds smoke-budget and off-grid jobs.
 
-## Run a sweep
+`--out` writes the full JSON summary; see [Aggregate summary](../evaluation/outputs.md#aggregate-summary).
 
-Each launcher loops over `DATASETS` × `TOPOLOGIES`, runs one pilot process per cell in sequence, and writes to `$OUT_ROOT/<topology>_<dataset>`. The scripts `cd` into their workspace, so `OUT_ROOT` is relative to `optimizers/gepa/` or `optimizers/mipro/`. A failing cell, including an unregistered topology name, prints `skipped/failed` and the loop continues.
+## Spread the load
 
-```bash title="Team-size sweep with GEPA"
-DATASETS="hotpotqa lcb" \
-TOPOLOGIES="centralized_r2 centralized_r4 centralized_r8 centralized_r10" \
-  bash optimizers/gepa/run_gepa.sh
-```
-
-=== "run_gepa.sh"
-
-    | Variable | Default | Passed as |
-    | --- | --- | --- |
-    | `GEPA_REFL_ENDPOINT` | `http://localhost:8000/v1` | exported |
-    | `DATASETS` | `bfcl gpqa hotpotqa math apps lcb swe apibank toolhop` | `--dataset` |
-    | `TOPOLOGIES` | the eight base names | `--topology` |
-    | `TRAIN_SIZE` | `25` | `--train-size` |
-    | `VAL_SIZE` | `25` | `--val-size` |
-    | `MAX_FULL_EVALS` | `5` | `--max-full-evals` |
-    | `REFLECTION_MINIBATCH_SIZE` | `3` | `--reflection-minibatch-size` |
-    | `NUM_THREADS` | `4` | `--num-threads` |
-    | `N_AGENTS` | `4` | `--n-agents` |
-    | `N_ROUNDS` | `2` | `--n-rounds` |
-    | `COMPONENT_SELECTOR` | `round_robin` | `--component-selector` |
-    | `EARLY_STOP_PATIENCE` | `3` | `--early-stop-patience` |
-    | `OUT_ROOT` | `results/gepa` | `--out` prefix |
-
-    The script always adds `--skip-perfect-score`. It does not set `GEPA_TASK_ENDPOINTS`, so export it first.
-
-=== "run_mipro.sh"
-
-    | Variable | Default | Passed as |
-    | --- | --- | --- |
-    | `MIPRO_REFL_ENDPOINT` | `http://localhost:8000/v1` | exported |
-    | `MIPRO_TASK_ENDPOINTS` | `http://localhost:8000/v1` | exported |
-    | `DATASETS` | `bfcl gpqa hotpotqa math apps lcb swe apibank toolhop` | `--dataset` |
-    | `TOPOLOGIES` | the eight base names | `--topology` |
-    | `TRAIN_SIZE` | `25` | `--train-size` |
-    | `VAL_SIZE` | `25` | `--val-size` |
-    | `NUM_CANDIDATES` | `3` | `--num-candidates` |
-    | `NUM_TRIALS` | `3` | `--num-trials` |
-    | `NUM_THREADS` | `4` | `--num-threads` |
-    | `OUT_ROOT` | `results/mipro` | `--out` prefix |
-
-    Because the script exports both MIPRO endpoint variables, the fallback to the GEPA variables never applies in a sweep. It does not pass `--n-agents` or `--n-rounds`, so Independent and Decentralized cells run with 2 agents and 1 round.
-
-## Use several task endpoints
-
-`GEPA_TASK_ENDPOINTS` and `MIPRO_TASK_ENDPOINTS` take a comma-separated list. Every time an adapter builds an agent client it takes the next endpoint in the list, round robin and thread-safe, and DSPy's task model rotates the same way per call. Load spreads across replicas without sharding. All endpoints must serve the same model under the same name. `models/serve_qwen3_5_9b.sh` starts one replica per GPU on consecutive ports from 8000 (`VLLM_BASE_PORT`), so list each port. The reflection or proposal model is a single endpoint; `models/serve_qwen3_5_122b.sh` also defaults to port 8000, so move it with `VLLM_PORT` or run it on another host.
-
-## Compute tips
-
-- **Count runs, not calls.** Every metric call is one full multi-agent run. A GEPA cell at the sweep setting allows up to 5 × (25 + 25) = 250 runs plus 50 for the pilot's two validation passes. A MIPRO trial scores the whole validation split unless you pass `--minibatch`.
-- **Threads help most on HotpotQA and LCB.** Their adapters load a private copy of the runner module per call, so `--num-threads` runs examples in parallel. The APPS, MATH, SWE, API-Bank and ToolHop adapters hold a lock on the runner module while an example runs, so extra threads there mostly wait.
-- **Check before you search.** GEPA's `--baseline-only` scores the seed prompts on validation and exits, which confirms the endpoints, the wiring and the starting score.
+Every client an adapter builds takes the next entry of `TASK_ENDPOINTS`, round robin and thread-safe, so a job spreads its rollouts across replicas without sharding. `models/serve_qwen3_5_9b.sh` starts one replica per GPU on consecutive ports from 8000 (`serve_llama3_1_8b.sh` from 8100), so list each port. The reflection model is one endpoint; `serve_qwen3_5_122b.sh` serves it on port 8200 with tensor parallelism over 4 GPUs.

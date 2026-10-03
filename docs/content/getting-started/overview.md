@@ -1,11 +1,11 @@
 # Overview
 
-MAS-PromptBench measures when optimizing system prompts improves a multi-agent LLM system, and by how much. This page explains the model of a multi-agent system the benchmark uses, the four factors it varies, and the one number every run reports.
+MAS-PromptBench measures when optimizing system prompts improves a multi-agent LLM system, and by how much. This page explains the model of a multi-agent system the benchmark uses, the factors it varies, and the one number every optimizer job reports.
 { .lede }
 
 ## The question
 
-Prompt optimizers such as GEPA reliably improve a single LLM agent. A multi-agent system (MAS) is harder: each agent's prompt can improve locally, yet the system can still get worse once agents hand work to each other. MAS-PromptBench runs the same optimizer across many controlled MAS configurations so you can see where gains transfer and where they break.
+Most prompt optimizers were designed for a single LLM agent. A multi-agent system (MAS) is harder: each agent's prompt can improve locally, yet the system can still get worse once agents hand work to each other. MAS-PromptBench runs eight optimizers across many controlled MAS configurations so you can see where gains transfer and where they break.
 
 ## A multi-agent system, formally
 
@@ -15,26 +15,26 @@ The benchmark models a MAS as a tuple \( \mathcal{M} = (\mathcal{A}, G, P) \):
 - \( G \) is the **workflow topology**: who sends work to whom.
 - \( P \) is the **communication protocol**: the format of the messages agents exchange.
 
-Model weights never change. Optimization edits only the joint set of role prompts \( \pi \). The seed prompts \( \pi^0 \) live in `configs/prompts/<topology>/<dataset>/<role>.txt`.
+Model weights never change. Optimization edits only the joint set of role prompts \( \pi \). The seed prompts \( \pi^0 \) live in `configs/prompts/<topology>/<dataset>/<role>.txt`, and no optimizer writes to them.
 
 ## The prompt-optimization gain
 
-For a configuration \( (\mathcal{T}, G, n, P) \) (task, topology, team size, protocol), the benchmark reports the gain of the optimized prompts \( \pi^\star \) over the seed prompts \( \pi^0 \):
+For a configuration \( (\mathcal{T}, G, n, P) \) (task, topology, team size, protocol), the benchmark reports the gain of the deployed prompts \( \hat{\pi} \) over the seed prompts \( \pi^0 \) on the task's held-out test split:
 
 \[
-\Delta(\mathcal{T}, G, n, P) = \mathbb{E}_{(x,y)\sim\mathcal{T}}\big[\,\mu(\mathcal{M}(x;\pi^\star), y) - \mu(\mathcal{M}(x;\pi^0), y)\,\big]
+\Delta(\mathcal{T}, G, n, P) = \mathbb{E}_{(x,y)\sim\mathcal{T}_{\text{test}}}\big[\,\mu(\mathcal{M}(x;\hat{\pi}), y) - \mu(\mathcal{M}(x;\pi^0), y)\,\big]
 \]
 
-\( \mu \) is the task's own scorer (exact match, pass@1, AST match, …). Each optimizer run writes this as `delta` in its `meta.json`, as a fraction; the paper reports it in percentage points. A positive \( \Delta \) means the optimized prompts helped; a negative one means they hurt.
+\( \mu \) is the task's scorer (exact match, pass@1, AST match, …), 0 or 1 per example. \( \hat{\pi} \) is the optimizer's best prompt set only if it scores strictly higher than the seeds on the validation split; otherwise the seeds stay deployed. Each job writes \( \Delta \) as `delta_pp`, in percentage points, in its `result.json`. A positive \( \Delta \) means the deployed prompts helped; a negative one means they hurt.
 
-## The four factors
+## The factors
 
 The benchmark varies one factor at a time and holds the others at their defaults.
 
 <div class="cards factors" markdown>
 
 - [Task](../tasks/index.md)
-  Nine datasets in three domains: reasoning, coding and tool-calling.
+  Nine datasets in three domains: reasoning, coding and tool calling.
 - [Workflow topology](../mas/topologies.md)
   Single, Independent, Sequential, Centralized and Decentralized, on four frameworks.
 - [Communication protocol](../mas/communication-protocols.md)
@@ -44,42 +44,31 @@ The benchmark varies one factor at a time and holds the others at their defaults
 
 </div>
 
-Two [optimizers](../optimizers/index.md) run over every factor: **GEPA** (reflective prompt evolution) and **MIPRO** (instruction and few-shot example search). Both score candidate prompts by running the real topology runners, so the prompts they return run unchanged in the benchmark.
+Every agent runs on the task model `Qwen/Qwen3.5-9B`; `meta-llama/Llama-3.1-8B-Instruct` repeats a subset of cells. Eight [optimizers](../optimizers/index.md) run over these factors: **GEPA**, **MIPRO**, **MAPRO**, **MASPO**, **HiveMind**, **MAMUT-GEPA**, **MASPOB** and **TAVO**. All eight follow one run protocol and score candidate prompts by running the real topology runners, so the prompts they return run unchanged in the benchmark.
 
 ## Vocabulary
 
 Cell
-:   One configuration, such as *BFCL · Sequential (CrewAI)*. Each cell is evaluated twice, with seed and optimized prompts, on the same examples.
+:   One runtime configuration: task, topology, framework, communication format, team size and task model, such as *BFCL · Sequential (CrewAI) · freeform · 4 agents · Qwen3.5-9B*.
+
+Job
+:   One optimizer on one cell with one optimizer seed (0, 1 or 2). It optimizes, selects on validation and scores seed and deployed prompts on the same test examples.
 
 Runner
-:   The Python module that runs one cell, for example `topologies.sequential.crewai.bfcl.crewai_bfcl`. Every runner has a batch mode; most also have a smoke demo.
+:   The Python module that runs one cell, for example `topologies.sequential.crewai.bfcl.crewai_bfcl`. Every runner has a batch mode; five datasets also have a smoke demo.
 
 Role and seed prompt
 :   A position in the topology (stage, worker, manager, peer) and the system-prompt file it starts from.
 
-Eval IDs
-:   The frozen example IDs per dataset in `benchmarks/<dataset>/<dataset>_eval_ids.json`. The optimizers keep them out of their train and validation splits. See [Evaluation Protocol](../evaluation/protocol.md).
-
-## What the paper found
-
-| Factor | Finding | Numbers (GEPA, pp) |
-| --- | --- | --- |
-| Task | Explicit, verifiable tasks gain more | coding +3.7, tool-calling +4.3, reasoning +1.3 |
-| Topology | Every MAS topology gains less than one agent | Single +4.2; MAS between −0.5 and +2.3 |
-| Protocol | Shared structure gives optimization more room | Freeform +1.6, Semi-structured +2.4, Structured +4.3 |
-| Team size | Larger teams make optimization harder | +2.4 at n = 2, −2.1 at n = 10 |
-
-The spread is wide: the same optimizer lifts Sequential (CrewAI) BFCL from 60.0 to 84.0 and drops Independent MATH from 76.0 to 60.0.
-
-!!! takeaway
-    Prompt optimization can help a multi-agent system a lot, but a single-agent optimizer applied naively is not reliable. Gains depend on the task, the topology, the protocol and the team size.
+Splits and eval IDs
+:   Fixed `train`, `validation` and `test` IDs per dataset in `benchmarks/<dataset>/<dataset>_splits.json`. `test` is the evaluation set, also listed in `<dataset>_eval_ids.json`; `train` and `validation` never overlap it. See [Evaluation Protocol](../evaluation/protocol.md).
 
 ## Next steps
 
 <div class="cards" markdown>
 
 - [Installation](installation.md)
-  Clone with submodules and create the conda environment.
+  Create the conda environment and the isolated Agents SDK install.
 - [Quick Start](quick-start.md)
   Run a baseline, optimize it and read \( \Delta \) in a few commands.
 

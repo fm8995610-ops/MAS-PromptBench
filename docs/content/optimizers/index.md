@@ -1,71 +1,102 @@
 # Optimizers
 
-MAS-PromptBench optimizes the system prompts of a multi-agent system while the model weights stay frozen. GEPA and MIPRO both score every candidate prompt set by running the real topology runner, so the prompts they return run unchanged in the benchmark.
+MAS-PromptBench optimizes the system prompts of a multi-agent system while the model weights stay frozen. Eight methods share one run protocol and one bridge to the real topology runners, so every method spends the same budget, is selected by the same rule and is scored on the same held-out rows.
 { .lede }
+
+<div class="facts" markdown>
+<div><span>Methods</span>8</div>
+<div><span>Protocol</span>mas-promptbench-v1</div>
+<div><span>Budget</span>600 rollouts</div>
+<div><span>Optimizer seeds</span>0, 1, 2</div>
+</div>
 
 ## What gets optimized
 
-A multi-agent system \( M \) is a topology plus a set of roles: a planner, a solver, a manager, a debater and so on. Each role has a system prompt. The seed prompts live in `configs/prompts/<topology>/<dataset>/<role>.txt`, one file per role. The optimizers treat the joint set \( \pi = (\pi_1, \dots, \pi_K) \) of role prompts as the only variable. The agent model, the topology wiring, the tools and the scorer stay fixed.
+A multi-agent system \( M \) is a topology plus a set of roles: a planner, a solver, a manager, a debater and so on. Each role has a system prompt, and the seed prompts live in `configs/prompts/<topology>/<dataset>/<role>.txt`. A method treats the joint set \( \pi = (\pi_1, \dots, \pi_K) \) of role prompts as the only variable; the model, the topology wiring, the tools and the scorer stay fixed. MIPRO's few-shot demos are rendered into the role prompts, so they are part of \( \pi \) too.
 
-The quantity of interest is the prompt-optimization gain:
+The quantity of interest is the prompt-optimization gain on the held-out test split:
 
 \[
-\Delta = \mathbb{E}_{(x, y) \sim \mathcal{D}}\left[\mu\big(M(x; \pi^\ast), y\big) - \mu\big(M(x; \pi^0), y\big)\right]
+\Delta = \mathbb{E}_{(x, y) \sim \mathcal{D}_{\text{test}}}\left[\mu\big(M(x; \pi^{\text{dep}}), y\big) - \mu\big(M(x; \pi^0), y\big)\right]
 \]
 
-Here \( \pi^0 \) is the seed prompt set, \( \pi^\ast \) the optimized set, \( \mu \) the task scorer and \( (x, y) \) a task instance with its reference answer. A run's `meta.json` reports the sample estimate as `delta = compiled_score - baseline_score`, both means over the same validation rows. Scores are fractions in [0, 1]; multiply by 100 for percentage points.
+Here \( \pi^0 \) is the seed prompt set, \( \pi^{\text{dep}} \) the deployed set, \( \mu \) the task metric and \( (x, y) \) a test instance with its reference answer. The deployed set is the method's incumbent only if it beats the seeds on validation; otherwise it is \( \pi^0 \) and the gain is zero. A job's `result.json` reports the estimate as `delta_pp`, in percentage points, and [aggregation](running.md#aggregate-the-seeds) averages it over the three optimizer seeds.
 
-Neither optimizer writes to `configs/`. Compiled prompts go to the run's `--out` folder.
+No method writes to `configs/`. Optimized prompts stay in the job's `--out` folder.
+
+## The eight methods
+
+| Method | `--method` | Approach | Code | Grid cells |
+| --- | --- | --- | --- | ---: |
+| GEPA | `gepa` | Reflective prompt evolution (DSPy `GEPA`) | [`gepa/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/gepa) | 147 |
+| MIPRO | `mipro` | Instruction and few-shot demo search (DSPy `MIPROv2`) | [`mipro/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/mipro) | 147 |
+| MAPRO | `mapro` | Per-role prompt pools, max-product belief propagation, blame-driven mutation | [`mapro/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/mapro) | 135 |
+| MASPO | `maspo` | Role-wise evolutionary beam search with pairwise judging | [`maspo/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/maspo) | 135 |
+| HiveMind | `hivemind` | Coalition (Shapley) credit, lesson-based refinement of the lowest-credit role | [`hivemind/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/hivemind) | 12 |
+| MAMUT-GEPA | `mamut_gepa` | One joint GEPA search over all role prompts (`gepa` engine) | [`mamut_gepa/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/mamut_gepa) | 12 |
+| MASPOB | `maspob` | Prompt-variant bandit with a GATv2 surrogate (LinUCB) | [`maspob/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/maspob) | 12 |
+| TAVO | `tavo` | Trajectory credit assignment and a shared verbalized-policy overlay | [`tavo/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/tavo) | 12 |
+
+A grid cell is one (dataset, topology, framework, communication format, team size, task model) configuration of the experiment grid in `optimizers/protocol/cells.py`, run once per optimizer seed:
+
+- **GEPA and MIPRO** cover every dataset on all five topologies, in each topology's native framework and in LangGraph, plus the communication formats and team sizes on HotpotQA, LiveCodeBench and BFCL, and those three datasets with `meta-llama/Llama-3.1-8B-Instruct`.
+- **MAPRO and MASPO** cover the same cells except `single`.
+- **HiveMind, MAMUT-GEPA, MASPOB and TAVO** cover HotpotQA, LiveCodeBench and BFCL on the four multi-agent LangGraph topologies.
+
+The built-in `identity` method returns the seed prompts without a rollout; it runs on any grid configuration and gives the seed baseline of a cell. Any method runs on any registered pair with `--allow-any-cell`, as a non-conformant job.
+
+## One protocol for every method
+
+Every method runs as a job of the protocol `mas-promptbench-v1`, `python -m optimizers.protocol.run`:
+
+1. **Optimize.** The method gets the fixed, ordered train and validation rows, the frozen seed bundle and a ledger of 600 usable full-system rollouts, sampled at temperature 0.2, top-p 0.9 and up to 32,768 tokens. It returns its incumbent bundle.
+2. **Final validation.** Uncharged and greedy: the seed and the incumbent run on the full validation split with paired per-item request seeds. The incumbent is deployed only if it is strictly better; a tie or a regression keeps the seeds. The decision is sealed in `selection.json`.
+3. **Test.** After the lock, the seed and deployed bundles run on the held-out test split with the same paired seeds.
+
+The methods differ only in step 1. Their reflection or proposal calls go to `Qwen/Qwen3.5-122B-A10B-FP8` with thinking on and up to 48,000 output tokens, at temperature and top-p 1.0 unless the method sets them. [Evaluation Protocol](../evaluation/protocol.md) covers budgets, seeds and scorers in detail.
 
 ## The real-runner bridge
 
-Each optimizer has its own bridge package: [`real_runner_gepa/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/gepa/real_runner_gepa) and [`real_runner_mipro/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/mipro/real_runner_mipro). They follow the same three layers.
+Every rollout runs through [`optimizers/bridge/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/bridge), which wraps the topology runners instead of re-implementing them, so an optimized prompt runs unchanged in the benchmark.
 
-1. **Adapter** (`adapters/`). One class per `(topology, dataset)` pair implements the `RealRunnerAdapter` protocol in `protocol.py`: `roles()`, `get_prompt()`, `set_prompt()`, `reset()`, `run_example()` and `format_role_trace()`. It loads the seed prompts, imports the real runner module (for example `topologies.single.hotpotqa.langgraph_hotpotqa`) and, for each example, patches the module's prompt loader, model client, endpoint, model name and agent or round counts before calling the runner's own solve function.
-2. **Program** (`programs.py`, plus `mipro_programs.py` for MIPRO). A DSPy module registers one predictor per mutable role. The predictor's instruction text is the role prompt, so the optimizer finds and edits the roles through `named_predictors()`.
-3. **Forward pass.** `forward()` copies the current instructions into the adapter, runs the real runner once, and records one trace per role for the optimizer to read.
+1. **Adapter** (`adapters/`). One class per (dataset, registry key) pair exposes the per-role prompts (`roles()`, `get_prompt()`, `set_prompt()`) and `run_example()`, one execution of the real runner. It patches the runner module's prompt loader, model client, endpoint and team size in a private copy of the module.
+2. **Registry** (`registry.py`). Maps each dataset and key, such as `sequential_crewai` or `centralized_r8`, to its adapter class.
+3. **Programs** (`programs.py`, `mipro_programs.py`). Register one DSPy predictor per role, so GEPA and MIPRO edit the role instructions through `named_predictors()`. The other methods pass their candidates to the protocol's runner, directly or through its `RunnerSession`, which runs the same adapter.
+4. **Metric** (`datasets/<dataset>.py`). `load_all()` and `metric()`, which returns a 0 or 1 score and feedback text for reflection.
 
-`registry.py` maps each `(dataset, topology)` name to its adapter class. The bridge also re-attaches two things the optimizer cannot edit: the protected final-output contract for the role that emits the answer, and a few format nudges (code-first for APPS and LCB coders, patch-first for SWE). See [Evaluation Protocol](../evaluation/protocol.md#output-contracts).
+The bridge also re-attaches what a method cannot edit: the protected final-output contract of the answering roles and a few format nudges. See [Output contracts](../evaluation/protocol.md#output-contracts).
 
-!!! note "Scoring during optimization"
-    The runner code is the real one, but the metric each optimizer maximizes lives in `datasets/<dataset>.py`. For LCB and APPS it runs only the first three tests, and for SWE-bench it checks that the patch is a non-trivial unified diff. [Evaluation Protocol](../evaluation/protocol.md#scorers) lists every metric.
+!!! note "Cheaper checks for code and patches"
+    The protocol scores LiveCodeBench and APPS on the first three tests only, and SWE-bench with a structural check of the diff, cheaper than the topology runners' scorers. [Scorers](../evaluation/protocol.md#scorers) lists every metric.
 
-## GEPA and MIPRO compared
+## Method settings
 
-| | GEPA | MIPRO |
+Each method's knobs are one frozen dataclass; the protocol fixes everything else. Only MAPRO and TAVO also read [environment variables](../reference/environment.md#method-settings).
+
+| Method | Settings | Defaults |
 | --- | --- | --- |
-| Method | Reflective prompt evolution (DSPy `GEPA`) | Instruction and few-shot demo search (DSPy `MIPROv2`) |
-| What changes | Role instruction text | Role instruction text plus selected demos, rendered into the prompt |
-| Proposal signal | Reflection model reads each role's trace and the metric's feedback text | Proposal model sees the program, a data summary, tips and bootstrapped demos |
-| Search | Mutates one role or all roles per step, tracks candidates on the validation split | Proposes candidates, then a Bayesian search over instruction and demo combinations |
-| Budget flags | `--max-full-evals` or `--auto` | `--num-candidates` and `--num-trials`, or `--auto` |
-| Early stopping | `--early-stop-patience` | None |
-| Extra output | `gepa_state/` | `mipro_state/`, `compiled_demos/` |
-| Entry point | `real_runner_gepa.pilots.run_gepa_dataset` | `real_runner_mipro.pilots.run_mipro_dataset` |
-| Sweep launcher | `optimizers/gepa/run_gepa.sh` | `optimizers/mipro/run_mipro.sh` |
+| GEPA | `gepa/integration.py: GEPAPolicy` | `max_full_evals=5`, minibatch 3, Pareto selection, round-robin components, merge (at most 5), plateau patience 3, seed 0 |
+| MIPRO | `mipro/integration.py: MIPROPolicy` | 3 candidates, 3 trials, at most 4 bootstrapped and 0 labeled demos, no minibatch, seed 9, all proposer hints on |
+| MAPRO | `mapro/regime.py: MAPROSettings` | 5 candidates per role, at most 8 rounds, patience 3, scoring batch 3, feedback 3, 12 threads |
+| MASPO | `maspo/integration.py: MASPOSettings` | beam 2, 2 offspring, minibatch 10, depth at most 9, 3 rounds per turn, 12 threads, 4 judge calls in flight |
+| HiveMind | `hivemind/regime.py: HiveMindSettings` | coalition batch 5, acceptance batch 5, at most 40 coalitions, manager every 3rd cycle, at most 6 lessons, reflection temperature 0.7, cycles until B |
+| MAMUT-GEPA | `mamut_gepa/integration.py: MAMUTGEPASettings` | `max_metric_calls = min(600, B)`, Pareto, round-robin, merge, minibatch 3, reflection temperature 0.7 |
+| MASPOB | `maspob/regime.py: MASPOBSettings` | 20 variants per role, generation temperature 0.5, MiniLM embeddings, seed 42 (+1000 per optimizer seed), minibatch 5, at most 5 warm-up pulls |
+| TAVO | `tavo/settings.py: TAVOSettings` | train batch 6, at most 5 outer rounds, validation batch at least 3, adoption threshold 0.01, 2 attempts per round, patience 2, temperature 0.5 |
 
-The paper's headline results use GEPA.
-
-## Train/val split and acceptance
-
-Each run draws two disjoint splits from the dataset's optimization pool:
-
-- **Train** (`--train-size`): rows the optimizer learns from. GEPA reflects on minibatches of them; MIPRO bootstraps demos and writes its data summary from them.
-- **Validation** (`--val-size`): rows the optimizer uses to compare candidates, and the rows the pilot uses for the before/after measurement.
-
-The frozen eval IDs in `benchmarks/<dataset>/<dataset>_eval_ids.json` are excluded from the pool unless you turn exclusion off. The pilot defaults are 1 train and 1 validation row, a smoke-test size; the sweeps use 25 and 25. [Evaluation Protocol](../evaluation/protocol.md#trainval-splits-for-optimization) covers the split rules.
-
-After optimization the pilot scores the seed prompts and the compiled prompts on the same validation rows and applies one rule: keep the compiled prompts when `compiled_score + 1e-9 >= baseline_score`, so a tie keeps the compiled prompts. Two cases override it. If any compiled validation record shows an infrastructure error, the baseline prompts are kept. ToolHop uses a stricter rule that also rejects ties without row-level gains and prompts that memorize examples. The decision lands in `meta.json` as `accept_compiled_prompt`, `selected_prompt_source` and `selection_reason`. See [Read the Results](../evaluation/results.md#acceptance-and-selection_reason).
+The [run protocol README](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/optimizers/protocol/README.md#settings) keeps the full table. MASPOB also needs `torch`, `torch_geometric` and `sentence-transformers`, which `environment.yml` installs; a CPU is enough.
 
 ## Next steps
 
 <div class="cards" markdown>
 
-- [GEPA](gepa.md)
-  The reflective loop, every flag and its default, and a worked command.
-- [MIPRO](mipro.md)
-  Instruction proposal, demo search, every flag and its default.
 - [Run an Optimizer](running.md)
-  Endpoints, topology names, sweeps and compute tips, end to end.
+  Endpoints, cells, one job, smoke runs and aggregation over seeds.
+- [Evaluation Protocol](../evaluation/protocol.md)
+  Splits, budget, decoding, selection and scorers.
+- [Read Run Outputs](../evaluation/outputs.md)
+  Every file of a job folder and the aggregate summary.
+- [Add an Optimizer](../extending/add-optimizer.md)
+  The interface a ninth method implements.
 
 </div>

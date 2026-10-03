@@ -4,6 +4,7 @@ Colours come from CSS custom properties in docs/theme/assets/docs.css (--tc is s
 diagram), so the same SVG reads correctly in light and dark themes.
 Run: python docs/theme/make_diagrams.py
 """
+
 import math
 from pathlib import Path
 
@@ -22,9 +23,10 @@ def arrow(x1, y1, x2, y2, cls="edge", head=True, both=False, size=7.5):
 
     def tri(tx, ty, a):
         p1 = (tx, ty)
-        p2 = (tx - size * math.cos(a) + size * .55 * math.sin(a), ty - size * math.sin(a) - size * .55 * math.cos(a))
-        p3 = (tx - size * math.cos(a) - size * .55 * math.sin(a), ty - size * math.sin(a) + size * .55 * math.cos(a))
+        p2 = (tx - size * math.cos(a) + size * 0.55 * math.sin(a), ty - size * math.sin(a) - size * 0.55 * math.cos(a))
+        p3 = (tx - size * math.cos(a) - size * 0.55 * math.sin(a), ty - size * math.sin(a) + size * 0.55 * math.cos(a))
         return f'<path class="{hc}" d="M{p1[0]:.1f} {p1[1]:.1f} L{p2[0]:.1f} {p2[1]:.1f} L{p3[0]:.1f} {p3[1]:.1f}Z"/>'
+
     if head:
         out.append(tri(x2, y2, ang))
     if both:
@@ -53,8 +55,10 @@ def text(x, y, s, cls="t-small", anchor="middle"):
 
 
 def svg(name, h, label, body, top=0):
-    return (f'<div class="diagram-wrap"><svg class="topo-diagram" style="--tc: var(--t-{name})" viewBox="0 {top} 620 {h - top}" '
-            f'role="img" aria-label="{label}" xmlns="http://www.w3.org/2000/svg">{body}</svg></div>\n')
+    return (
+        f'<div class="diagram-wrap"><svg class="topo-diagram" style="--tc: var(--t-{name})" viewBox="0 {top} 620 {h - top}" '
+        f'role="img" aria-label="{label}" xmlns="http://www.w3.org/2000/svg">{body}</svg></div>\n'
+    )
 
 
 def single():
@@ -82,11 +86,16 @@ def independent():
         b.append(arrow(81, 130, 186, y, "edge-io"))
         b.append(node(230, y, 88, 40, f"Agent {i + 1}"))
         b.append(arrow(274, y, 370, 130))
-    b.append(node(422, 130, 104, 50, "Aggregate", "vote or best-of-N", cls="node-strong", text_cls="t-on"))
+    b.append(node(422, 130, 104, 50, "Aggregate", "majority vote", cls="node-strong", text_cls="t-on"))
     b.append(arrow(474, 130, 530, 130, "edge-io"))
     b.append(io(568, 130, "Answer"))
     b.append(text(230, 258, "Same task, no messages between agents"))
-    return svg("independent", 268, "Independent topology: four agents answer the same task in parallel and their answers are aggregated.", "".join(b))
+    return svg(
+        "independent",
+        268,
+        "Independent topology: four agents answer the same task in parallel and their answers are aggregated.",
+        "".join(b),
+    )
 
 
 def sequential():
@@ -96,8 +105,18 @@ def sequential():
     b.append(io(46, 90, "Task", w=66))
     b.append(arrow(79, 90, 114, 90, "edge-io"))
     for i, (x, r) in enumerate(zip(xs, roles)):
-        b.append(node(x, 90, 88, 52, f"Stage {i + 1}", r, cls="node-strong" if i == 3 else "node",
-                      text_cls="t-on" if i == 3 else ""))
+        b.append(
+            node(
+                x,
+                90,
+                88,
+                52,
+                f"Stage {i + 1}",
+                r,
+                cls="node-strong" if i == 3 else "node",
+                text_cls="t-on" if i == 3 else "",
+            )
+        )
         if i < 3:
             b.append(arrow(x + 44, 90, xs[i + 1] - 44, 90))
     # every stage reads all earlier stages: dashed context arcs below
@@ -108,7 +127,13 @@ def sequential():
     b.append(arrow(538, 90, 556, 90, "edge-io", size=6))
     b.append(io(588, 90, "Answer", w=60))
     b.append(text(326, 196, "Each stage reads the task and every earlier stage's output · roles shown for HotpotQA"))
-    return svg("sequential", 206, "Sequential topology: four stages run in order; each reads all earlier stages; the last stage answers.", "".join(b), top=52)
+    return svg(
+        "sequential",
+        206,
+        "Sequential topology: four stages run in order; each reads all earlier stages; the last stage answers.",
+        "".join(b),
+        top=52,
+    )
 
 
 def centralized():
@@ -120,14 +145,20 @@ def centralized():
     for i, x in enumerate(wx):
         b.append(node(x, 190, 96, 42, f"Worker {i + 1}"))
         sx = 270 + i * 40
-        b.append(arrow(sx - 6, 86, x - 8, 168))          # delegate
-        b.append(arrow(x + 8, 168, sx + 6, 86))          # report back
+        b.append(arrow(sx - 6, 86, x - 8, 168))  # delegate
+        b.append(arrow(x + 8, 168, sx + 6, 86))  # report back
     b.append(arrow(380, 58, 530, 58, "edge-io"))
     b.append(io(568, 58, "Answer"))
     b.append(text(216, 118, "delegate ↓", anchor="end"))
     b.append(text(404, 118, "↑ report back", anchor="start"))
     b.append(text(310, 240, "Workers never talk to each other · loops until the manager ends or a turn cap"))
-    return svg("centralized", 252, "Centralized topology: a manager delegates to three workers, collects their reports and answers.", "".join(b), top=20)
+    return svg(
+        "centralized",
+        252,
+        "Centralized topology: a manager delegates to three workers, collects their reports and answers.",
+        "".join(b),
+        top=20,
+    )
 
 
 def decentralized():
@@ -149,7 +180,13 @@ def decentralized():
     b.append(arrow(528, 130, 548, 130, "edge-io", size=6))
     b.append(io(584, 130, "Answer", w=64))
     b.append(text(250, 256, "Round 0: each peer answers alone · Round 1: each reads the others' answers and revises"))
-    return svg("decentralized", 266, "Decentralized topology: four peers answer, exchange answers for a round, and the final answers are put to a vote.", "".join(b), top=18)
+    return svg(
+        "decentralized",
+        266,
+        "Decentralized topology: four peers answer, exchange answers for a round, and the final answers are put to a vote.",
+        "".join(b),
+        top=18,
+    )
 
 
 if __name__ == "__main__":

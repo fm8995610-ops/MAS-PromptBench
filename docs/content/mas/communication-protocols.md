@@ -1,25 +1,25 @@
 # Communication Protocols
 
-The same topology can pass messages as free text, as tagged reports or as JSON. This page covers the three message formats, which cells use them, how to run them and how they change what prompt optimization achieves.
+The same topology can pass messages as free text, as tagged reports or as JSON. This page covers the three message formats, which cells use them, and how to run and optimize them.
 { .lede }
 
 <div class="facts" markdown>
 <div><span>Formats</span>3</div>
 <div><span>Topologies</span>4</div>
-<div><span>Datasets</span>5</div>
-<div><span>Runners</span>60</div>
+<div><span>Datasets</span>6</div>
+<div><span>Runners</span>72</div>
 </div>
 
 ## What a format changes
 
 A format governs only the inter-agent hand-off: the report an agent passes to the next stage, the manager, a peer or the aggregator. The model, topology, roles, tools and scorer stay the same, and the scorer-facing final answer keeps its usual form after the report.
 
-The format is applied in two places, by [`communications/communication_formats.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/communications/communication_formats.py):
+Each topology runner applies the format itself through its communication policy, defined in [`core/communication.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/core/communication.py), in two places:
 
-1. **In the prompts.** For HotpotQA, LiveCodeBench and SWE-bench, a format contract is appended to every role's system prompt, telling the agent how to write its report and to put the final artifact after it. The ToolHop and API-Bank runners build their prompts differently and don't receive this contract.
-2. **In the hand-offs.** Before a receiver reads another agent's output, the runner re-renders that text into the chosen format (`format_handoff`, or the report builder in the ToolHop and API-Bank runners). The receiver always gets a well-formed message, even when the sender ignored the contract.
+1. **In the prompts.** A format contract is appended to every agent's system prompt, telling it how to write its report and to put the final artifact after it.
+2. **In the hand-offs.** Before a receiver reads another agent's output, the runner re-renders that text in the chosen format, so the receiver always gets a well-formed message. The HotpotQA and LiveCodeBench runners, the Sequential and Centralized BFCL runners, and the ToolHop and API-Bank runners do this; the SWE-bench runners and the Decentralized BFCL runner use the prompt contract only.
 
-In Independent, replicas never exchange messages, so only the prompt contract applies there; Independent ToolHop and API-Bank cells run the same agents under every format. Malformed reports are never rejected or re-prompted.
+In Independent, replicas never exchange messages, so only the prompt contract applies there. Malformed reports are never rejected or re-prompted.
 
 ## The three formats
 
@@ -31,7 +31,7 @@ In Independent, replicas never exchange messages, so only the prompt contract ap
 
 In both structured formats, `status` must be one of `not_started`, `in_progress`, `completed`, `blocked`, and `confidence` one of `low`, `medium`, `high`. A Structured report parses only if the JSON is an object with all five keys and `payload` is itself an object.
 
-Here is one HotpotQA report in each format. The last line is the scorer-facing artifact from `topologies/output_contracts.py` (re-exported by `communications/output_contracts.py`), unchanged across formats.
+Here is one HotpotQA report in each format. The last line is the scorer-facing artifact from the output contract, unchanged across formats.
 
 === "Freeform"
 
@@ -83,6 +83,7 @@ Each dataset suggests its own optional tags and payload fields:
 | --- | --- | --- | --- |
 | HotpotQA | `[ENTITIES]`, `[HOPS]`, `[ANSWER_CANDIDATE]` | `entities`, `hops`, `evidence`, `answer_candidate` | `Answer: <short-form>` |
 | LiveCodeBench | `[APPROACH]`, `[COMPLEXITY]`, `[EDGE_CASES]`, `[CODE_STATUS]` | `approach`, `complexity`, `edge_cases`, `tests`, `code_status` | fenced `python` block |
+| BFCL | `[FUNCTION_CHOICE]`, `[ARG_PLAN]`, `[CALL_CANDIDATE]` | `function_choice`, `arg_plan`, `call_candidate` | fenced `json` call list |
 | ToolHop | `[TOOL_CHAIN]`, `[OBSERVATIONS]`, `[ANSWER_CANDIDATE]` | `tool_chain`, `observations`, `answer_candidate` | `<answer>...</answer>` |
 | API-Bank | none; one short sentence per section, final call after `[NEXT]` | `api_choice`, `call_candidate` | one bracketed API call |
 | SWE-bench | `[BUG_LOCATION]`, `[PATCH_PLAN]`, `[RISK_OR_REGRESSION]` | `bug_location`, `root_cause`, `patch_plan`, `regression_risk`, `tests_or_checks` | the repository diff |
@@ -91,11 +92,11 @@ Each dataset suggests its own optional tags and payload fields:
 
 Runners exist for every combination of:
 
-- **Topologies:** `independent`, `sequential`, `centralized`, `decentralized`. Each wraps the LangGraph runner of that topology.
-- **Datasets:** `hotpotqa`, `lcb`, `toolhop`, `apibank`, `swe`.
+- **Topologies:** `independent`, `sequential`, `centralized`, `decentralized`. Each runs the LangGraph runner of that topology.
+- **Datasets:** `hotpotqa`, `lcb`, `bfcl`, `toolhop`, `apibank`, `swe`.
 - **Formats:** `freeform`, `semi_structured`, `structured_soft`.
 
-The path pattern is `communications/<topology>/<dataset>/<dataset>_<format>.py`.
+The path pattern is `communications/<topology>/<dataset>/<dataset>_<format>.py`. Each file is a few lines: it calls `install` from [`communications/communication_formats.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/communications/communication_formats.py), which loads the topology runner as a module of its own with the format preset, records its hand-offs and scores its reports.
 
 ## Run a cell
 
@@ -103,10 +104,9 @@ The path pattern is `communications/<topology>/<dataset>/<dataset>_<format>.py`.
 python -m communications.centralized.hotpotqa.hotpotqa_structured_soft --batch --limit 100
 ```
 
-All 60 runners share one command line: `--batch`, `--limit`, `--offset`, `--only` (repeat it once per ID) and `--out`. Results go to `results/communications_baseline/<topology>_<dataset>_<format>/results.jsonl` unless you pass `--out <file.jsonl>`; an existing file at that path is overwritten. Each row holds the dataset's usual score fields plus `communication_format` and the rendered hand-offs (`communication_inflight_handoffs`). The parse fields (`communication_parse_rate`, `communication_all_parse_ok`) are computed on the runner's re-rendered reports, so they check the rendering, not the model's own text. ToolHop cells need `export TOOLHOP_ALLOW_DATASET_EXEC=1`.
+All 72 runners share the runners' command line (`--batch`, `--limit`, `--offset`, `--only`, `--out-dir`, `--out`); the BFCL runners add `--category`. They have no demo, and without `--limit` they run every row. Results go to `results/communications_baseline/<topology>_<dataset>_<format>/results.jsonl` (BFCL: one subfolder per category) unless you pass `--out-dir` or `--out`, and the file is emptied first. ToolHop cells need `export TOOLHOP_ALLOW_DATASET_EXEC=1`.
 
-!!! warning "SWE-bench cells"
-    The shared batch loop calls each runner's `run_one(instance, None)`, but the SWE-bench topology runners also require a workdir and an output directory. Expect every SWE-bench row to be written as an error record until that call is fixed.
+Each row holds the dataset's usual score fields plus `communication_format`, the parsed reports and the rendered hand-offs (`communication_inflight_handoffs`). The parse metrics judge each agent's own text against the format: `communication_parse_rate` is the share of reports that parse as written, and `communication_all_parse_ok` is true when all do. The re-rendered reports always parse; their rate is reported separately as `communication_render_parse_rate`.
 
 ## Run the sweep
 
@@ -119,31 +119,16 @@ FORMATS="freeform structured_soft" \
 bash scripts/run_communications.sh
 ```
 
-The script uses fixed limits per dataset (HotpotQA, ToolHop and API-Bank 100, LiveCodeBench 50, SWE-bench 30), sets `TOOLHOP_ALLOW_DATASET_EXEC=1`, and reads `VLLM_BASE_URL` and `MODEL_ID` like every runner.
+The script runs BFCL and SWE-bench on their eval IDs (BFCL one category at a time) and the other datasets with fixed limits (HotpotQA, ToolHop and API-Bank 100, LiveCodeBench 50). It sets `TOOLHOP_ALLOW_DATASET_EXEC=1` unless you set it, and reads `VLLM_BASE_URL` and `MODEL_ID` like every runner.
 
 ## Optimize a cell
 
-The optimizer topology name is `<topology>_communications_<format>`, for example `centralized_communications_semi_structured`. These names exist for HotpotQA, LiveCodeBench, ToolHop and API-Bank; SWE-bench has no optimizer adapter for protocol cells.
+Pass `--communication <format>` to the run protocol, or use the key `<topology>_communications_<format>`. The bridge has adapters for HotpotQA, LiveCodeBench, BFCL, ToolHop and API-Bank; the experiment grid covers HotpotQA, LiveCodeBench and BFCL with GEPA, MIPRO, MAPRO and MASPO, and other cells need `--allow-any-cell`. For example, MASPO on Sequential LiveCodeBench with Structured messages:
 
-```bash title="GEPA on Sequential / HotpotQA with Structured messages"
-cd optimizers/gepa
-python -m real_runner_gepa.pilots.run_gepa_dataset --dataset hotpotqa \
-  --topology sequential_communications_structured_soft \
-  --train-size 25 --val-size 25 --max-full-evals 5 \
-  --out results/gepa/sequential_communications_structured_soft_hotpotqa
+```bash title="MASPO on Sequential · LiveCodeBench · Structured"
+python -m optimizers.protocol.run --method maspo --dataset lcb \
+  --topology sequential --communication structured_soft \
+  --model qwen --seed 0 --out runs/maspo/lcb/sequential_structured_soft/qwen/0
 ```
 
-For Independent and Decentralized cells, add `--n-agents 4` (and `--n-rounds 2` for Decentralized) to match the baseline team; the pilot defaults are 2 agents and 1 round.
-
-## What the paper found
-
-With GEPA, the average gain from prompt optimization rose with the structure of the messages:
-
---8<-- "results/summary-protocols.html"
-
-The effect was largest on HotpotQA, where downstream agents reuse upstream evidence, and weakest on LiveCodeBench, where tests decide correctness whatever the message format. Each cell below is one topology and protocol:
-
---8<-- "results/protocols.html"
-
-!!! takeaway
-    Prompt optimization gains grow as inter-agent messages become more structured.
+See [Run an Optimizer](../optimizers/running.md).

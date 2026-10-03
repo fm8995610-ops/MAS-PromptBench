@@ -1,98 +1,115 @@
 # Evaluation Protocol
 
-This page fixes what a score means: which instances are reported, how optimization data is kept apart from them, how a before/after pair is measured, and which settings stay constant across runs.
+This page fixes what a score means: which instances are reported, how optimization data is kept apart from them, how a seed and an optimized prompt set are compared, and which settings stay constant across methods and runs.
 { .lede }
 
-## Frozen eval-ID manifests
+<div class="facts" markdown>
+<div><span>Protocol</span>mas-promptbench-v1</div>
+<div><span>Budget</span>600 usable rollouts</div>
+<div><span>Selection</span>Strictly better on validation</div>
+<div><span>Evaluation IDs</span>730</div>
+</div>
 
-Every dataset has a manifest at `benchmarks/<dataset>/<dataset>_eval_ids.json` with the fields `dataset`, `sample`, `n`, `source` and `ids`. The IDs are the instances behind reported scores, so every topology, team size and communication format is scored on the same set.
+## Evaluation IDs
 
-| Dataset | Eval IDs | Sample |
+Every dataset has a manifest at `benchmarks/<dataset>/<dataset>_eval_ids.json` with the fields `dataset`, `sample`, `n`, `source` and `ids`. The IDs are the instances behind reported scores, so every topology, team size, communication format and optimizer is scored on the same set.
+
+| Dataset | IDs | Sample |
 | --- | ---: | --- |
 | `gpqa` | 100 | report 100 |
 | `hotpotqa` | 100 | report 100 |
-| `math` | 100 | report 100 |
+| `math` | 100 | report 100 (Precalculus, Level 5) |
 | `lcb` | 50 | report 50 |
-| `apps` | 50 | ids 0..49 |
-| `swe` | 30 | balanced_30: 15 `<15 min fix`, 15 `15 min - 1 hour` |
-| `bfcl` | 25 | 10 simple, 5 multiple, 5 parallel, 5 parallel_multiple |
+| `apps` | 50 | dataset IDs 0 to 49 |
+| `swe` | 30 | a fixed 30-instance sample of SWE-bench Verified |
+| `bfcl` | 100 | 40 simple, 20 multiple, 20 parallel, 20 parallel_multiple |
 | `apibank` | 100 | 33 Level 1, 33 Level 2, 34 Level 3 |
-| `toolhop` | 100 | dataset ids 0..99 |
-| **Total** | **655** | |
+| `toolhop` | 100 | dataset IDs 0 to 99 |
+| **Total** | **730** | |
 
 Restrict a baseline run to the manifest with `--only`:
 
-```bash title="Run HotpotQA on its eval IDs"
+```bash title="Run HotpotQA on its evaluation IDs"
 IDS=$(python -c "import json; \
 print(' '.join(json.load(open('benchmarks/hotpotqa/hotpotqa_eval_ids.json'))['ids']))")
 python -m topologies.single.hotpotqa.langgraph_hotpotqa --batch --only $IDS \
   --out results/topologies_baseline/single_hotpotqa/predictions.jsonl
 ```
 
-The GPQA, HotpotQA, MATH, LCB and APPS runners take `--only` as one list. The BFCL, SWE-bench, ToolHop, API-Bank and communication runners take it once per ID (`--only a --only b`). The API-Bank runners also load their manifest by default.
+The sweep launchers pass the BFCL and SWE-bench IDs with `--only` and a `--limit` for the other datasets. The API-Bank runners load their manifest by default.
 
-## Train/val splits for optimization
+## Fixed splits
 
-The optimizers draw train and validation rows from each dataset's loader in `datasets/<dataset>.py`. The generic split in [`split_utils.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/optimizers/gepa/real_runner_gepa/datasets/split_utils.py) does this:
+The optimizers never draw their own splits. Each dataset ships `benchmarks/<dataset>/<dataset>_splits.json` with fixed, ordered `train`, `validation` and `test` ID lists:
 
-1. Drop every ID in the eval manifest, when exclusion is on.
-2. Drop the first `--offset` rows.
-3. Shuffle with `random.Random(--split-seed)`.
-4. Take the first `--train-size` rows as train and the next `--val-size` rows as validation.
+| Dataset | Train | Validation | Test | Protocol metric |
+| --- | ---: | ---: | ---: | --- |
+| `gpqa` | 48 | 50 | 100 | `accuracy` |
+| `hotpotqa` | 150 | 50 | 100 | `exact_match` |
+| `math` | 150 | 50 | 100 | `accuracy` |
+| `lcb` | 150 | 50 | 50 | `pass_at_1` |
+| `apps` | 150 | 50 | 50 | `pass_at_1` |
+| `swe` | 146 | 50 | 30 | `resolved_rate` |
+| `bfcl` | 150 | 50 | 100 | `accuracy` |
+| `toolhop` | 150 | 50 | 100 | `accuracy` |
+| `apibank` | 150 | 50 | 100 | `accuracy` |
 
-If the pool is too small the pilot stops with an error. Three datasets use their own rules. API-Bank balances train and validation across Levels 1 to 3. ToolHop picks rows whose profile matches the eval set. SWE-bench interleaves rows round robin by repository. API-Bank and ToolHop always exclude their eval IDs, whatever the variable says. For those two, GEPA also looks for a frozen `benchmarks/<dataset>/<dataset>_gepa25_signal_split.json` when you ask for 25/25 with seed 0 and offset 0; none ship, so the seeded split is used.
+`test` is the evaluation-ID set, in the same order. `train` and `validation` are drawn with `split_seed` 0 from the remaining pool and never overlap it, so optimization never sees a reported instance. A job's identity includes a hash of the splits, and test rows are released only after the selection is sealed.
 
-Exclusion is controlled by `GEPA_EXCLUDE_REAL_EVAL_IDS`, and by `MIPRO_EXCLUDE_REAL_EVAL_IDS` (which falls back to the GEPA variable) for MIPRO. In the code it is **on when the variable is unset**; only `0`, `false`, `no` or `off` turn it off. The optimizer READMEs tell you to add `=1` to enable it; in the code that only restates the default. Set it to `1` explicitly in your scripts, never to `0` for a reported run, and check `meta.json`: `exclude_real_eval_ids` should be `true` and `train_real_eval_overlap` and `val_real_eval_overlap` should be empty lists.
+## One job, three phases
 
-## The paired measurement
+A job is one method, one cell and one optimizer seed in {0, 1, 2}. A cell is (task, topology, framework, communication format, team size, task model).
 
-The pilot measures the seed prompts and the optimized prompts on the same validation rows, with the same model, endpoints, sampling, topology and scorer. Only the role prompts differ.
+1. **Optimize.** The method gets the train and validation rows, the frozen seed bundle and a budget of 600 usable full-system rollouts, and returns its incumbent bundle.
+2. **Final validation.** Uncharged and greedy. The seed and the incumbent run on the full validation split with paired per-item request seeds. The incumbent is deployed only if its validation mean is strictly higher; a tie, a regression, an unusable record or an infrastructure-invalid optimization keeps the seed bundle. The decision is sealed in `selection.json` before any test row is loaded.
+3. **Test.** Uncharged and greedy. The seed and deployed bundles run on the test split with the same paired seeds. The gain is `delta_pp = 100 × (deployed mean − seed mean)`.
 
-1. Score the seed prompts on validation and write `baseline_val.jsonl`.
-2. Run the optimizer with `trainset=train, valset=val`.
-3. Score the compiled prompts on the same validation rows and write `compiled_val.jsonl`.
-4. Apply the acceptance rule and write the chosen side to `optimized_val.jsonl`.
+[Read Run Outputs](outputs.md) lists the fallback reasons and every artifact.
 
-`delta = compiled_score - baseline_score` is the mean of the per-row differences, a direct estimate of the gain \( \Delta \) defined on the [Optimizers](../optimizers/index.md#what-gets-optimized) page.
+### Budget and charging
 
-!!! warning "Validation is also the selection set"
-    GEPA and MIPRO choose their best candidate by its validation score, and the pilot reports the delta on those same rows. With 25 rows, one row is 4 percentage points. The pilots stop at this validation measurement; a held-out number needs the selected prompts scored on the frozen eval IDs.
+A rollout is one complete multi-agent execution of one row, scored by the dataset metric.
 
-## Sampling settings
+- **Usable** rollouts end in `success` or `semantic_failure`, which includes wrong or malformed answers. Only these are charged.
+- **Infrastructure failures** are an exception before a scored observation (connection error, timeout, 5xx, BadRequest), transport-error text, no model call, or a scorer exception. They are never charged, are retried twice with the same request seed, and then return unusable.
+- Batches reserve budget before dispatch and are trimmed at the cap, so a job never overshoots 600.
+- A `--budget` other than 600, an off-grid cell or another reflection model makes a job non-conformant; aggregation skips it by default.
 
-The optimizer workspaces define their sampling in `lm.py`:
+## Decoding and seeds
 
-| Setting | Agents | Reflection / proposal |
-| --- | --- | --- |
-| `temperature` | 0.2 | 1.0 |
-| `top_p` | 0.9 | not set |
-| `seed` | 0 | not set |
-| `max_tokens` | 1024 in `task_sampling()`; 4096 for agent clients built by the module adapters (`REAL_RUNNER_TASK_MAX_TOKENS`) | 48000 |
-| Extra body | `repetition_penalty` 1.05, thinking disabled through `chat_template_kwargs` | none |
+| Setting | Optimization rollouts | Final validation and test | Reflection |
+| --- | --- | --- | --- |
+| Model | the task model | the task model | `Qwen/Qwen3.5-122B-A10B-FP8` |
+| Temperature | 0.2 | 0.0 | 1.0 unless the method sets it |
+| Top-p | 0.9 | 0.9 | 1.0 unless the method sets it |
+| Max output tokens | 32,768 | 32,768 | 48,000 |
+| Thinking | off | off | on |
 
-The agent clients built by the adapters reuse temperature, top_p, seed and the extra body. The topology runners use the same values and set their own `max_tokens` (2048 in the Single HotpotQA runner, for example).
+The task model is `Qwen/Qwen3.5-9B` (`--model qwen`) or `meta-llama/Llama-3.1-8B-Instruct` (`--model llama`). The runners also send `repetition_penalty` 1.05.
+
+Every request carries a seed. Optimization and reflection requests get a logical seed hashed from the optimizer seed, the cell, the phase and the request's place in the search (iteration, row, role, turn), offset by 0, 1000 or 2000 for optimizer seed 0, 1 or 2; an infrastructure retry reuses it. Evaluation items get a paired seed that depends on the runtime condition, the optimizer seed, the split and the row, but not on the bundle or the method. The seed and deployed bundles therefore see the same seed on each row, and a deployed seed bundle reproduces the baseline exactly.
 
 ## Scorers
 
-Each task family uses its official or community-standard scorer in the runners. During optimization the metric comes from the optimizer's `datasets/<dataset>.py`, which calls the runner's scoring code where it can and uses a cheaper check for code execution and patches.
+Every rollout in every phase is scored 0 or 1 by `optimizers.bridge.datasets.<dataset>.metric`, and a split's score is the mean. LiveCodeBench, APPS and SWE-bench use cheaper checks than the topology runners report:
 
-| Family | Dataset | Runner scorer | Optimization metric |
-| --- | --- | --- | --- |
-| Reasoning | `gpqa` | Letter match | Same |
-| | `hotpotqa` | Official EM and token F1 | EM (F1 appears in feedback) |
-| | `math` | Hendrycks `is_equiv` on `\boxed{}` | Same, via the Single MATH runner |
-| Coding | `lcb` | pass@1, stdin and functional tests | 1 if the first 3 tests all pass |
-| | `apps` | pass@1, stdin and call-based tests | 1 if the first 3 tests all pass |
-| | `swe` | `FAIL_TO_PASS` and `PASS_TO_PASS` tests | 1 if the output holds a non-trivial unified diff |
-| Tool-calling | `bfcl` | Official `bfcl_eval` AST checker | Same checker |
-| | `apibank` | Official API-Bank harness | The runner's `score_prediction` |
-| | `toolhop` | Exact or normalized answer match | The runner's `score_answer` |
+| Dataset | Protocol metric | Topology runners |
+| --- | --- | --- |
+| `gpqa` | Option letter equals the gold letter | Same |
+| `hotpotqa` | Official exact match | Exact match and token F1 |
+| `math` | Hendrycks `is_equiv` of the last `\boxed{}` | Same |
+| `bfcl` | `bfcl_eval` AST checker | Same |
+| `apibank` | The runners' API-Bank replay check | Same |
+| `toolhop` | ToolHop's matcher on the final answer, else on the selected agent's last tool result | Same |
+| `lcb` | Passes the first 3 private tests | All private tests |
+| `apps` | Passes the first 3 tests | The first 20 tests |
+| `swe` | Structural check only: a unified diff with a header and at least one changed line; not applied, no tests run | Every `FAIL_TO_PASS` and `PASS_TO_PASS` test passes in the instance's SWE-bench image |
 
-Every metric also returns feedback text, which GEPA reads and MIPRO ignores. Task details are on the [task pages](../tasks/index.md).
+The bridge's APPS loader keeps only `interview` problems; all APPS evaluation IDs are `interview`. Every metric also returns feedback text, which reflective methods read. Task details are on the [task pages](../tasks/index.md).
 
 ## Output contracts
 
-[`topologies/output_contracts.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/topologies/output_contracts.py) fixes the final answer format per dataset. The role that emits the answer gets a `PROTECTED FINAL OUTPUT CONTRACT` block before its prompt and a reminder after it. That role is the solver-type role in Single and Independent, the `debater` in Decentralized, the last stage in Sequential (for example `writer` for HotpotQA) and the manager plus answer-producing workers in Centralized.
+`core/output_contracts.py` fixes the final answer format per dataset. The role that emits the answer gets a `PROTECTED FINAL OUTPUT CONTRACT` block before its prompt and a reminder after it. That role is the solver-type role in Single and Independent, the `debater` in Decentralized, the last stage in Sequential (for example `writer` for HotpotQA) and the manager plus the answer-producing workers in Centralized.
 
 | Dataset | Required ending |
 | --- | --- |
@@ -105,15 +122,19 @@ Every metric also returns feedback text, which GEPA reads and MIPRO ignores. Tas
 | `apibank` | One bracketed call, `[ApiName(arg='value')]` |
 | `toolhop` | `<answer>...</answer>` |
 
-The contract is not an optimization target. The adapters attach it at execution time, outside the text the optimizer edits, so compiled prompts never contain it and cannot remove it. The bridges carry their own copy with fuller wording (`real_runner_*/output_contracts.py`, version 2, recorded as `output_contract_version` in `meta.json`); the runners use version 1.
+The contract is not an optimization target. The bridge adapters attach their own copy, `optimizers/bridge/output_contracts.py` (version 2, with fuller wording), at execution time and outside the text a method edits, so optimized prompts never contain it and cannot remove it. The runners use version 1.
 
 ## Telemetry
 
-[`topologies/telemetry.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/topologies/telemetry.py) gives every runner record the same five counters: `prompt_tokens`, `completion_tokens`, `total_tokens`, `n_llm_calls` and `n_tool_calls`. One extractor exists per framework:
+`core/telemetry.py` gives every runner record the same five counters: `prompt_tokens`, `completion_tokens`, `total_tokens`, `n_llm_calls` and `n_tool_calls`.
 
 - **LangGraph**: sums usage over the AI messages; Independent sums across all replicas.
 - **CrewAI**: reads the crew's `usage_metrics`; it does not track tool calls, so `n_tool_calls` stays 0.
 - **AutoGen**: sums `models_usage` per message and counts tool-call request events.
-- **OpenAI SDK**: accumulates usage per call; the fallback path counts calls only and leaves tokens at 0.
+- **OpenAI Agents SDK**: the debate engine in `agents_sdk_base.py` sums the usage of every SDK run.
 
-Counts are totals for the row across every agent and every round, so they grow with team size and debate rounds. `normalize()` forces the five-key shape. The optimizer's `*_val.jsonl` records do not carry these counters, so compare cost with baseline runs.
+Counts are totals for the row across every agent and round, so they grow with team size and debate rounds. Protocol records carry their own usage per component (task, judge, reflection) in the job artifacts.
+
+## Statistics
+
+`optimizers.protocol.aggregate` pairs the three optimizer seeds of each cell. Per seed it reports the seed and deployed test means and their difference; across seeds, the mean and standard deviation of the difference, a seed-stratified paired bootstrap 95% interval (10,000 replicates) and, for binary scores, an exact McNemar test per seed with Holm correction inside a family (dataset × model by default). A cell is complete only when all three seeds have valid test data. See [Aggregate the seeds](../optimizers/running.md#aggregate-the-seeds).

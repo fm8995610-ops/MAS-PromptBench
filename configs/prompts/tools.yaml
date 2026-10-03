@@ -106,5 +106,3 @@ decentralized:
   toolhop:  *toolhop_dynamic_tools
   apibank:  *apibank_dynamic_apis
 
-decentralized_openai:
-  math:     *calculator_equation

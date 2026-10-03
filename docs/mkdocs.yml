@@ -17,7 +17,7 @@ theme:
     - 404.html
 
 extra:
-  project_page: https://fm8995610-ops.github.io/MAS-PromptBench/
+  project_page: !ENV [MPB_PROJECT_PAGE, "https://fm8995610-ops.github.io/MAS-PromptBench/"]
   deepwiki: https://deepwiki.com/fm8995610-ops/MAS-PromptBench
 
 plugins:
@@ -83,14 +83,10 @@ nav:
       - Team Sizes: mas/team-sizes.md
   - Optimizers:
       - Overview: optimizers/index.md
-      - GEPA: optimizers/gepa.md
-      - MIPRO: optimizers/mipro.md
       - Run an Optimizer: optimizers/running.md
-  - Results:
-      - Results Explorer: results/index.md
   - Evaluation:
       - Evaluation Protocol: evaluation/protocol.md
-      - Read the Results: evaluation/results.md
+      - Read Run Outputs: evaluation/outputs.md
   - Extending:
       - Add a Dataset: extending/add-dataset.md
       - Add a Topology: extending/add-topology.md
@@ -99,8 +95,6 @@ nav:
       - Command-Line Flags: reference/cli.md
       - Environment Variables: reference/environment.md
       - Repository Map: reference/repository.md
-      - Known Issues: reference/known-issues.md
-      - Ask DeepWiki: reference/deepwiki.md
 
 validation:
   links:

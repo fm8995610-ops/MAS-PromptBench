@@ -21,7 +21,10 @@ if [ "${CONDA_DEFAULT_ENV:-}" != "${CONDA_ENV}" ]; then
 fi
 
 # --- Model cache ---
-# Point HF_HOME / MODEL_PATH at your local model cache (default: $HOME/models).
+# HF_HOME and MODEL_PATH (vLLM's --download-dir) default to $HOME/models, a flat
+# download directory with the models--<org>--<name>/ folders right under it, not
+# the standard ~/.cache/huggingface/hub layout. To serve from an existing Hugging
+# Face cache, set HF_HOME to it and MODEL_PATH / TRANSFORMERS_CACHE to <HF_HOME>/hub.
 export HF_HOME=${HF_HOME:-$HOME/models}
 export MODEL_PATH=${MODEL_PATH:-$HF_HOME}
 export TRANSFORMERS_CACHE=${TRANSFORMERS_CACHE:-$HF_HOME}

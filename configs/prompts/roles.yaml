@@ -328,13 +328,3 @@ topologies:
       apibank:
         debater: "Predicts the next API call in round 0, including ToolSearcher when needed; in later rounds, compares peers' API choices and argument evidence, then revises when peer reasoning is stronger."
 
-  decentralized_openai:
-    description: >
-      4 peer agents (N=4 by default) debate over R rounds. In round 0
-      each peer answers independently. In every later round, each peer
-      sees the other peers' previous-round answers and revises its own.
-      The final answer is the round-R majority (for discrete outputs)
-      or the round-R consensus (for generative outputs).
-    benchmarks:
-      math:
-        debater: "Solves the math problem in round 0 with a boxed answer; in later rounds, compares peers' intermediate steps and either confirms or corrects its own final answer."
