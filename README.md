@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://fm8995610-ops.github.io/MAS-PromptBench/"><img src="https://img.shields.io/badge/Project-Page-2f6db3" alt="Project Page"></a>
-  <a href="https://deepwiki.com/fm8995610-ops/MAS-PromptBench"><img src="https://img.shields.io/badge/Ask-DeepWiki-2f6db3" alt="Ask DeepWiki"></a>
+  <a href="https://deepwiki.com/fm8995610-ops/MAS-PromptBench"><img src="assets/deepwiki-badge.svg" alt="Ask DeepWiki"></a>
 </p>
 
 <h2 align="center">
