@@ -178,7 +178,7 @@
 
   function loadIndex() {
     if (index || loading) return loading;
-    loading = fetch(base + '/search/search_index.json')
+    loading = fetch(base + '/search/search_index.json?v=' + ((siteEl && siteEl.getAttribute('data-version')) || ''))
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (data) {
         index = (data.docs || []).map(function (d) {
