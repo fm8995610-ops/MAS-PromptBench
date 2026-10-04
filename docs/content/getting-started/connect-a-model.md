@@ -54,9 +54,9 @@ The three scripts in `models/` start vLLM's OpenAI-compatible server inside the 
 
 | Script | Model | Serving | GPUs |
 | --- | --- | --- | --- |
-| [`serve_qwen3_5_9b.sh`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/models/serve_qwen3_5_9b.sh) | `Qwen/Qwen3.5-9B` (task model) | one replica per GPU, ports 8000+ | ≥ 1 CUDA GPU |
-| [`serve_llama3_1_8b.sh`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/models/serve_llama3_1_8b.sh) | `meta-llama/Llama-3.1-8B-Instruct` (task model) | one replica per GPU, ports 8100+ | ≥ 1 CUDA GPU |
-| [`serve_qwen3_5_122b.sh`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/models/serve_qwen3_5_122b.sh) | `Qwen/Qwen3.5-122B-A10B-FP8` (reflection model) | tensor-parallel (TP = 4), port 8200 | 4 FP8-capable GPUs (Hopper or Blackwell) |
+| [`serve_qwen3_5_9b.sh`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/models/serve_qwen3_5_9b.sh) | `Qwen/Qwen3.5-9B` (task model) | one replica per GPU, ports 8000+ | ≥ 1 CUDA GPU |
+| [`serve_llama3_1_8b.sh`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/models/serve_llama3_1_8b.sh) | `meta-llama/Llama-3.1-8B-Instruct` (task model) | one replica per GPU, ports 8100+ | ≥ 1 CUDA GPU |
+| [`serve_qwen3_5_122b.sh`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/models/serve_qwen3_5_122b.sh) | `Qwen/Qwen3.5-122B-A10B-FP8` (reflection model) | tensor-parallel (TP = 4), port 8200 | 4 FP8-capable GPUs (Hopper or Blackwell) |
 
 The two replica scripts share their settings:
 

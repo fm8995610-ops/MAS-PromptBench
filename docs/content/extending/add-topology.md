@@ -35,7 +35,7 @@ Pattern demos sit next to the runners. No runner imports them:
 
 A framework variant reuses its topology's team spec and prompts, so skip to step 3. For a new topology:
 
-1. **Team.** Add a `<topo>:` entry to each `configs/teams/<ds>.yaml` and a builder for it in `_FIELDS` in `core/teams.py`, which turns the YAML into a `TeamSpec` for r ∈ {2, 4, 8, 10}. The [team-spec README](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/teams/README.md) documents the existing schemas.
+1. **Team.** Add a `<topo>:` entry to each `configs/teams/<ds>.yaml` and a builder for it in `_FIELDS` in `core/teams.py`, which turns the YAML into a `TeamSpec` for r ∈ {2, 4, 8, 10}. The [team-spec README](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/teams/README.md) documents the existing schemas.
 2. **Roles.** Add a block to `configs/prompts/roles.yaml` with a `description` of the topology and, under `benchmarks`, one entry per dataset listing `<role>: "<job description>"`. Add `<topo>:` to `configs/prompts/tools.yaml` with a tool list per dataset.
 3. **Prompts.** Run `python configs/generate_role_prompts.py --only <topo>` to write `configs/prompts/<topo>/<ds>/<role>.txt`; [Add a Dataset](add-dataset.md#4-seed-prompts) describes the generator.
 4. **Contract.** Teach `output_contract()` in `core/output_contracts.py` which roles produce the final answer. It recognizes only `single`, `independent`, `sequential`, `sequential_crewai`, `centralized`, `centralized_autogen`, `decentralized` and `decentralized_openai_agents`; any other name gets no contract. Make the same change in `optimizers/bridge/output_contracts.py`.
@@ -75,7 +75,7 @@ For a new topology, also set `prompt_topology` (the prompt folder) and `roles_` 
 - The `framework` attribute picks the client the adapter injects into `_build_llm` and `_build_client` (`patched_module` in `adapters/module_common.py`). A new framework needs its own branch there.
 - `default_adapter_kwargs` in `optimizers/protocol/runner.py` passes the team size as `n_agents` to `independent` and `decentralized` adapters and `n_rounds=2` to `decentralized` ones. Add your topology if its team shape is configurable.
 
-Registry values are import strings, so a framework is imported only when its pair is requested. The [bridge README](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/optimizers/bridge/README.md#adding-a-pair) has the full checklist and the [adapter template](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/optimizers/bridge/templates/adapter_template.py).
+Registry values are import strings, so a framework is imported only when its pair is requested. The [bridge README](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/bridge/README.md#adding-a-pair) has the full checklist and the [adapter template](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/bridge/templates/adapter_template.py).
 
 ## 5. Run it through the protocol
 

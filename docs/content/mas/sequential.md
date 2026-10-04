@@ -36,7 +36,7 @@ The four default stages per dataset, in order:
 | `toolhop` | `planner` | `caller` | `checker` | `verifier` |
 | `apibank` | `dialogue_reader` | `schema_mapper` | `argument_planner` | `verifier` |
 
-Each role's seed prompt is `configs/prompts/sequential/<dataset>/<role>.txt`, and both frameworks read the same files. The LangGraph stages, their tools and each stage's task message come from the team spec in `configs/teams/<dataset>.yaml`; ToolHop and API-Bank fix their four stages in code. Every dataset folder holds ten role files: the four above plus six specialists that only the 8- and 10-stage [team-size](team-sizes.md) variants use. For HotpotQA those are `query_decomposer`, `searcher`, `entity_disambiguator`, `evidence_filter`, `citation_compiler` and `answer_simplifier`. All role descriptions are under `sequential:` in [`configs/prompts/roles.yaml`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/prompts/roles.yaml).
+Each role's seed prompt is `configs/prompts/sequential/<dataset>/<role>.txt`, and both frameworks read the same files. The LangGraph stages, their tools and each stage's task message come from the team spec in `configs/teams/<dataset>.yaml`; ToolHop and API-Bank fix their four stages in code. Every dataset folder holds ten role files: the four above plus six specialists that only the 8- and 10-stage [team-size](team-sizes.md) variants use. For HotpotQA those are `query_decomposer`, `searcher`, `entity_disambiguator`, `evidence_filter`, `citation_compiler` and `answer_simplifier`. All role descriptions are under `sequential:` in [`configs/prompts/roles.yaml`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/prompts/roles.yaml).
 
 ## Implementations
 
@@ -48,7 +48,7 @@ Each role's seed prompt is `configs/prompts/sequential/<dataset>/<role>.txt`, an
 
 `topologies/sequential/crewai/<dataset>/crewai_<dataset>.py` builds one CrewAI `Agent` per stage, with the seed prompt as the agent's `backstory`, and one `Task` per stage whose `context` lists every earlier task. A `Crew` runs them with `Process.sequential`. The model is reached through CrewAI's `LLM` class at `openai/<MODEL_ID>` on `VLLM_BASE_URL`, with the same decoding settings as every runner.
 
-[`topologies/sequential/crewai/crewai_base/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/topologies/sequential/crewai/crewai_base) is a CrewAI project scaffold (`crew.py`, `main.py`, `config/agents.yaml`, `config/tasks.yaml`) with a researcher, analyst, writer and editor. It is a reference demo, not a benchmark runner. There is no separate LangGraph base file for this topology.
+[`topologies/sequential/crewai/crewai_base/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/topologies/sequential/crewai/crewai_base) is a CrewAI project scaffold (`crew.py`, `main.py`, `config/agents.yaml`, `config/tasks.yaml`) with a researcher, analyst, writer and editor. It is a reference demo, not a benchmark runner. There is no separate LangGraph base file for this topology.
 
 !!! note "ToolHop and API-Bank"
     These runners use no framework objects. They run the four roles in a plain-Python loop, passing each stage the trimmed reports of the earlier stages. The CrewAI runner is the LangGraph runner's code under the `sequential_crewai` label.

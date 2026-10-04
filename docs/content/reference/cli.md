@@ -134,4 +134,4 @@ It prints a tab-separated table to stdout and exits with status 1 when it finds 
 | `--keep-tmp` | off | Keep the worker temp folders, for debugging. |
 | `--no-verify` | off | Skip the reproduction pass: faster, but a load-induced flake could be recorded. |
 
-Replay the suite with `python -m pytest -p no:cacheprovider tests/golden -q`; the [golden tests README](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/tests/golden/README.md) covers its prerequisites.
+Replay the suite with `python -m pytest -p no:cacheprovider tests/golden -q`; the [golden tests README](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/tests/golden/README.md) covers its prerequisites.

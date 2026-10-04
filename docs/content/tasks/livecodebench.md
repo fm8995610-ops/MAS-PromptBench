@@ -40,7 +40,7 @@ An instance scores 1 only if all tests pass (the pass@1 convention); otherwise 0
 
 The runner loads the Hugging Face dataset `livecodebench/code_generation_lite`, split `test`. Hidden tests come from each row's `private_test_cases` field, which is stored compressed; the runner decodes it and skips rows without usable tests. Row IDs are LiveCodeBench `question_id` values, such as `1873_A`.
 
-The 50 eval IDs are in [`benchmarks/lcb/lcb_eval_ids.json`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/lcb/lcb_eval_ids.json); they are the first 50 rows, so `--limit 50` scores exactly that set.
+The 50 eval IDs are in [`benchmarks/lcb/lcb_eval_ids.json`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/benchmarks/lcb/lcb_eval_ids.json); they are the first 50 rows, so `--limit 50` scores exactly that set.
 
 ## Run it
 

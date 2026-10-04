@@ -39,7 +39,7 @@ The runner registers your `MODEL_ID` in BFCL's model table before scoring, so do
 
 Each category is two files in the Hugging Face dataset `gorilla-llm/Berkeley-Function-Calling-Leaderboard`: `BFCL_v3_<category>.json` for the requests and `possible_answer/BFCL_v3_<category>.json` for the gold answers. The runner downloads them with `hf_hub_download`; no other setup is needed.
 
-The 100 eval IDs in [`benchmarks/bfcl/bfcl_eval_ids.json`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/bfcl/bfcl_eval_ids.json) are a seed-0 stratified sample: 40 `simple`, 20 `multiple`, 20 `parallel` and 20 `parallel_multiple`. They are not a slice of any category, so a plain `--limit` run does not reproduce them.
+The 100 eval IDs in [`benchmarks/bfcl/bfcl_eval_ids.json`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/benchmarks/bfcl/bfcl_eval_ids.json) are a seed-0 stratified sample: 40 `simple`, 20 `multiple`, 20 `parallel` and 20 `parallel_multiple`. They are not a slice of any category, so a plain `--limit` run does not reproduce them.
 
 ## Run it
 

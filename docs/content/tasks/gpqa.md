@@ -15,7 +15,7 @@ GPQA-Diamond is a set of graduate-level science questions with four answer optio
 
 Each instance is one multiple-choice question. The runner shows the agents the question followed by four lines, `A)` to `D)`. Agents can use one tool, `calculator`, which evaluates a numeric Python expression with the usual math functions (`sqrt`, `log`, `exp`, trigonometry, `pi`, `e`).
 
-The answering agent must end with exactly one line of the form `Answer: A` (or B, C, D). This is the GPQA output contract from [`core/output_contracts.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/core/output_contracts.py). The runner adds it to the answering role's system prompt when it loads the prompt file, so it stays in place whatever the editable role prompt says.
+The answering agent must end with exactly one line of the form `Answer: A` (or B, C, D). This is the GPQA output contract from [`core/output_contracts.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/core/output_contracts.py). The runner adds it to the answering role's system prompt when it loads the prompt file, so it stays in place whatever the editable role prompt says.
 
 ## How it is scored
 
@@ -35,7 +35,7 @@ The runner loads the `gpqa_diamond` config of the Hugging Face dataset `Idavidre
 
 The raw rows store the correct answer and three incorrect answers in separate fields. To keep the correct letter from always being A, the runner shuffles the four options per row with a seeded generator (`--shuffle-seed`, default `0`). The same seed gives the same option order in every topology. Rows with a missing option are skipped.
 
-GPQA has no ID field, so the runner builds one from the question text: `gpqa_` plus the first 10 hex characters of its MD5 hash. The 100 eval IDs are in [`benchmarks/gpqa/gpqa_eval_ids.json`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/gpqa/gpqa_eval_ids.json); they are the first 100 questions, so `--limit 100` scores exactly that set. Only 98 questions remain for the optimizers, hence the smaller train split.
+GPQA has no ID field, so the runner builds one from the question text: `gpqa_` plus the first 10 hex characters of its MD5 hash. The 100 eval IDs are in [`benchmarks/gpqa/gpqa_eval_ids.json`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/benchmarks/gpqa/gpqa_eval_ids.json); they are the first 100 questions, so `--limit 100` scores exactly that set. Only 98 questions remain for the optimizers, hence the smaller train split.
 
 ## Run it
 

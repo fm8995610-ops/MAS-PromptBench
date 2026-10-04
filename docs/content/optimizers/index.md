@@ -28,14 +28,14 @@ No method writes to `configs/`. Optimized prompts stay in the job's `--out` fold
 
 | Method | `--method` | Approach | Code | Grid cells |
 | --- | --- | --- | --- | ---: |
-| GEPA | `gepa` | Reflective prompt evolution (DSPy `GEPA`) | [`gepa/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/gepa) | 147 |
-| MIPRO | `mipro` | Instruction and few-shot demo search (DSPy `MIPROv2`) | [`mipro/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/mipro) | 147 |
-| MAPRO | `mapro` | Per-role prompt pools, max-product belief propagation, blame-driven mutation | [`mapro/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/mapro) | 135 |
-| MASPO | `maspo` | Role-wise evolutionary beam search with pairwise judging | [`maspo/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/maspo) | 135 |
-| HiveMind | `hivemind` | Coalition (Shapley) credit, lesson-based refinement of the lowest-credit role | [`hivemind/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/hivemind) | 12 |
-| MAMUT-GEPA | `mamut_gepa` | One joint GEPA search over all role prompts (`gepa` engine) | [`mamut_gepa/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/mamut_gepa) | 12 |
-| MASPOB | `maspob` | Prompt-variant bandit with a GATv2 surrogate (LinUCB) | [`maspob/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/maspob) | 12 |
-| TAVO | `tavo` | Trajectory credit assignment and a shared verbalized-policy overlay | [`tavo/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/tavo) | 12 |
+| GEPA | `gepa` | Reflective prompt evolution (DSPy `GEPA`) | [`gepa/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/gepa) | 147 |
+| MIPRO | `mipro` | Instruction and few-shot demo search (DSPy `MIPROv2`) | [`mipro/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/mipro) | 147 |
+| MAPRO | `mapro` | Per-role prompt pools, max-product belief propagation, blame-driven mutation | [`mapro/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/mapro) | 135 |
+| MASPO | `maspo` | Role-wise evolutionary beam search with pairwise judging | [`maspo/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/maspo) | 135 |
+| HiveMind | `hivemind` | Coalition (Shapley) credit, lesson-based refinement of the lowest-credit role | [`hivemind/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/hivemind) | 12 |
+| MAMUT-GEPA | `mamut_gepa` | One joint GEPA search over all role prompts (`gepa` engine) | [`mamut_gepa/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/mamut_gepa) | 12 |
+| MASPOB | `maspob` | Prompt-variant bandit with a GATv2 surrogate (LinUCB) | [`maspob/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/maspob) | 12 |
+| TAVO | `tavo` | Trajectory credit assignment and a shared verbalized-policy overlay | [`tavo/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/tavo) | 12 |
 
 A grid cell is one (dataset, topology, framework, communication format, team size, task model) configuration of the experiment grid in `optimizers/protocol/cells.py`, run once per optimizer seed:
 
@@ -57,7 +57,7 @@ The methods differ only in step 1. Their reflection or proposal calls go to `Qwe
 
 ## The real-runner bridge
 
-Every rollout runs through [`optimizers/bridge/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/optimizers/bridge), which wraps the topology runners instead of re-implementing them, so an optimized prompt runs unchanged in the benchmark.
+Every rollout runs through [`optimizers/bridge/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/bridge), which wraps the topology runners instead of re-implementing them, so an optimized prompt runs unchanged in the benchmark.
 
 1. **Adapter** (`adapters/`). One class per (dataset, registry key) pair exposes the per-role prompts (`roles()`, `get_prompt()`, `set_prompt()`) and `run_example()`, one execution of the real runner. It patches the runner module's prompt loader, model client, endpoint and team size in a private copy of the module.
 2. **Registry** (`registry.py`). Maps each dataset and key, such as `sequential_crewai` or `centralized_r8`, to its adapter class.
@@ -84,7 +84,7 @@ Each method's knobs are one frozen dataclass; the protocol fixes everything else
 | MASPOB | `maspob/regime.py: MASPOBSettings` | 20 variants per role, generation temperature 0.5, MiniLM embeddings, seed 42 (+1000 per optimizer seed), minibatch 5, at most 5 warm-up pulls |
 | TAVO | `tavo/settings.py: TAVOSettings` | train batch 6, at most 5 outer rounds, validation batch at least 3, adoption threshold 0.01, 2 attempts per round, patience 2, temperature 0.5 |
 
-The [run protocol README](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/optimizers/protocol/README.md#settings) keeps the full table. MASPOB also needs `torch`, `torch_geometric` and `sentence-transformers`, which `environment.yml` installs; a CPU is enough.
+The [run protocol README](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/protocol/README.md#settings) keeps the full table. MASPOB also needs `torch`, `torch_geometric` and `sentence-transformers`, which `environment.yml` installs; a CPU is enough.
 
 ## Next steps
 

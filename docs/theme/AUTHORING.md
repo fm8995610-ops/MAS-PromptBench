@@ -31,9 +31,8 @@ One or two sentences saying what this page covers and why it matters.
 - Link to sibling pages with relative links to the `.md` file, e.g.
   `[Sequential](../mas/sequential.md)` or `[Flags](swe-bench.md#flags)`. Only link to
   pages that exist in `docs/mkdocs.yml`.
-- Link to repo files with full GitHub URLs:
-  `https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/<path>` (files) or
-  `.../tree/main/<path>` (folders).
+- Link to repo files through the anonymous repository:
+  `https://anonymous.4open.science/r/MAS-PromptBench-Codebase/<path>` (files and folders).
 
 ## Markdown features available
 

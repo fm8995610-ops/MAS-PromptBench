@@ -45,9 +45,9 @@ Each line of `results.jsonl` has `correct`, the failing `stage` and `error`, and
 
 ## Data
 
-The API-Bank source from `AlibabaResearch/DAMO-ConvAI` ships in the repository at [`benchmarks/apibank/apibank_upstream/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/benchmarks/apibank/apibank_upstream), under its own license, so nothing needs downloading. Set `APIBANK_ROOT` to use another checkout.
+The API-Bank source from `AlibabaResearch/DAMO-ConvAI` ships in the repository at [`benchmarks/apibank/apibank_upstream/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/benchmarks/apibank/apibank_upstream), under its own license, so nothing needs downloading. Set `APIBANK_ROOT` to use another checkout.
 
-With the default level, `all`, the runner reads the eval manifest [`benchmarks/apibank/apibank_eval_ids.json`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/apibank/apibank_eval_ids.json) directly: 100 IDs, 33 from Level 1, 33 from Level 2 and 34 from Level 3. So `--limit 100` scores exactly the eval set. The optimizers' train and validation splits come from the 445-task curated pool in `benchmarks/apibank/apibank_pool_ids.json`.
+With the default level, `all`, the runner reads the eval manifest [`benchmarks/apibank/apibank_eval_ids.json`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/benchmarks/apibank/apibank_eval_ids.json) directly: 100 IDs, 33 from Level 1, 33 from Level 2 and 34 from Level 3. So `--limit 100` scores exactly the eval set. The optimizers' train and validation splits come from the 445-task curated pool in `benchmarks/apibank/apibank_pool_ids.json`.
 
 For a single level, the runner builds a task list on the fly: the first tasks whose gold call replays correctly, skipping those that need `SearchEngine` or `Translate`, up to 100 for Levels 1 and 2 or 245 for Level 3.
 

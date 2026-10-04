@@ -17,11 +17,11 @@ Prompt optimization changes only the prompts \( s_1, \dots, s_n \). The model, t
 | --- | --- |
 | \( M \) | One OpenAI-compatible endpoint, `VLLM_BASE_URL` + `MODEL_ID` (default `Qwen/Qwen3.5-9B`) |
 | \( s_i \) | Seed prompts in `configs/prompts/<topology>/<dataset>/<role>.txt` |
-| \( G \) | The runners in [`topologies/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/topologies), one per topology, framework and dataset |
+| \( G \) | The runners in [`topologies/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/topologies), one per topology, framework and dataset |
 | \( P \) | Free text by default; the formats in [Communication Protocols](communication-protocols.md) |
-| \( n \) | The team specs in [`configs/teams/`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/configs/teams), 4 agents by default; varied in [Team Sizes](team-sizes.md) |
+| \( n \) | The team specs in [`configs/teams/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/teams), 4 agents by default; varied in [Team Sizes](team-sizes.md) |
 
-The seed prompts were written by an LLM from the role catalog in [`configs/prompts/roles.yaml`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/prompts/roles.yaml), the domain and tool lists next to it, and the template `configs/prompts/meta_prompt.txt`. Optimizers read them and never overwrite them. A team spec, `configs/teams/<dataset>.yaml`, names each topology's roles, their tools and order, and the turn caps, for every team size; ToolHop and API-Bank fix their roles in code instead.
+The seed prompts were written by an LLM from the role catalog in [`configs/prompts/roles.yaml`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/prompts/roles.yaml), the domain and tool lists next to it, and the template `configs/prompts/meta_prompt.txt`. Optimizers read them and never overwrite them. A team spec, `configs/teams/<dataset>.yaml`, names each topology's roles, their tools and order, and the turn caps, for every team size; ToolHop and API-Bank fix their roles in code instead.
 
 ## The five topologies
 

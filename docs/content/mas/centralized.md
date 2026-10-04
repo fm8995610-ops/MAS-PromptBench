@@ -40,7 +40,7 @@ Each dataset has a `manager` and three workers:
 | `toolhop` | `planner_worker`, `caller_worker`, `validator_worker` |
 | `apibank` | `inspector_worker`, `caller_worker`, `validator_worker` |
 
-Seed prompts live at `configs/prompts/centralized/<dataset>/manager.txt` and `configs/prompts/centralized/<dataset>/<worker>.txt`. Each folder also holds `manager_r8.txt`, `manager_r10.txt` and six more workers, used only by the larger [team sizes](team-sizes.md). The workers, their tools, the manager's tools and the turn caps come from the team spec in `configs/teams/<dataset>.yaml`; ToolHop and API-Bank fix their roles in code. Role descriptions are under `centralized:` in [`configs/prompts/roles.yaml`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/prompts/roles.yaml).
+Seed prompts live at `configs/prompts/centralized/<dataset>/manager.txt` and `configs/prompts/centralized/<dataset>/<worker>.txt`. Each folder also holds `manager_r8.txt`, `manager_r10.txt` and six more workers, used only by the larger [team sizes](team-sizes.md). The workers, their tools, the manager's tools and the turn caps come from the team spec in `configs/teams/<dataset>.yaml`; ToolHop and API-Bank fix their roles in code. Role descriptions are under `centralized:` in [`configs/prompts/roles.yaml`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/prompts/roles.yaml).
 
 ## Implementations
 
@@ -52,7 +52,7 @@ Seed prompts live at `configs/prompts/centralized/<dataset>/manager.txt` and `co
 
 `topologies/centralized/autogen/<dataset>/autogen_<dataset>.py` creates one `AssistantAgent` per role with the seed prompt as its `system_message`, and puts them in a `SelectorGroupChat`. A `selector_func` returns the manager whenever the last speaker was a worker; after a manager turn, AutoGen's model-based selector picks who speaks next. Termination is `TextMentionTermination("TERMINATE") | MaxMessageTermination(N)`.
 
-[`topologies/centralized/autogen/autogen_base.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/topologies/centralized/autogen/autogen_base.py) is the reference demo of this pattern: a `PlanningAgent` with `Researcher`, `Analyst` and `Writer` workers.
+[`topologies/centralized/autogen/autogen_base.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/topologies/centralized/autogen/autogen_base.py) is the reference demo of this pattern: a `PlanningAgent` with `Researcher`, `Analyst` and `Writer` workers.
 
 !!! note "ToolHop and API-Bank"
     These runners use no framework objects, and the AutoGen runner is the LangGraph runner's code under the `centralized_autogen` label. Each worker runs once on the task, then the manager reads all three reports and writes the answer. There is no delegation loop.

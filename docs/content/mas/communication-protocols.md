@@ -14,7 +14,7 @@ The same topology can pass messages as free text, as tagged reports or as JSON. 
 
 A format governs only the inter-agent hand-off: the report an agent passes to the next stage, the manager, a peer or the aggregator. The model, topology, roles, tools and scorer stay the same, and the scorer-facing final answer keeps its usual form after the report.
 
-Each topology runner applies the format itself through its communication policy, defined in [`core/communication.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/core/communication.py), in two places:
+Each topology runner applies the format itself through its communication policy, defined in [`core/communication.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/core/communication.py), in two places:
 
 1. **In the prompts.** A format contract is appended to every agent's system prompt, telling it how to write its report and to put the final artifact after it.
 2. **In the hand-offs.** Before a receiver reads another agent's output, the runner re-renders that text in the chosen format, so the receiver always gets a well-formed message. The HotpotQA and LiveCodeBench runners, the Sequential and Centralized BFCL runners, and the ToolHop and API-Bank runners do this; the SWE-bench runners and the Decentralized BFCL runner use the prompt contract only.
@@ -96,7 +96,7 @@ Runners exist for every combination of:
 - **Datasets:** `hotpotqa`, `lcb`, `bfcl`, `toolhop`, `apibank`, `swe`.
 - **Formats:** `freeform`, `semi_structured`, `structured_soft`.
 
-The path pattern is `communications/<topology>/<dataset>/<dataset>_<format>.py`. Each file is a few lines: it calls `install` from [`communications/communication_formats.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/communications/communication_formats.py), which loads the topology runner as a module of its own with the format preset, records its hand-offs and scores its reports.
+The path pattern is `communications/<topology>/<dataset>/<dataset>_<format>.py`. Each file is a few lines: it calls `install` from [`communications/communication_formats.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/communications/communication_formats.py), which loads the topology runner as a module of its own with the format preset, records its hand-offs and scores its reports.
 
 ## Run a cell
 

@@ -21,10 +21,10 @@ Single is excluded: one agent has no team size. For the other four topologies, `
 | [Centralized](centralized.md) | 1 manager + (n − 1) workers | 1 + 1 | 1 + 3 | 1 + 7 | 1 + 9 |
 | [Decentralized](decentralized.md) | debating peers, always 2 rounds | 2 × 2 | 4 × 2 | 8 × 2 | 10 × 2 |
 
-For seven datasets, every size of the team is declared in the team spec, [`configs/teams/<dataset>.yaml`](https://github.com/fm8995610-ops/MAS-PromptBench/tree/main/configs/teams); ToolHop and API-Bank work differently (see below). Tools, aggregation rules and the Decentralized round count stay as in the baseline. What grows is the set of agents:
+For seven datasets, every size of the team is declared in the team spec, [`configs/teams/<dataset>.yaml`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/teams); ToolHop and API-Bank work differently (see below). Tools, aggregation rules and the Decentralized round count stay as in the baseline. What grows is the set of agents:
 
 - **Independent and Decentralized** add copies of the one shared prompt (`solver`, `coder`, `caller` or `patcher`; `debater`).
-- **Sequential and Centralized** add new roles. At `n = 2` the team keeps the essential tool-using role and the role that writes the answer. At `n = 8` and `n = 10` it adds specialist roles defined in [`configs/prompts/roles.yaml`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/prompts/roles.yaml), whose seed prompts sit beside the baseline ones in `configs/prompts/<topology>/<dataset>/`.
+- **Sequential and Centralized** add new roles. At `n = 2` the team keeps the essential tool-using role and the role that writes the answer. At `n = 8` and `n = 10` it adds specialist roles defined in [`configs/prompts/roles.yaml`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/prompts/roles.yaml), whose seed prompts sit beside the baseline ones in `configs/prompts/<topology>/<dataset>/`.
 - **Centralized** swaps in `manager_r8.txt` or `manager_r10.txt` at `n = 8` and `n = 10`; those prompts name all 7 or 9 workers. At `n = 2` the manager's turn cap is halved (18 to 9 on HotpotQA).
 
 For example, the HotpotQA Sequential pipeline at each size:

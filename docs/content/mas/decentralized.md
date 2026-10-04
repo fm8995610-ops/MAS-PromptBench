@@ -50,7 +50,7 @@ One role, `debater`, shared by every peer: `configs/prompts/decentralized/<datas
 
 ### OpenAI Agents SDK
 
-`topologies/decentralized/openai_agents/<dataset>/openai_agents_<dataset>.py` supplies the prompt, tools and scoring; the debate engine is [`agents_sdk_base.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/topologies/decentralized/openai_agents/agents_sdk_base.py) next to them. Every peer turn is one Agents SDK run with the dataset's function tools and no handoffs. From round 1 on, its input is the original task, the peer's own previous answer and the other peers' answers from the previous round. Each peer turn sends its own request seed.
+`topologies/decentralized/openai_agents/<dataset>/openai_agents_<dataset>.py` supplies the prompt, tools and scoring; the debate engine is [`agents_sdk_base.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/topologies/decentralized/openai_agents/agents_sdk_base.py) next to them. Every peer turn is one Agents SDK run with the dataset's function tools and no handoffs. From round 1 on, its input is the original task, the peer's own previous answer and the other peers' answers from the previous round. Each peer turn sends its own request seed.
 
 These runners need the isolated SDK install from [Installation](../getting-started/installation.md#install-the-openai-agents-sdk); they restart themselves with it first on `PYTHONPATH`.
 

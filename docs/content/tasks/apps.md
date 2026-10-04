@@ -40,7 +40,7 @@ The runner loads the Hugging Face dataset `codeparrot/apps`, split `test`. Each 
 
 APPS problems can have hundreds of tests, so the runner keeps the first 20 per problem by default. Change this with `--max-tests-per-row`; a value of 0 or less keeps every test. The cap changes the score, so keep it fixed when you compare runs.
 
-The 50 eval IDs are problem IDs `0` to `49`, all interview-level, listed in [`benchmarks/apps/apps_eval_ids.json`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/apps/apps_eval_ids.json). They are the first 50 rows, so `--limit 50` scores exactly that set.
+The 50 eval IDs are problem IDs `0` to `49`, all interview-level, listed in [`benchmarks/apps/apps_eval_ids.json`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/benchmarks/apps/apps_eval_ids.json). They are the first 50 rows, so `--limit 50` scores exactly that set.
 
 ## Run it
 

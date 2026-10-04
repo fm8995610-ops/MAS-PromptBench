@@ -30,7 +30,7 @@ The batch reports `EM`, the fraction of instances judged equivalent, over all in
 
 The runner loads the Hugging Face dataset `qwedsacf/competition_math` (split `train`) and keeps the 312 rows whose subject is `Precalculus` and level is `Level 5`. That dataset has no answer field, so the gold answer is the last `\boxed{...}` in the reference solution; rows without one are skipped. Each row's ID is `math_` plus the first 10 hex characters of the MD5 of the problem text, so IDs match across topologies.
 
-The 100 eval IDs are in [`benchmarks/math/math_eval_ids.json`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/math/math_eval_ids.json); they are the first 100 problems of the slice, so `--limit 100` scores exactly that set. No setup is needed beyond Hugging Face access.
+The 100 eval IDs are in [`benchmarks/math/math_eval_ids.json`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/benchmarks/math/math_eval_ids.json); they are the first 100 problems of the slice, so `--limit 100` scores exactly that set. No setup is needed beyond Hugging Face access.
 
 ## Run it
 

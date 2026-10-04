@@ -30,7 +30,7 @@ Several copies of one agent answer the same input in parallel and never see each
 | SWE-bench | non-empty patches, compared with whitespace normalized; only the winner is evaluated |
 | ToolHop, API-Bank | final answers or API calls |
 
-The largest bucket wins, ties go to the bucket with the lowest replica, and replicas without an answer abstain. The shared rule is in [`core/voting.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/core/voting.py).
+The largest bucket wins, ties go to the bucket with the lowest replica, and replicas without an answer abstain. The shared rule is in [`core/voting.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/core/voting.py).
 
 The replica count comes from the team spec (4) and `INDEPENDENT_N_AGENTS` overrides it. The ToolHop and API-Bank runners read `TOOLHOP_INDEPENDENT_N_AGENTS` or `APIBANK_INDEPENDENT_N_AGENTS` first. For the 2, 8 and 10 replica variants, see [Team Sizes](team-sizes.md).
 
@@ -49,7 +49,7 @@ Because every replica reads the same file, optimizing this topology means tuning
 
 ## Implementation
 
-- **Reference scaffold:** [`topologies/independent/langgraph_base.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/topologies/independent/langgraph_base.py) shows the `Send` fan-out and fan-in with four agents. Its demo agents have different personas; the benchmark runners use one shared prompt instead.
+- **Reference scaffold:** [`topologies/independent/langgraph_base.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/topologies/independent/langgraph_base.py) shows the `Send` fan-out and fan-in with four agents. Its demo agents have different personas; the benchmark runners use one shared prompt instead.
 - **Dataset runners:** `topologies/independent/<dataset>/langgraph_<dataset>.py`. The GPQA, HotpotQA and MATH runners cap each row at 120 s of wall-clock time and the LiveCodeBench and APPS runners at 180 s, so one stuck replica can't stall a batch. On SWE-bench, each replica edits its own clone of the repository.
 - **ToolHop and API-Bank:** no LangGraph graph. The runner calls the shared tool loop (ToolHop) or model call (API-Bank) once per seed in plain Python and votes over the results.
 

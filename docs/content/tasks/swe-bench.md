@@ -46,9 +46,9 @@ Every run writes to `--out-dir`: `predictions.jsonl` (`instance_id`, `model_patc
 
 ## Data
 
-The runner loads `princeton-nlp/SWE-bench_Verified` from Hugging Face. You also need `git` and network access to GitHub for the clones, and Singularity on your `PATH` for the agents' shell and for `singularity` mode. A full set of instance images takes tens of gigabytes; [the benchmarks README](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/README.md) lists the disk needs.
+The runner loads `princeton-nlp/SWE-bench_Verified` from Hugging Face. You also need `git` and network access to GitHub for the clones, and Singularity on your `PATH` for the agents' shell and for `singularity` mode. A full set of instance images takes tens of gigabytes; [the benchmarks README](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/benchmarks/README.md) lists the disk needs.
 
-The 30 eval IDs in [`benchmarks/swe/swe_eval_ids.json`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/swe/swe_eval_ids.json) are a balanced sample: 15 instances labelled "<15 min fix" and 15 labelled "15 min - 1 hour". They are not a slice of the split, so pass them with `--only` rather than `--limit 30`.
+The 30 eval IDs in [`benchmarks/swe/swe_eval_ids.json`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/benchmarks/swe/swe_eval_ids.json) are a balanced sample: 15 instances labelled "<15 min fix" and 15 labelled "15 min - 1 hour". They are not a slice of the split, so pass them with `--only` rather than `--limit 30`.
 
 ## Run it
 

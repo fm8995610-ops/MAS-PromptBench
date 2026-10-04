@@ -66,7 +66,7 @@ A `--budget` below 600 makes a non-conformant smoke run, which aggregation skips
 | `maspob` | 10 for one LinUCB pull (30 after 5 warm-ups) | warm-up only; `rollout_budget_spent` |
 | `tavo` | 12 | `budget_before_outer_round`, seed kept; fails below 3 |
 
-GPQA (48 train rows) and SWE-bench (146) shift the budgets that scale with the training split. The [run protocol README](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/optimizers/protocol/README.md#smoke-budgets) shows what each method charges.
+GPQA (48 train rows) and SWE-bench (146) shift the budgets that scale with the training split. The [run protocol README](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/protocol/README.md#smoke-budgets) shows what each method charges.
 
 ```bash title="Smoke-test one method on one cell"
 python -m optimizers.protocol.run --method gepa --dataset math --topology single \

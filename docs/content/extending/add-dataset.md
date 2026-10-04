@@ -40,7 +40,7 @@ python -m communications.<topology>.<ds>.<ds>_structured_soft         # with COM
 
 ## 2. Team spec
 
-`configs/teams/<ds>.yaml` has one entry per multi-agent topology, following the [schema](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/teams/README.md): a replicated role (`independent`, `decentralized`), the r stages (`sequential`), or a manager and its r - 1 workers (`centralized`). `recursion_limit` is the same at every r and is omitted when the agents make plain model calls. All text is sent to the model verbatim.
+`configs/teams/<ds>.yaml` has one entry per multi-agent topology, following the [schema](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/teams/README.md): a replicated role (`independent`, `decentralized`), the r stages (`sequential`), or a manager and its r - 1 workers (`centralized`). `recursion_limit` is the same at every r and is omitted when the agents make plain model calls. All text is sent to the model verbatim.
 
 ## 3. Topology runners
 
@@ -67,7 +67,7 @@ def main(argv=None) -> int:
                     demo=_canned_demo, source=task.SOURCE, add_arguments=task.add_arguments)
 ```
 
-[`topologies/single/math/langgraph_math.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/topologies/single/math/langgraph_math.py) is a complete single-agent example. The `core/llm.py` docstring lists the client builders for every runner style.
+[`topologies/single/math/langgraph_math.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/topologies/single/math/langgraph_math.py) is a complete single-agent example. The `core/llm.py` docstring lists the client builders for every runner style.
 
 !!! warning "Module attributes are an interface"
     Read them at call time, keep their names, and keep when they are called (how many clients a row builds, when a prompt is loaded). The optimizer adapters patch or read `_load_prompt`, `SYSTEM_PROMPT`, `_build_llm`, `_build_client`, `VLLM_BASE_URL`, `MODEL_ID`, `N_AGENTS`, `N_ROUNDS`, `_RECURSION_LIMIT` and `_OUTPUT_FORMAT_NUDGE`. HiveMind patches `DELEGATION_TOOLS`, `DELEGATION_NAMES`, `MANAGER_TOOLS`, `_manager_tool_node` and `_MANAGER_TERMINATE_NUDGE` of the centralized LangGraph runners. The golden harness reads `solve`, `run_one`, `run_batch`, `load_instances` and the scorers.
@@ -80,7 +80,7 @@ The command line comes from `core.cli.main`, which adds the [shared runner optio
 
 ## 4. Seed prompts
 
-Seed prompts are written by an LLM. For every `(topology, dataset, role)` in `roles.yaml`, [`configs/generate_role_prompts.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/generate_role_prompts.py) fills `meta_prompt.txt` with the dataset line from `domains.yaml`, the topology and role descriptions from `roles.yaml` and the tool list from `tools.yaml`. It sends the result as one user message, strips any `<think>` block and writes the reply to `configs/prompts/<topology>/<ds>/<role>.txt`.
+Seed prompts are written by an LLM. For every `(topology, dataset, role)` in `roles.yaml`, [`configs/generate_role_prompts.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/generate_role_prompts.py) fills `meta_prompt.txt` with the dataset line from `domains.yaml`, the topology and role descriptions from `roles.yaml` and the tool list from `tools.yaml`. It sends the result as one user message, strips any `<think>` block and writes the reply to `configs/prompts/<topology>/<ds>/<role>.txt`.
 
 Add the dataset to the three YAML files in `configs/prompts/`:
 
@@ -152,7 +152,7 @@ Ship two files in `benchmarks/<ds>/`, with IDs equal to the `id` values of `load
 
 ## 9. Optimizer bridge
 
-1. Add `optimizers/bridge/datasets/<ds>.py` from [`templates/dataset_template.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/optimizers/bridge/templates/dataset_template.py): `load_all()` returns `dspy.Example`s with an `id` and a `task_instance` input, and `metric(example, prediction, ...)` returns `dspy.Prediction(score=..., feedback=...)`. The protocol imports the module by the dataset name.
+1. Add `optimizers/bridge/datasets/<ds>.py` from [`templates/dataset_template.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/bridge/templates/dataset_template.py): `load_all()` returns `dspy.Example`s with an `id` and a `task_instance` input, and `metric(example, prediction, ...)` returns `dspy.Prediction(score=..., feedback=...)`. The protocol imports the module by the dataset name.
 2. Add adapters under `optimizers/bridge/adapters/`, usually a `module_<ds>.py` whose classes subclass `ModuleAdapterBase` (`module_common.py`) as `module_lcb.py` does, and register them in `DATASET_ADAPTERS` in `optimizers/bridge/registry.py`. [Add a Topology](add-topology.md#4-bridge-adapters) covers the adapter contract.
 3. A new dataset is outside the experiment grid, so protocol jobs on it need `--allow-any-cell` and are non-conformant. Run the adapter's `run_example()` on one example, then the optimization phase on a [smoke budget](../optimizers/running.md#smoke-runs), and check that `job.json`, `optimization.json` and `optimization/optimizer_result.json` exist under `--out`:
 

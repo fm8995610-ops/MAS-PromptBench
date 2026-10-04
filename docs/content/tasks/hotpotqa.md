@@ -40,7 +40,7 @@ The batch summary averages EM and F1 over all instances, counting a missing answ
 
 The runner loads the Hugging Face dataset `hotpot_qa`, config `distractor`, split `validation`. It keeps only the ID, question, answer, type and level of each row; the distractor paragraphs are never shown to agents. Rows use HotpotQA's own string IDs.
 
-The 100 eval IDs are in [`benchmarks/hotpotqa/hotpotqa_eval_ids.json`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/hotpotqa/hotpotqa_eval_ids.json); they are the first 100 rows, so `--limit 100` scores exactly that set. The `wikipedia` client is already in `environment.yml`; nothing else needs installing.
+The 100 eval IDs are in [`benchmarks/hotpotqa/hotpotqa_eval_ids.json`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/benchmarks/hotpotqa/hotpotqa_eval_ids.json); they are the first 100 rows, so `--limit 100` scores exactly that set. The `wikipedia` client is already in `environment.yml`; nothing else needs installing.
 
 ## Run it
 

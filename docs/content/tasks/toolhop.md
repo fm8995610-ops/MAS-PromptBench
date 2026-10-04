@@ -29,7 +29,7 @@ Each line of `results.jsonl` has `correct` and `predicted_answer`; accuracy is t
 
 ## Data and setup
 
-The runner downloads `data/ToolHop.json` from the Hugging Face dataset `bytedance-research/ToolHop`. Row IDs are the dataset's integer IDs; the 100 eval IDs are `0` to `99`, listed in [`benchmarks/toolhop/toolhop_eval_ids.json`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/benchmarks/toolhop/toolhop_eval_ids.json). They are the first 100 rows, so `--limit 100` scores exactly that set.
+The runner downloads `data/ToolHop.json` from the Hugging Face dataset `bytedance-research/ToolHop`. Row IDs are the dataset's integer IDs; the 100 eval IDs are `0` to `99`, listed in [`benchmarks/toolhop/toolhop_eval_ids.json`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/benchmarks/toolhop/toolhop_eval_ids.json). They are the first 100 rows, so `--limit 100` scores exactly that set.
 
 Before it runs a tool, the runner reduces its source to function definitions, replaces the builtins with a restricted set, and allows imports only from a fixed list of modules (such as `math`, `datetime`, `re`, `json`, `numpy` and `sympy`). It still executes code from the dataset, so it refuses unless you opt in:
 

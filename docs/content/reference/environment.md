@@ -116,7 +116,7 @@ Per rollout the protocol sets, then restores, `MODEL_ID`, `REQUEST_SEED`, `TASK_
 
 ## Optimizer bridge
 
-Read by `optimizers/bridge`; the index is [`env.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/optimizers/bridge/env.py).
+Read by `optimizers/bridge`; the index is [`env.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/bridge/env.py).
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
@@ -200,4 +200,4 @@ All three also read `VLLM_HOST` (`0.0.0.0`), `CONDA_ENV` (`mas-promptbench`, act
 | `HF_HOME`, `HF_DATASETS_CACHE` | `~/.cache/huggingface` | Local Hugging Face cache. |
 | `MASPOB_TEST_SITE_PACKAGES` | unset | Extra site-packages with `torch_geometric` for the MASPOB tests, which skip without it. |
 
-The suite runs offline with `HF_DATASETS_OFFLINE=1 HF_HUB_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 TOOLHOP_ALLOW_DATASET_EXEC=1`; see the [golden tests README](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/tests/golden/README.md).
+The suite runs offline with `HF_DATASETS_OFFLINE=1 HF_HUB_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 TOOLHOP_ALLOW_DATASET_EXEC=1`; see the [golden tests README](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/tests/golden/README.md).

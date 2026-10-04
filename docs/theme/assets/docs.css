@@ -655,11 +655,8 @@ kbd {
 .dtip b { display: block; font-size: .8rem; }
 .dtip span { display: block; opacity: .8; }
 
-/* ---------- page meta & pager ---------- */
-.page-meta { margin-top: 2.6rem; display: flex; justify-content: flex-end; font-size: .86rem; }
-.edit-link { display: inline-flex; align-items: center; gap: .4rem; color: var(--muted); }
-.edit-link:hover { color: var(--blue); }
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.4rem; }
+/* ---------- pager ---------- */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 4rem; }
 .pager-link {
   display: flex; flex-direction: column; gap: .2rem; padding: .9rem 1.1rem; border: 1px solid var(--line); border-radius: 14px;
   background: var(--surface); transition: border-color .2s ease, box-shadow .2s ease; text-decoration: none !important; min-width: 0;
@@ -759,7 +756,7 @@ mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; padding: .
   .glance b { font-size: 1.5rem; }
 }
 @media (max-width: 400px) {
-  .topbar .icon-btn[aria-label="GitHub repository"] { display: none; }
+  .topbar .code-btn { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }

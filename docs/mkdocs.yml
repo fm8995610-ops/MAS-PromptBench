@@ -1,9 +1,6 @@
 site_name: MAS-PromptBench
 site_description: Tutorial and reference for MAS-PromptBench, a benchmark for system-prompt optimization in multi-agent LLM systems.
 site_url: https://fm8995610-ops.github.io/MAS-PromptBench/docs/
-repo_url: https://github.com/fm8995610-ops/MAS-PromptBench
-repo_name: fm8995610-ops/MAS-PromptBench
-edit_uri: edit/main/docs/content/
 docs_dir: content
 site_dir: site
 copyright: MAS-PromptBench is released under the MIT License.
@@ -18,6 +15,7 @@ theme:
 
 extra:
   project_page: !ENV [MPB_PROJECT_PAGE, "https://anonymous.4open.science/w/MAS-PromptBench/"]
+  code_url: !ENV [MPB_CODE_URL, "https://anonymous.4open.science/r/MAS-PromptBench-Codebase/"]
   deepwiki: https://deepwiki.com/fm8995610-ops/MAS-PromptBench
 
 plugins:

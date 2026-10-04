@@ -18,7 +18,7 @@ A method is one package, `optimizers/<method>/`, whose `integration.py` exposes 
 
 ## 1. Create and register the package
 
-Put the method in `optimizers/<method>/`, with its optimizer class in `integration.py` and its knobs in one frozen settings dataclass, as the existing methods do. Register the class in `METHODS` in [`optimizers/protocol/methods/__init__.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/optimizers/protocol/methods/__init__.py):
+Put the method in `optimizers/<method>/`, with its optimizer class in `integration.py` and its knobs in one frozen settings dataclass, as the existing methods do. Register the class in `METHODS` in [`optimizers/protocol/methods/__init__.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/protocol/methods/__init__.py):
 
 ```python title="optimizers/protocol/methods/__init__.py"
 METHODS: dict[str, str] = {
@@ -28,7 +28,7 @@ METHODS: dict[str, str] = {
 }
 ```
 
-The registry is lazy: nothing is imported until a job asks for the method, and the `--method` choices of `optimizers.protocol.run` come from it. [`identity.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/optimizers/protocol/methods/identity.py) is the smallest complete method: it returns the seed bundle without a rollout.
+The registry is lazy: nothing is imported until a job asks for the method, and the `--method` choices of `optimizers.protocol.run` come from it. [`identity.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/protocol/methods/identity.py) is the smallest complete method: it returns the seed bundle without a rollout.
 
 ## 2. Implement the interface
 

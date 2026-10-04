@@ -11,7 +11,7 @@ The tasks are grouped by what the final agent has to produce and how that output
 - **Coding**: LiveCodeBench, APPS and SWE-bench Verified. The agents produce a program or a repository patch, and the scorer runs tests against it.
 - **Tool calling**: BFCL, ToolHop and API-Bank. The agents emit function or API calls against schemas given with each task, and the scorer checks the calls themselves or the answer the call chain produces.
 
-Each task fixes the form of the final answer with an output contract, defined in [`core/output_contracts.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/core/output_contracts.py). The runner adds it to the answering role's system prompt at load time, so an optimizer can rewrite role prompts without removing the format the scorer expects. Data loading, scoring and records live in one task module per dataset, `core/tasks/<dataset>.py`.
+Each task fixes the form of the final answer with an output contract, defined in [`core/output_contracts.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/core/output_contracts.py). The runner adds it to the answering role's system prompt at load time, so an optimizer can rewrite role prompts without removing the format the scorer expects. Data loading, scoring and records live in one task module per dataset, `core/tasks/<dataset>.py`.
 
 ## At a glance
 

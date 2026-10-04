@@ -29,11 +29,11 @@ Every dataset uses a single role, `solver`:
 | --- | --- |
 | `gpqa`, `hotpotqa`, `math`, `lcb`, `apps`, `bfcl`, `swe`, `toolhop`, `apibank` | `configs/prompts/single/<dataset>/solver.txt` |
 
-The role descriptions the prompts were generated from are under `single:` in [`configs/prompts/roles.yaml`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/configs/prompts/roles.yaml). The optimizers read these files and never overwrite them; a job keeps its prompts under its own `--out` folder.
+The role descriptions the prompts were generated from are under `single:` in [`configs/prompts/roles.yaml`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/prompts/roles.yaml). The optimizers read these files and never overwrite them; a job keeps its prompts under its own `--out` folder.
 
 ## Implementation
 
-- **Reference scaffold:** [`topologies/single/langgraph_base.py`](https://github.com/fm8995610-ops/MAS-PromptBench/blob/main/topologies/single/langgraph_base.py) shows the pattern in 54 lines: `create_react_agent` with toy tools (`add`, `multiply`, a mock `web_search`). It is a demo, not a benchmark runner.
+- **Reference scaffold:** [`topologies/single/langgraph_base.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/topologies/single/langgraph_base.py) shows the pattern in 54 lines: `create_react_agent` with toy tools (`add`, `multiply`, a mock `web_search`). It is a demo, not a benchmark runner.
 - **Dataset runners:** `topologies/single/<dataset>/langgraph_<dataset>.py`, one per dataset. Each wires the real tools to the same ReAct agent; the loader, scorer and records come from the dataset's task module in `core/tasks/`.
 - **ToolHop and API-Bank:** these two runners don't use LangGraph objects. ToolHop runs a plain tool loop on the `openai` client (9 turns by default, `TOOLHOP_MAX_TURNS`); API-Bank makes one model call. Both live in `core/tasks/toolhop.py` and `core/tasks/apibank.py`, shared by every topology's runner.
 
