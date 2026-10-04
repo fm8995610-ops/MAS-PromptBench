@@ -117,7 +117,10 @@
     toggle.addEventListener('click', function () {
       var next = effectiveTheme() === 'dark' ? 'light' : 'dark';
       root.setAttribute('data-theme', next);
-      try { localStorage.setItem('mpb-theme', next); } catch (e) {}
+      try { localStorage.setItem('mpb-theme', next); } catch (e) {
+        /* Storage is blocked in a sandboxed page: keep the choice in the tab's window.name. */
+        if (!window.name || /^mpb-theme=/.test(window.name)) window.name = 'mpb-theme=' + next;
+      }
       label();
     });
     if (mq.addEventListener) mq.addEventListener('change', label);
