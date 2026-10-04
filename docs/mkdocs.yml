@@ -17,7 +17,7 @@ theme:
     - 404.html
 
 extra:
-  project_page: !ENV [MPB_PROJECT_PAGE, "https://fm8995610-ops.github.io/MAS-PromptBench/"]
+  project_page: !ENV [MPB_PROJECT_PAGE, "https://anonymous.4open.science/w/MAS-PromptBench/"]
   deepwiki: https://deepwiki.com/fm8995610-ops/MAS-PromptBench
 
 plugins:
