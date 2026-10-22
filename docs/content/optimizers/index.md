@@ -5,7 +5,7 @@ MAS-PromptBench optimizes the system prompts of a multi-agent system while the m
 
 <div class="facts" markdown>
 <div><span>Methods</span>8</div>
-<div><span>Protocol</span>mas-promptbench-v1</div>
+<div><span>Protocol</span>mas-promptbench</div>
 <div><span>Budget</span>600 rollouts</div>
 <div><span>Optimizer seeds</span>0, 1, 2</div>
 </div>
@@ -47,7 +47,7 @@ The built-in `identity` method returns the seed prompts without a rollout; it ru
 
 ## One protocol for every method
 
-Every method runs as a job of the protocol `mas-promptbench-v1`, `python -m optimizers.protocol.run`:
+Every method runs as a job of the protocol `mas-promptbench`, `python -m optimizers.protocol.run`:
 
 1. **Optimize.** The method gets the fixed, ordered train and validation rows, the frozen seed bundle and a ledger of 600 usable full-system rollouts, sampled at temperature 0.2, top-p 0.9 and up to 32,768 tokens. It returns its incumbent bundle.
 2. **Final validation.** Uncharged and greedy: the seed and the incumbent run on the full validation split with paired per-item request seeds. The incumbent is deployed only if it is strictly better; a tie or a regression keeps the seeds. The decision is sealed in `selection.json`.

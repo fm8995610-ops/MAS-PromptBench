@@ -158,7 +158,7 @@ def test_other_modes_run_end_to_end_with_their_labels():
     assert paper.implementation_kind == "native_tavo_paper_reproduction_common_runner"
     assert "overlay" not in reflection.kinds() and "aggregate" in reflection.kinds()
     with pytest.raises(ValueError, match="unsupported TAVO mode"):
-        TAVOOptimizer(reflection_client=FakeReflection(), mode="overlay-v2")
+        TAVOOptimizer(reflection_client=FakeReflection(), mode="no-such-mode")
 
 
 def test_cells_outside_table_6_are_rejected_before_any_rollout():
@@ -177,7 +177,7 @@ def test_artifact_contract_and_persisted_files(tmp_path):
     cell = tavo_cell()
     artifact, budget, _, runner, _ = _optimize(cell, store=store, directory=directory)
     payload = artifact.to_dict()
-    assert payload["schema"] == "mas-promptbench-native-optimizer-result/v1"
+    assert payload["schema"] == "mas-promptbench-native-optimizer-result"
     assert (payload["method"], payload["cell_id"], payload["production_eligible"]) == ("tavo", cell.cell_id, True)
     assert payload["budget_snapshot"] == budget.snapshot() and json.dumps(payload) and content_hash(payload)
     assert incumbent_of(artifact) is artifact.selected_bundle
@@ -186,7 +186,7 @@ def test_artifact_contract_and_persisted_files(tmp_path):
     assert saved["artifact_sha256"] == content_hash({k: v for k, v in saved.items() if k != "artifact_sha256"})
     checkpoints = sorted(directory.glob("optimizer_checkpoint_*.json"))
     assert len(checkpoints) == 5
-    assert read_json(checkpoints[0])["schema"] == "mas-promptbench-native-optimizer-checkpoint/v1"
+    assert read_json(checkpoints[0])["schema"] == "mas-promptbench-native-optimizer-checkpoint"
     curve = read_jsonl(directory / "learning_curve.jsonl")
     grid = [row["rollout_grid"] for row in curve if row["rollout_grid"] is not None]
     assert grid == list(range(0, 601, 10)) and curve[-1]["post_stop_carried_forward"] is True

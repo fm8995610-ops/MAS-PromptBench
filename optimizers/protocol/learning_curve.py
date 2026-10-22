@@ -106,7 +106,6 @@ class LearningCurveRecorder:
     ) -> dict[str, Any]:
         staleness = None if rollout_grid is None else rollout_grid - state.charged_rollouts
         return {
-            "schema_version": "1.0",
             "reason": reasons[0],
             "reasons": list(dict.fromkeys(reasons)),
             "rollout_grid": rollout_grid,

@@ -15,7 +15,7 @@ import random
 from dataclasses import dataclass
 from itertools import combinations
 
-ADAPTATION_ID = "hivemind-adapted/worker-shapley+manager-rotation+minibatch-gate/v1"
+ADAPTATION_ID = "hivemind-adapted/worker-shapley+manager-rotation+minibatch-gate"
 ALGORITHM = "CG-OPO_coalition"
 
 

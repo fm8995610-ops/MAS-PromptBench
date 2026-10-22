@@ -117,7 +117,7 @@ def observe_reflection_response(response: Any) -> dict[str, Any]:
     usage = _response_field(response, "usage")
     details = _response_field(usage, "completion_tokens_details")
     metadata = {
-        "schema": "reflection-response-observation/v1",
+        "schema": "reflection-response-observation",
         "finish_reason": choices[0]["finish_reason"] if len(choices) == 1 else None,
         "length_limited": _any_observed([choice["length_limited"] for choice in choices]),
         "empty_final": _any_observed([choice["empty_final"] for choice in choices]),

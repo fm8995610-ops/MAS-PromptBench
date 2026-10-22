@@ -182,7 +182,7 @@ def test_full_budget_lifecycle_spends_exactly_600_rollouts(tmp_path, offline, no
     assert artifact.metadata["ucb"] == UCB_SETTINGS and artifact.metadata["run_seed"] == 42
     assert artifact.metadata["generation_task"] == "hotpotqa"
     payload = json.dumps(artifact.to_dict())
-    assert artifact.to_dict()["schema"] == "mas-promptbench-native-optimizer-result/v1"
+    assert artifact.to_dict()["schema"] == "mas-promptbench-native-optimizer-result"
     assert str(tmp_path) not in payload and str(Path.home()) not in payload
 
 

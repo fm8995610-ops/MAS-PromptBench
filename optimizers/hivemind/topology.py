@@ -13,11 +13,11 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any
 
-TOPOLOGY_ADAPTATION_ID = "hivemind-topology-coalitions/v2"
-CENTRALIZED_CONTROL_SCHEMA = "mas-promptbench-hivemind-coalition/v1"
-TOPOLOGY_CONTROL_SCHEMA = "mas-promptbench-hivemind-coalition/v2"
-CENTRALIZED_ACK_SCHEMA = "mas-promptbench-hivemind-coalition-ack/v1"
-TOPOLOGY_ACK_SCHEMA = "mas-promptbench-hivemind-coalition-ack/v2"
+TOPOLOGY_ADAPTATION_ID = "hivemind-topology-coalitions"
+CENTRALIZED_CONTROL_SCHEMA = "mas-promptbench-hivemind-centralized-coalition"
+TOPOLOGY_CONTROL_SCHEMA = "mas-promptbench-hivemind-coalition"
+CENTRALIZED_ACK_SCHEMA = "mas-promptbench-hivemind-centralized-coalition-ack"
+TOPOLOGY_ACK_SCHEMA = "mas-promptbench-hivemind-coalition-ack"
 EMPTY_COALITION = "canonical-abstention-zero-model-calls"
 
 
@@ -84,9 +84,7 @@ def expected_control_evidence(control: Mapping[str, Any]) -> dict[str, Any]:
         "masked_workers": sorted(control["masked_workers"]),
         "routable_workers": active,
         "bound_delegation_tools": [f"delegate_to_{p}" for p in active] if centralized else [],
-        "enforcement": "delegation-tool-and-route-mask/v1"
-        if centralized
-        else f"{control['topology']}-native-player-mask/v2",
+        "enforcement": "delegation-tool-and-route-mask" if centralized else f"{control['topology']}-native-player-mask",
     }
     if not centralized:
         value.update(

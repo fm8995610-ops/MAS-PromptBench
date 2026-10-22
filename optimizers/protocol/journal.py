@@ -94,7 +94,6 @@ class LifecycleJournal:
         state_snapshot = json.loads(canonical_json(dict(state)))
         snap = dict(self.session.budget.snapshot())
         event_base = {
-            "schema_version": "1.0",
             "method": self.method,
             "cell_id": self.cell.cell_id,
             "optimizer_seed": self.cell.optimizer_seed,

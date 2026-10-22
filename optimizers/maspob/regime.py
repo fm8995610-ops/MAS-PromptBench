@@ -10,15 +10,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 # Provenance
-ADAPTATION_ID = "maspob-official-source-adaptation/v3"
+ADAPTATION_ID = "maspob-official-source-adaptation"
 SOURCE_URL = "https://github.com/HZ1008/MASPOB"
 SOURCE_PAPER = "arXiv:2603.02630"
 SOURCE_COMMIT = "0be3af42da83b9b5ab187c101ec6d2ce87a5fe04"
 LICENSE_STATUS = (
     "released for research purposes (upstream README); no LICENSE/COPYING/NOTICE file in the pinned repository"
 )
-CACHE_SCHEMA = 3
-GUARD_VERSION = "exact-protocol-v3"
 GENERATION_TEMPLATE_SHA256 = "d610e2871cb1fb80758b419bfb29df74dbf0c14dd4ea6b5a3be2abcb49582cd2"
 # SHA-256 of each vendored file's content below its ``HEADER_END`` line.
 CORE_SOURCE_SHA256 = {
@@ -35,7 +33,7 @@ GENERATION_TASK_NAMES = {"lcb": "livecodebench"}
 DEFAULT_EMBED_BACKEND = "sentence-transformers"
 
 # Bandit lifecycle and seeds
-RNG_PROTOCOL = "independent-combo-and-row-streams/v1"
+RNG_PROTOCOL = "independent-combo-and-row-streams"
 ROW_SAMPLER_SEED_SALT = 104729
 INITIALIZATION_PROTOCOL = "surrogate-mean-pretrain"
 DEFAULT_SELECTION_PROTOCOL = "surrogate-mean"
@@ -113,7 +111,6 @@ def run_seed(optimizer_seed: int) -> int:
 __all__ = [
     "ADAPTATION_ID",
     "BENCHMARK_ADAPTATIONS",
-    "CACHE_SCHEMA",
     "CORE_SOURCE_SHA256",
     "DEFAULTS",
     "DEFAULT_EMBED_BACKEND",
@@ -121,7 +118,6 @@ __all__ = [
     "GENERATION_TASK_NAMES",
     "GENERATION_TEMPLATE_SHA256",
     "GNN_SETTINGS",
-    "GUARD_VERSION",
     "HEADER_END",
     "INITIALIZATION_PROTOCOL",
     "LICENSE_STATUS",

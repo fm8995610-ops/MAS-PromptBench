@@ -31,12 +31,10 @@ from optimizers.protocol.reflection import reflection_model_id
 
 from .regime import (
     ADAPTATION_ID,
-    CACHE_SCHEMA,
     CORE_SOURCE_SHA256,
     DEFAULT_EMBED_BACKEND,
     DEFAULTS,
     GENERATION_TEMPLATE_SHA256,
-    GUARD_VERSION,
     HEADER_END,
     INITIALIZATION_PROTOCOL,
     ROW_SAMPLER_SEED_SALT,
@@ -226,7 +224,6 @@ def pool_cache_identity(
     """What a cached pool must match to be reused. The endpoint is stored only as a hash."""
     endpoint = getattr(reflection, "endpoint", None)
     return {
-        "schema_version": CACHE_SCHEMA,
         "adaptation_id": ADAPTATION_ID,
         "official_source_commit": SOURCE_COMMIT,
         "core_source_sha256": verified_core_source_hashes(),
@@ -235,7 +232,6 @@ def pool_cache_identity(
         "endpoint_sha256": _sha256_text(str(endpoint)) if endpoint else None,
         "generation_temperature": float(getattr(reflection, "temperature", DEFAULTS.generation_temperature)),
         "generation_template_sha256": GENERATION_TEMPLATE_SHA256,
-        "guard_version": GUARD_VERSION,
         "roles": list(roles),
         "seed_sha256": {role: _sha256_text(seed_prompts[role]) for role in roles},
         "generation_seed": int(generation_seed),
@@ -256,7 +252,7 @@ def generate_prompt_pool(
         "Respect the original executable collaboration/delegation protocol and exact output format."
     ),
 ) -> tuple[dict[str, list[str]], dict[str, Any]]:
-    """Create or incrementally fill a versioned, contract-validated prompt pool.
+    """Create or incrementally fill a contract-validated prompt pool.
 
     Variant 0 of each role is the exact seed prompt. Random style draws use the
     process-global ``random`` stream (upstream behavior); the caller seeds it.

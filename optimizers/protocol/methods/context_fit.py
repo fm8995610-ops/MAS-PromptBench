@@ -13,7 +13,7 @@ still happens is retried a few times with a request that fits (first the
 answer ceiling is lowered to the room the prompt leaves, never below
 ``MIN_REFLECTION_OUTPUT_TOKENS``; then the prompt is cut). Each refit is
 recorded next to the call's response observations as a
-``mas-promptbench-prompt-fit/v1`` entry. Requests that fit pass through
+``mas-promptbench-prompt-fit`` entry. Requests that fit pass through
 untouched.
 
 ``ContextFitLM`` is a transparent proxy, so it can wrap the common reflection

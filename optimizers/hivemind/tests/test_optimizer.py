@@ -38,7 +38,7 @@ def _centralized(budget: int):
 def _assert_artifact_contract(artifact, ledger, runner) -> None:
     snapshot = ledger.snapshot()
     payload = artifact.to_dict()
-    assert payload["schema"] == "mas-promptbench-native-optimizer-result/v1"
+    assert payload["schema"] == "mas-promptbench-native-optimizer-result"
     assert payload["method"] == "hivemind" and payload["cell_id"] == runner.cell.cell_id
     assert payload["budget_snapshot"] == snapshot and snapshot["reserved"] == 0
     assert snapshot["charged"] <= snapshot["maximum"]

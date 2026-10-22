@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 # Config
-PROTOCOL_ID = "mas-promptbench-v1"
+PROTOCOL_ID = "mas-promptbench"
 BUDGET = 600
 OPTIMIZER_SEEDS = (0, 1, 2)
 REQUEST_SEED_OFFSETS = {0: 0, 1: 1000, 2: 2000}
@@ -38,7 +38,7 @@ REFLECTION_SAMPLING = {
     "default_top_p": 1.0,
     "max_output_tokens": 48000,
     "thinking": True,
-    "sampling_policy": "benchmark_thinking_48000_native_sampling/v1",
+    "sampling_policy": "benchmark_thinking_48000_native_sampling",
 }
 
 # Fixed ordered splits ship in benchmarks/<dataset>/<dataset>_splits.json.

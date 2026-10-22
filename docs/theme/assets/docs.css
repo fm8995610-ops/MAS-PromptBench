@@ -462,7 +462,9 @@ kbd {
 .prose h1.brand-title {
   font-style: italic; font-weight: 800; font-size: clamp(1.9rem, 8.2vw, 3.6rem); line-height: 1.05; letter-spacing: -0.03em;
   background: linear-gradient(120deg, var(--brand-a) 0%, var(--blue-2) 60%, var(--brand-b) 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent; display: inline-block; padding-right: .1em; margin-bottom: 1rem;
+  -webkit-background-clip: text; background-clip: text; color: transparent; display: inline-block;
+  /* the gradient only paints inside the box: pad it so italic overhangs and the p descender keep their color */
+  padding: 0 .1em .16em .05em; margin: 0 0 calc(1rem - .16em) -.05em;
 }
 .hero-lede { font-size: 1.2rem; line-height: 1.6; max-width: 40rem; color: var(--body); }
 .hero-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.6rem; }

@@ -26,7 +26,7 @@ runs/gepa/hotpotqa/centralized/qwen/0/
 
 Methods add their own files under `optimization/`, such as `learning_curve.jsonl` and checkpoints. An evaluation in progress is journaled as `evaluations/<evaluation id>.partial.jsonl`, and `.lock` files guard concurrent writers; `--evaluation-cache` moves `evaluations/` to a shared folder.
 
-The top-level files and the evaluations are sealed: each carries a `sha256` of its own content, checked when the protocol reads it back, and a versioned `schema` such as `mas-promptbench-job-result/v1`. Paths inside are relative to the job folder, and no artifact records an absolute path or a host name.
+The top-level files and the evaluations are sealed: each carries a `sha256` of its own content, checked when the protocol reads it back, and a `schema` such as `mas-promptbench-job-result`. Paths inside are relative to the job folder, and no artifact records an absolute path or a host name.
 
 ## result.json
 
@@ -34,7 +34,7 @@ The job summary that aggregation reads:
 
 | Field | Content |
 | --- | --- |
-| `status`, `protocol_id`, `protocol_conformant` | `completed`; `mas-promptbench-v1`; whether the budget, the cell and the reflection model follow the protocol. |
+| `status`, `protocol_id`, `protocol_conformant` | `completed`; `mas-promptbench`; whether the budget, the cell and the reflection model follow the protocol. |
 | `cell`, `cell_id` | The full job identity (method, task, runtime, budget, optimizer seed, reflection model, protocol and split hashes) and its short hash. |
 | `grid_cell`, `registry_key`, `source_tables` | The grid configuration, the bridge key of its runtime, and the experiment tables that include it. |
 | `optimizer_seed`, `condition_id` | The seed, and the hash of the method-independent evaluation condition. |

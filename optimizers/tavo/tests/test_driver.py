@@ -266,4 +266,4 @@ def test_paper_mode_aggregates_per_agent_and_refines_the_previous_prompt():
 
 def test_unknown_mode_is_rejected():
     with pytest.raises(ValueError, match="unsupported optimizer mode"):
-        _attempt(FakeReflection(), mode="overlay-v2")
+        _attempt(FakeReflection(), mode="no-such-mode")

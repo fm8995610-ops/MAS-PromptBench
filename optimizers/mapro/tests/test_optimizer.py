@@ -46,7 +46,7 @@ def _assert_contract(artifact, runner, budget, cell):
     snapshot = budget.snapshot()
     payload = artifact.to_dict()
     json.dumps(payload, allow_nan=False)  # the protocol writes it with allow_nan=False and no default
-    assert payload["schema"] == "mas-promptbench-native-optimizer-result/v1"
+    assert payload["schema"] == "mas-promptbench-native-optimizer-result"
     assert (payload["method"], payload["cell_id"], payload["protocol_id"]) == ("mapro", cell.cell_id, cell.protocol_id)
     assert payload["budget_snapshot"] == snapshot and snapshot["reserved"] == 0 and closed_ledger(snapshot)
     assert snapshot["charged"] <= budget.maximum and snapshot["charged"] % TRAIN == 0

@@ -6,7 +6,7 @@ import os
 from dataclasses import dataclass
 from types import SimpleNamespace
 
-ADAPTATION_ID = "mapro-adapted/star-proxy+deterministic-critic+train-patience/v1"
+ADAPTATION_ID = "mapro-adapted/star-proxy+deterministic-critic+train-patience"
 NODE_JUDGE_INPUTS = "candidate_prompt_and_response"
 
 

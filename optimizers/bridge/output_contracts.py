@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-OUTPUT_CONTRACT_VERSION = 2
-
 CONTRACT_GUARD = (
     "This contract is not optional. Keep reasoning concise enough that the "
     "response reaches the required final artifact. If uncertain, still provide "

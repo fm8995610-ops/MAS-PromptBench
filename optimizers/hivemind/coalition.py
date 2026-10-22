@@ -67,7 +67,7 @@ def _control_evidence(active_workers, masked_workers, delegation_tools):
         "masked_workers": sorted(masked_workers),
         "routable_workers": sorted(active_workers),
         "bound_delegation_tools": sorted(tool.name for tool in delegation_tools),
-        "enforcement": "delegation-tool-and-route-mask/v1",
+        "enforcement": "delegation-tool-and-route-mask",
     }
 
 

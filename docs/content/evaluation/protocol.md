@@ -4,7 +4,7 @@ This page fixes what a score means: which instances are reported, how optimizati
 { .lede }
 
 <div class="facts" markdown>
-<div><span>Protocol</span>mas-promptbench-v1</div>
+<div><span>Protocol</span>mas-promptbench</div>
 <div><span>Budget</span>600 usable rollouts</div>
 <div><span>Selection</span>Strictly better on validation</div>
 <div><span>Evaluation IDs</span>730</div>

@@ -1,6 +1,6 @@
 # Run Protocol
 
-**`mas-promptbench-v1`** is the one run protocol for every prompt optimizer. A **job** is `(method, cell, optimizer seed ∈ {0, 1, 2})`; a **cell** is `(task, topology, framework, communication, team size, task model)`.
+**`mas-promptbench`** is the one run protocol for every prompt optimizer. A **job** is `(method, cell, optimizer seed ∈ {0, 1, 2})`; a **cell** is `(task, topology, framework, communication, team size, task model)`.
 
 Part of [optimizers/](../README.md). Every rollout runs through the [real-runner bridge](../bridge/README.md); the seed prompts in `configs/prompts/` are **read-only**.
 

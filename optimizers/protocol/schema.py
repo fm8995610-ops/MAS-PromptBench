@@ -35,8 +35,8 @@ def content_hash(value: Any) -> str:
 
 
 def schema_name(thing: str) -> str:
-    """Versioned schema string for one artifact kind."""
-    return f"mas-promptbench-{thing}/v1"
+    """Schema string for one artifact kind."""
+    return f"mas-promptbench-{thing}"
 
 
 # Core records

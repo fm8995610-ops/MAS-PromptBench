@@ -77,7 +77,7 @@ def test_control_requests_must_be_canonical_partitions_inside_the_frozen_scope()
         ({**control, "masked_workers": ["writer_worker"]}, "exact role partition"),
         ({**control, "active_workers": "retriever_worker"}, "invalid"),
         ({**control, "extra": True}, "not canonical"),
-        ({**control, "schema": "other/v1"}, "not canonical"),
+        ({**control, "schema": "other"}, "not canonical"),
     ]:
         with pytest.raises(RunnerContractError, match=message):
             validated_control(cell, HOTPOTQA_ROLES, bad)

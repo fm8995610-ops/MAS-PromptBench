@@ -1,4 +1,4 @@
-"""Shared run protocol for every prompt optimizer (``mas-promptbench-v1``).
+"""Shared run protocol for every prompt optimizer (``mas-promptbench``).
 
 One job = (method, cell, optimizer seed). The method receives a 600-rollout
 budget ledger and the fixed train/validation rows; the seed and incumbent
