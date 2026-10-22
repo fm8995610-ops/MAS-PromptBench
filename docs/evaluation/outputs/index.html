@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../../assets/docs.css?v=20261004034342">
+  <link rel="stylesheet" href="../../assets/docs.css?v=20261022203713">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../../assets/mpb-transition.js?v=20261004034342"></script>
-  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261004034342">
+  <script src="../../assets/mpb-transition.js?v=20261022203713"></script>
+  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261022203713">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url="../.." data-version="20261004034342">
+<div class="site" data-base-url="../.." data-version="20261022203713">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -193,7 +193,7 @@
 └── result.json                    # the job summary
 </code></pre></div>
 <p>Methods add their own files under <code>optimization/</code>, such as <code>learning_curve.jsonl</code> and checkpoints. An evaluation in progress is journaled as <code>evaluations/&lt;evaluation id&gt;.partial.jsonl</code>, and <code>.lock</code> files guard concurrent writers; <code>--evaluation-cache</code> moves <code>evaluations/</code> to a shared folder.</p>
-<p>The top-level files and the evaluations are sealed: each carries a <code>sha256</code> of its own content, checked when the protocol reads it back, and a versioned <code>schema</code> such as <code>mas-promptbench-job-result/v1</code>. Paths inside are relative to the job folder, and no artifact records an absolute path or a host name.</p>
+<p>The top-level files and the evaluations are sealed: each carries a <code>sha256</code> of its own content, checked when the protocol reads it back, and a <code>schema</code> such as <code>mas-promptbench-job-result</code>. Paths inside are relative to the job folder, and no artifact records an absolute path or a host name.</p>
 <h2 id="resultjson">result.json<a class="headerlink" href="#resultjson" title="Link to this section">#</a></h2>
 <p>The job summary that aggregation reads:</p>
 <table>
@@ -206,7 +206,7 @@
 <tbody>
 <tr>
 <td><code>status</code>, <code>protocol_id</code>, <code>protocol_conformant</code></td>
-<td><code>completed</code>; <code>mas-promptbench-v1</code>; whether the budget, the cell and the reflection model follow the protocol.</td>
+<td><code>completed</code>; <code>mas-promptbench</code>; whether the budget, the cell and the reflection model follow the protocol.</td>
 </tr>
 <tr>
 <td><code>cell</code>, <code>cell_id</code></td>
@@ -428,7 +428,7 @@
     svg: { fontCache: "global" }
   };
 </script>
-<script src="../../assets/docs.js?v=20261004034342" defer></script>
+<script src="../../assets/docs.js?v=20261022203713" defer></script>
 </div>
 </body>
 </html>

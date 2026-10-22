@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../assets/docs.css?v=20261004034342">
+  <link rel="stylesheet" href="../assets/docs.css?v=20261022203713">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../assets/mpb-transition.js?v=20261004034342"></script>
-  <link rel="stylesheet" href="../assets/mpb-transition.css?v=20261004034342">
+  <script src="../assets/mpb-transition.js?v=20261022203713"></script>
+  <link rel="stylesheet" href="../assets/mpb-transition.css?v=20261022203713">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url=".." data-version="20261004034342">
+<div class="site" data-base-url=".." data-version="20261022203713">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -177,7 +177,7 @@
 <p class="lede">MAS-PromptBench optimizes the system prompts of a multi-agent system while the model weights stay frozen. Eight methods share one run protocol and one bridge to the real topology runners, so every method spends the same budget, is selected by the same rule and is scored on the same held-out rows.</p>
 <div class="facts">
 <div><span>Methods</span>8</div>
-<div><span>Protocol</span>mas-promptbench-v1</div>
+<div><span>Protocol</span>mas-promptbench</div>
 <div><span>Budget</span>600 rollouts</div>
 <div><span>Optimizer seeds</span>0, 1, 2</div>
 </div>
@@ -267,7 +267,7 @@
 </ul>
 <p>The built-in <code>identity</code> method returns the seed prompts without a rollout; it runs on any grid configuration and gives the seed baseline of a cell. Any method runs on any registered pair with <code>--allow-any-cell</code>, as a non-conformant job.</p>
 <h2 id="one-protocol-for-every-method">One protocol for every method<a class="headerlink" href="#one-protocol-for-every-method" title="Link to this section">#</a></h2>
-<p>Every method runs as a job of the protocol <code>mas-promptbench-v1</code>, <code>python -m optimizers.protocol.run</code>:</p>
+<p>Every method runs as a job of the protocol <code>mas-promptbench</code>, <code>python -m optimizers.protocol.run</code>:</p>
 <ol>
 <li><strong>Optimize.</strong> The method gets the fixed, ordered train and validation rows, the frozen seed bundle and a ledger of 600 usable full-system rollouts, sampled at temperature 0.2, top-p 0.9 and up to 32,768 tokens. It returns its incumbent bundle.</li>
 <li><strong>Final validation.</strong> Uncharged and greedy: the seed and the incumbent run on the full validation split with paired per-item request seeds. The incumbent is deployed only if it is strictly better; a tie or a regression keeps the seeds. The decision is sealed in <code>selection.json</code>.</li>
@@ -408,7 +408,7 @@
   };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" defer></script>
-<script src="../assets/docs.js?v=20261004034342" defer></script>
+<script src="../assets/docs.js?v=20261022203713" defer></script>
 </div>
 </body>
 </html>
