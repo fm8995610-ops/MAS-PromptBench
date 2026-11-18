@@ -107,16 +107,22 @@ DATASET_ADAPTERS: dict[str, dict[str, str]] = {
     },
 }
 
-_TEAMSIZES_DATASETS = ("hotpotqa", "lcb", "bfcl")
+_TEAMSIZES_DATASETS = ("hotpotqa", "lcb", "bfcl", "math", "swe")
 _TEAMSIZES_BASE_TOPOLOGIES = ("independent", "decentralized", "sequential", "centralized")
 TEAM_SIZES = (2, 4, 8, 10)  # canonical team-size sweep — single source of truth
-_COMMUNICATIONS_DATASETS = ("hotpotqa", "lcb", "bfcl")
+_COMMUNICATIONS_DATASETS = ("hotpotqa", "lcb", "bfcl", "math", "swe")
 _COMMUNICATIONS_BASE_TOPOLOGIES = ("independent", "decentralized", "sequential", "centralized")
 _COMMUNICATIONS_FORMATS = ("freeform", "semi_structured", "structured_soft")
 
 
 def _teamsizes_class_name(dataset: str, base_topology: str, team_size: int) -> str:
-    dataset_prefix = {"hotpotqa": "HotpotQATeamSizes", "lcb": "LCBTeamSizes", "bfcl": "BFCLTeamSizes"}[dataset]
+    dataset_prefix = {
+        "hotpotqa": "HotpotQATeamSizes",
+        "lcb": "LCBTeamSizes",
+        "bfcl": "BFCLTeamSizes",
+        "math": "MATHTeamSizes",
+        "swe": "SWETeamSizes",
+    }[dataset]
     topo_prefix = "".join(part.title() for part in base_topology.split("_"))
     return f"{dataset_prefix}{topo_prefix}R{team_size}Adapter"
 
@@ -126,6 +132,8 @@ def _communications_class_name(dataset: str, base_topology: str, fmt: str) -> st
         "hotpotqa": "HotpotQACommunications",
         "lcb": "LCBCommunications",
         "bfcl": "BFCLCommunications",
+        "math": "MATHCommunications",
+        "swe": "SWECommunications",
     }[dataset]
     topo_prefix = "".join(part.title() for part in base_topology.split("_"))
     fmt_prefix = "".join(part.title() for part in fmt.split("_"))

@@ -20,9 +20,13 @@ from optimizers.bridge.adapters.module_common import (
 class ModuleSWEAdapter(ModuleAdapterBase):
     dataset = "swe"
 
+    def load_module(self):
+        """The runner module a call executes (shared; calls on it are serialized by its lock)."""
+        return import_real_module(self.module_name)
+
     def run_example(self, example: Any) -> dict:
         instance = coerce_instance(example)
-        module = import_real_module(self.module_name)
+        module = self.load_module()
         temp_repos = []
         try:
             with module_lock(self.module_name), self.patched_module(module):

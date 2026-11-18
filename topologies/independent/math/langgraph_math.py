@@ -23,6 +23,7 @@ from typing_extensions import TypedDict
 from core import cli, prompts, settings, teams
 from core.batch import attempt
 from core.calculator import CALCULATOR_DOC, make_calculator
+from core.communication import CommPolicy
 from core.llm import chat_openai
 from core.tasks import math as task
 from core.tasks.math import (  # noqa: F401  (runner API)
@@ -43,6 +44,8 @@ TEAM = teams.spec(TOPOLOGY, task.DATASET, TEAM_SIZE)
 
 VLLM_BASE_URL = settings.base_url()
 MODEL_ID = settings.model_id()
+COMMUNICATION_FORMAT = globals().get("COMMUNICATION_FORMAT", "freeform")  # preset by the communications/ entries
+COMMUNICATION = CommPolicy(COMMUNICATION_FORMAT, task.DATASET, TOPOLOGY)
 N_AGENTS = settings.independent_n_agents(TEAM.n_agents)  # replica i samples with seed i
 
 # Stall guards: symbolic problems make the calculator fail and replicas retry,
@@ -51,7 +54,9 @@ PER_ROW_TIMEOUT_S = 120
 _RECURSION_LIMIT = TEAM.recursion_limit
 
 _OUTPUT_FORMAT_NUDGE = task.OUTPUT_FORMAT_NUDGE
-SYSTEM_PROMPT = prompts.role_prompt(TOPOLOGY, task.DATASET, TEAM.role, suffix=_OUTPUT_FORMAT_NUDGE)
+SYSTEM_PROMPT = COMMUNICATION.system_prompt(
+    prompts.role_prompt(TOPOLOGY, task.DATASET, TEAM.role, suffix=_OUTPUT_FORMAT_NUDGE)
+)
 
 calculator = tool(make_calculator(CALCULATOR_DOC))
 

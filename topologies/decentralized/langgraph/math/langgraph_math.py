@@ -22,6 +22,7 @@ from typing_extensions import TypedDict
 from core import cli, prompts, settings, teams
 from core.batch import attempt
 from core.calculator import CALCULATOR_DOC, make_calculator
+from core.communication import CommPolicy
 from core.llm import chat_openai
 from core.runtime import row_timeout
 from core.tasks import math as task
@@ -41,6 +42,8 @@ TEAM = teams.spec(TOPOLOGY, task.DATASET, TEAM_SIZE)
 
 VLLM_BASE_URL = settings.base_url()
 MODEL_ID = settings.model_id()
+COMMUNICATION_FORMAT = globals().get("COMMUNICATION_FORMAT", "freeform")  # preset by the communications/ entries
+COMMUNICATION = CommPolicy(COMMUNICATION_FORMAT, task.DATASET, TOPOLOGY)
 N_AGENTS = settings.decentralized_n_agents(TEAM.n_agents)
 N_ROUNDS = settings.decentralized_n_rounds(TEAM.n_rounds)
 
@@ -51,7 +54,7 @@ _RECURSION_LIMIT = TEAM.recursion_limit
 
 
 def _load_prompt(role: str) -> str:
-    return prompts.role_prompt(TOPOLOGY, task.DATASET, role)
+    return COMMUNICATION.system_prompt(prompts.role_prompt(TOPOLOGY, task.DATASET, role))
 
 
 SYSTEM_PROMPT = _load_prompt(TEAM.role)

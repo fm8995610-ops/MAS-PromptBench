@@ -125,6 +125,8 @@ def _semi_dataset_guidance(dataset: str) -> str:
         )
     if dataset == "bfcl":
         return "\nOptional BFCL tags may be included when useful:\n[FUNCTION_CHOICE], [ARG_PLAN], [CALL_CANDIDATE]."
+    if dataset == "math":
+        return "\nOptional MATH tags may be included when useful:\n[PROBLEM_PLAN], [DERIVATION], [CHECKS], [ANSWER_CANDIDATE]."
     return ""
 
 
@@ -164,6 +166,12 @@ def _json_payload_guidance(dataset: str) -> str:
             "For BFCL, payload should use fields when known: function_choice, "
             "arg_plan, call_candidate. The final canonical call list must "
             "still appear as the protected fenced json artifact."
+        )
+    if dataset == "math":
+        return (
+            "For MATH, payload should use fields when known: problem_plan, "
+            "derivation, checks, answer_candidate. The final answer must still "
+            "appear after END_JSON_REPORT inside \\boxed{...}."
         )
     return ""
 

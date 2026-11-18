@@ -73,9 +73,13 @@ class ModuleMATHAdapter:
     def __getstate__(self):
         return self.__dict__.copy()
 
+    def load_module(self):
+        """The runner module a call executes (shared; calls on it are serialized by its lock)."""
+        return import_real_module(self.module_name)
+
     def run_example(self, example: Any) -> dict:
         instance = coerce_instance(example)
-        module = import_real_module(self.module_name)
+        module = self.load_module()
         with _module_lock(self.module_name), self._patched_module(module):
             out = module.solve(instance["problem"])
         answer = out.get("answer")

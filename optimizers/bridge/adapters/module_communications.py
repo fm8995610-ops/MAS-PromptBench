@@ -19,8 +19,10 @@ from optimizers.bridge.adapters.module_bfcl import ModuleBFCLAdapter
 from optimizers.bridge.adapters.module_common import import_isolated_real_module
 from optimizers.bridge.adapters.module_hotpotqa import ModuleHotpotQAAdapter
 from optimizers.bridge.adapters.module_lcb import ModuleLCBAdapter
+from optimizers.bridge.adapters.module_math import ModuleMATHAdapter
+from optimizers.bridge.adapters.module_swe import ModuleSWEAdapter
 
-SUPPORTED_COMMUNICATIONS_DATASETS = ("hotpotqa", "lcb", "bfcl")
+SUPPORTED_COMMUNICATIONS_DATASETS = ("hotpotqa", "lcb", "bfcl", "math", "swe")
 SUPPORTED_COMMUNICATIONS_BASE_TOPOLOGIES = ("independent", "decentralized", "sequential", "centralized")
 SUPPORTED_COMMUNICATIONS_FORMATS = ("freeform", "semi_structured", "structured_soft")
 
@@ -44,6 +46,18 @@ ROLE_CATALOG: dict[str, dict[str, list[str]]] = {
         "sequential": ["analyzer", "inspector", "caller", "verifier"],
         "centralized": ["manager", "inspector_worker", "caller_worker", "validator_worker"],
     },
+    "math": {
+        "independent": ["solver"],
+        "decentralized": ["debater"],
+        "sequential": ["decomposer", "computer", "checker", "verifier"],
+        "centralized": ["manager", "decomposer_worker", "computation_worker", "verifier_worker"],
+    },
+    "swe": {
+        "independent": ["patcher"],
+        "decentralized": ["debater"],
+        "sequential": ["investigator", "planner", "patcher", "tester"],
+        "centralized": ["manager", "navigator_worker", "patcher_worker", "tester_worker"],
+    },
 }
 
 
@@ -60,6 +74,8 @@ def communications_class_name(dataset: str, base_topology: str, fmt: str) -> str
         "hotpotqa": "HotpotQACommunications",
         "lcb": "LCBCommunications",
         "bfcl": "BFCLCommunications",
+        "math": "MATHCommunications",
+        "swe": "SWECommunications",
     }[dataset]
     topo_prefix = "".join(part.title() for part in base_topology.split("_"))
     fmt_prefix = "".join(part.title() for part in fmt.split("_"))
@@ -183,6 +199,34 @@ class CommunicationsBFCLAdapter(CommunicationsAdapterMixin, ModuleBFCLAdapter):
         return append_contract(text, self.communications_format, self.dataset)
 
 
+class CommunicationsMATHAdapter(CommunicationsAdapterMixin, ModuleMATHAdapter):
+    """MATH keeps the format contract in the role prompts, after the protected output contract.
+
+    The agents write their reports in the format themselves; the runner passes
+    them on as written (no rendering or truncation of the handoffs).
+    """
+
+    dataset = "math"
+    framework = "langgraph"
+
+    def _prompt_for_module(self, module, role: str) -> str:
+        return append_contract(super()._prompt_for_module(module, role), self.communications_format, self.dataset)
+
+
+class CommunicationsSWEAdapter(CommunicationsAdapterMixin, ModuleSWEAdapter):
+    """SWE-bench keeps the format contract in the role prompts, as ``communications/<topology>/swe`` does.
+
+    The agents write their reports in the format; the patch is still the
+    repository diff, and the handoffs are passed on as written.
+    """
+
+    dataset = "swe"
+    framework = "langgraph"
+
+    def prompt_for_role(self, module, role: str) -> str:
+        return append_contract(super().prompt_for_role(module, role), self.communications_format, self.dataset)
+
+
 def _make_adapter_class(dataset: str, base_topology: str, fmt: str):
     if fmt not in FORMATS:
         raise ValueError(f"unknown communications format {fmt!r}")
@@ -191,6 +235,8 @@ def _make_adapter_class(dataset: str, base_topology: str, fmt: str):
         "hotpotqa": CommunicationsHotpotQAAdapter,
         "lcb": CommunicationsLCBAdapter,
         "bfcl": CommunicationsBFCLAdapter,
+        "math": CommunicationsMATHAdapter,
+        "swe": CommunicationsSWEAdapter,
     }[dataset]
     attrs = {
         "topology": communications_topology(base_topology, fmt),

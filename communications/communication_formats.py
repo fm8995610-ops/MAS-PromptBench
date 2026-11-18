@@ -204,6 +204,30 @@ class HotpotQAPair(Pair):
         return {"question": instance.get("question"), "gold_answer": instance.get("answer"), "predicted_answer": None}
 
 
+class MATHPair(Pair):
+    dataset = "math"
+
+    def solve_instance(self, instance: dict) -> dict:
+        return self.solve(instance["problem"])
+
+    def record(self, instance: dict, out: dict, latency_s: float) -> dict:
+        return self.task.record(
+            instance,
+            out.get("answer"),
+            **self.task.meta(instance),
+            latency_s=latency_s,
+            **_report_fields(out),
+            error=None,
+        )
+
+    def error_fields(self, instance: dict) -> dict:
+        return {
+            "problem": str(instance.get("problem") or "")[:400],
+            "gold_answer": instance.get("answer"),
+            "predicted_answer": None,
+        }
+
+
 class LCBPair(Pair):
     dataset = "lcb"
 
@@ -415,7 +439,7 @@ class SWEPair(Pair):
         return {**record, "communication_format": self.fmt, "base_module": runner_module(self.topology, self.dataset)}
 
 
-_PAIRS = {pair.dataset: pair for pair in (HotpotQAPair, LCBPair, ToolHopPair, APIBankPair, BFCLPair, SWEPair)}
+_PAIRS = {pair.dataset: pair for pair in (HotpotQAPair, MATHPair, LCBPair, ToolHopPair, APIBankPair, BFCLPair, SWEPair)}
 
 
 def _telemetry(out: dict) -> dict:

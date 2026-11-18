@@ -19,9 +19,11 @@ from core.paths import PROMPTS_DIR
 from optimizers.bridge.adapters.module_bfcl import ModuleBFCLAdapter
 from optimizers.bridge.adapters.module_hotpotqa import ModuleHotpotQAAdapter
 from optimizers.bridge.adapters.module_lcb import ModuleLCBAdapter
+from optimizers.bridge.adapters.module_math import ModuleMATHAdapter
+from optimizers.bridge.adapters.module_swe import ModuleSWEAdapter
 from optimizers.bridge.registry import TEAM_SIZES
 
-SUPPORTED_TEAMSIZES_DATASETS = ("hotpotqa", "lcb", "bfcl")
+SUPPORTED_TEAMSIZES_DATASETS = ("hotpotqa", "lcb", "bfcl", "math", "swe")
 SUPPORTED_TEAMSIZES_BASE_TOPOLOGIES = ("independent", "decentralized", "sequential", "centralized")
 SUPPORTED_TEAM_SIZES = TEAM_SIZES  # single source of truth: registry.TEAM_SIZES
 
@@ -35,7 +37,13 @@ def teamsizes_module_name(dataset: str, base_topology: str, team_size: int) -> s
 
 
 def class_name(dataset: str, base_topology: str, team_size: int) -> str:
-    dataset_prefix = {"hotpotqa": "HotpotQATeamSizes", "lcb": "LCBTeamSizes", "bfcl": "BFCLTeamSizes"}[dataset]
+    dataset_prefix = {
+        "hotpotqa": "HotpotQATeamSizes",
+        "lcb": "LCBTeamSizes",
+        "bfcl": "BFCLTeamSizes",
+        "math": "MATHTeamSizes",
+        "swe": "SWETeamSizes",
+    }[dataset]
     topo_prefix = "".join(part.title() for part in base_topology.split("_"))
     return f"{dataset_prefix}{topo_prefix}R{team_size}Adapter"
 
@@ -134,7 +142,7 @@ def trace_role(role: str) -> str:
 
 
 class TeamSizesAdapterMixin:
-    """Shared behavior for HotpotQA/LCB/BFCL team-size adapters."""
+    """Shared behavior for the HotpotQA/LCB/BFCL/MATH/SWE team-size adapters."""
 
     team_size: int
     base_topology: str
@@ -186,12 +194,24 @@ class TeamSizesBFCLAdapter(TeamSizesAdapterMixin, ModuleBFCLAdapter):
     framework = "langgraph"
 
 
+class TeamSizesMATHAdapter(TeamSizesAdapterMixin, ModuleMATHAdapter):
+    dataset = "math"
+    framework = "langgraph"
+
+
+class TeamSizesSWEAdapter(TeamSizesAdapterMixin, ModuleSWEAdapter):
+    dataset = "swe"
+    framework = "langgraph"
+
+
 def _make_adapter_class(dataset: str, base_topology: str, team_size: int):
     module_name = teamsizes_module_name(dataset, base_topology, team_size)
     base_class = {
         "hotpotqa": TeamSizesHotpotQAAdapter,
         "lcb": TeamSizesLCBAdapter,
         "bfcl": TeamSizesBFCLAdapter,
+        "math": TeamSizesMATHAdapter,
+        "swe": TeamSizesSWEAdapter,
     }[dataset]
     attrs = {
         "topology": teamsizes_topology(base_topology, team_size),

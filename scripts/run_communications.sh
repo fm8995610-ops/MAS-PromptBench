@@ -16,9 +16,9 @@ export MODEL_ID="${MODEL_ID:-Qwen/Qwen3.5-9B}"
 export TOOLHOP_ALLOW_DATASET_EXEC="${TOOLHOP_ALLOW_DATASET_EXEC:-1}"
 
 TOPOLOGIES="${TOPOLOGIES:-independent sequential centralized decentralized}"
-DATASETS="${DATASETS:-hotpotqa lcb bfcl toolhop apibank swe}"
+DATASETS="${DATASETS:-hotpotqa lcb bfcl toolhop apibank swe}"  # also: math
 FORMATS="${FORMATS:-freeform semi_structured structured_soft}"
-declare -A LIMIT=([hotpotqa]=100 [lcb]=50 [toolhop]=100 [apibank]=100)
+declare -A LIMIT=([hotpotqa]=100 [lcb]=50 [toolhop]=100 [apibank]=100 [math]=100)
 
 # --only flags for the frozen eval IDs of a dataset (optionally one BFCL category).
 eval_only_args() {

@@ -23,6 +23,7 @@ from typing_extensions import TypedDict
 from core import cli, prompts, settings, teams
 from core.batch import attempt
 from core.calculator import CALCULATOR_DOC_NARROW, make_calculator
+from core.communication import CommPolicy
 from core.llm import chat_openai
 from core.paths import RESULTS_DIR
 from core.tasks import math as task
@@ -40,6 +41,8 @@ DEFAULT_PREDICTIONS = (
 
 VLLM_BASE_URL = settings.base_url()
 MODEL_ID = settings.model_id()
+COMMUNICATION_FORMAT = globals().get("COMMUNICATION_FORMAT", "freeform")  # preset by the communications/ entries
+COMMUNICATION = CommPolicy(COMMUNICATION_FORMAT, task.DATASET, TOPOLOGY)
 MAX_TURNS = TEAM.max_turns
 
 calculator = tool(make_calculator(CALCULATOR_DOC_NARROW))
@@ -66,7 +69,7 @@ _MANAGER_TERMINATE_NUDGE = task.TERMINATE_NUDGE + "\n\n" + TEAM.delegation_note
 
 
 def _load_prompt(role: str) -> str:
-    return prompts.role_prompt(TOPOLOGY, task.DATASET, role)
+    return COMMUNICATION.system_prompt(prompts.role_prompt(TOPOLOGY, task.DATASET, role))
 
 
 def _build_llm() -> ChatOpenAI:
