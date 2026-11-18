@@ -23,7 +23,10 @@ A turn's ``text`` is what other agents read; its ``artifact`` is the exact artif
 it produced and is never truncated: the candidate final answer, code, patch or call
 in :data:`ARTIFACT_PHASES`, or a result a runner attaches to a worker's report
 (e.g. the diff of a SWE-bench worker's own clone). ``render`` turns reports into
-the context another agent reads (default :func:`render_reports`).
+the context another agent reads: :func:`render_reports` (the default) passes them
+on whole, while a runner may apply its dataset's handoff policy (the API-Bank and
+ToolHop runners keep the tail of each report, as their other topologies do). The
+candidate a critic or the verifier reviews is always shown whole (:func:`report`).
 """
 
 from __future__ import annotations

@@ -4,7 +4,9 @@ The model solves with the normal task prompts.  communications syntax is rendere
 infrastructure from raw runner reports before metadata is scored or recorded,
 so optimizers improve task behavior instead of JSON/tag formatting obedience.
 Each call runs a fresh copy of the runner with the pair's ``COMMUNICATION_FORMAT``
-preset, so the runner itself renders the handoffs in that format.
+preset, so the runner itself renders the handoffs in that format. The MATH and
+SWE-bench runners render none: their adapters keep the format contract in the
+role prompts and the agents' reports are passed on as written.
 """
 
 from __future__ import annotations
