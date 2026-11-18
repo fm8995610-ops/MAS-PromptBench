@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../../assets/docs.css?v=20261118193637">
+  <link rel="stylesheet" href="../../assets/docs.css?v=20261118194517">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../../assets/mpb-transition.js?v=20261118193637"></script>
-  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261118193637">
+  <script src="../../assets/mpb-transition.js?v=20261118194517"></script>
+  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261118194517">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url="../.." data-version="20261118193637">
+<div class="site" data-base-url="../.." data-version="20261118194517">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -124,7 +124,11 @@
   <li class="nav-section is-active">
     <span class="nav-label">Multi-Agent Systems</span>
     <ul class="nav-list nav-l1">
-  <li><a class="nav-link" href="../topologies/">Workflow Topologies</a></li>
+  <li class="nav-section is-active">
+    <details open>
+      <summary>Workflow Topologies<svg class="i" aria-hidden="true"><use href="#i-chevron"></use></svg></summary>
+      <ul class="nav-list nav-l2">
+  <li><a class="nav-link" href="../topologies/">All Topologies</a></li>
   <li><a class="nav-link" href="../single/">Single</a></li>
   <li><a class="nav-link" href="../independent/">Independent</a></li>
   <li><a class="nav-link" href="../sequential/">Sequential</a></li>
@@ -132,6 +136,9 @@
   <li><a class="nav-link" href="../decentralized/">Decentralized</a></li>
   <li><a class="nav-link" href="../fan-out-fan-in/">Fan-out/Fan-in</a></li>
   <li><a class="nav-link is-active" href="./" aria-current="page">Iterative Refinement</a></li>
+</ul>
+    </details>
+  </li>
   <li><a class="nav-link" href="../communication-protocols/">Communication Protocols</a></li>
   <li><a class="nav-link" href="../team-sizes/">Team Sizes</a></li>
 </ul>
@@ -172,7 +179,7 @@
   <div class="scrim" hidden></div>
 
   <main class="content" id="content">
-    <p class="crumbs"><span>Multi-Agent Systems</span>
+    <p class="crumbs"><span>Multi-Agent Systems</span><svg class="i" aria-hidden="true"><use href="#i-chevron"></use></svg><span>Workflow Topologies</span>
     </p>
     <article class="prose">
       <h1 id="iterative-refinement">Iterative Refinement<a class="headerlink" href="#iterative-refinement" title="Link to this section">#</a></h1>
@@ -352,7 +359,7 @@
     svg: { fontCache: "global" }
   };
 </script>
-<script src="../../assets/docs.js?v=20261118193637" defer></script>
+<script src="../../assets/docs.js?v=20261118194517" defer></script>
 </div>
 </body>
 </html>
