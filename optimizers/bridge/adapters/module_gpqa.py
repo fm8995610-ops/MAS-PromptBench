@@ -428,3 +428,30 @@ class CentralizedAutoGenGPQAAdapter(CentralizedGPQAAdapter):
                 "messages": messages,
             },
         }
+
+
+class _ExtensionGPQAAdapter(ModuleGPQAAdapter):
+    """An extension topology (:mod:`core.workflows`): the submission is the final turn's answer and text only.
+
+    No text of another turn (a worker's subtask, a critic's review, a failed
+    decomposition) stands in for a missing final artifact.
+    """
+
+    def _fallback_raw(self, out: dict) -> str:
+        return ""
+
+
+class FanOutFanInGPQAAdapter(_ExtensionGPQAAdapter):
+    topology = "fan_out_fan_in"
+    framework = "langgraph"
+    prompt_topology = "fan_out_fan_in"
+    roles_ = ["coordinator", "worker"]
+    module_name = "topologies.fan_out_fan_in.gpqa.langgraph_gpqa"
+
+
+class IterativeRefinementGPQAAdapter(_ExtensionGPQAAdapter):
+    topology = "iterative_refinement"
+    framework = "langgraph"
+    prompt_topology = "iterative_refinement"
+    roles_ = ["generator", "critic_1", "critic_2", "verifier"]
+    module_name = "topologies.iterative_refinement.gpqa.langgraph_gpqa"

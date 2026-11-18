@@ -63,19 +63,35 @@ def build_star_graph(roles: list[str], seed_prompts: dict[str, str]) -> MASGraph
     return MASGraph(agents=agents, edges=edges, output_agent=hub, name="centralized-star")
 
 
+# The extension topologies' prompt-variable DAGs over their fixed roles; the first role is the output agent.
+EXTENSION_GRAPHS = {
+    "fan_out_fan_in": (("coordinator", "worker"), (("coordinator", "worker"),)),
+    "iterative_refinement": (
+        ("generator", "critic_1", "critic_2", "verifier"),
+        (("generator", "critic_1"), ("generator", "critic_2"), ("critic_1", "verifier"), ("critic_2", "verifier")),
+    ),
+}
+
+
 def build_prompt_graph(roles: list[str], seed_prompts: dict[str, str], topology: str, team_size: int = 1) -> MASGraph:
-    """The prompt-variable graph of a topology (star, chain, or one tied replica variable)."""
+    """The prompt-variable graph of a topology (star, chain, extension DAG, or one tied replica variable)."""
     if topology == "centralized":
         return build_star_graph(roles, seed_prompts)
     agents = {r: Agent(id=r, role=r, base_prompt=seed_prompts[r]) for r in roles}
+    output_agent = roles[-1]
     if topology == "sequential":
         edges = [Edge(left, right) for left, right in zip(roles, roles[1:])]
+    elif topology in EXTENSION_GRAPHS and tuple(roles) == EXTENSION_GRAPHS[topology][0]:
+        # Fan-out: the coordinator's plan reaches the (tied) worker prompt; refinement: the
+        # generator's candidate reaches both critics, whose reviews reach the verifier.
+        edges = [Edge(parent, child) for parent, child in EXTENSION_GRAPHS[topology][1]]
+        output_agent = roles[0]
     elif topology in {"single", "independent", "decentralized"} and len(roles) == 1:
         # Replicas share one prompt parameter. No fictitious manager/worker edge.
         edges = []
     else:
         raise ValueError("unsupported native prompt-variable topology")
-    graph = MASGraph(agents=agents, edges=edges, output_agent=roles[-1], name=f"native-{topology}-prompt-graph")
+    graph = MASGraph(agents=agents, edges=edges, output_agent=output_agent, name=f"native-{topology}-prompt-graph")
     graph.tied_replicas = int(team_size) if topology in {"independent", "decentralized"} else 1
     graph.tied_peer_edges = int(team_size) * (int(team_size) - 1) if topology == "decentralized" else 0
     graph.factor_edges = [Edge(roles[0], roles[0])] if graph.tied_peer_edges else edges
@@ -105,7 +121,7 @@ def topology_contexts(record: dict, graph: MASGraph, topology: str) -> dict[str,
     messages = record.get("messages") or []
     result = {}
     for role in graph.agent_ids:
-        if topology == "sequential":
+        if topology == "sequential" or topology in EXTENSION_GRAPHS:
             first = next((i for i, item in enumerate(messages) if item.get("source") == role), len(messages))
             visible = messages[:first]
         elif topology == "decentralized":

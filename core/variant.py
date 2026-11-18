@@ -11,7 +11,7 @@ script runs the runner's command line.
 
 The parameters are ``TEAM_SIZE`` (a size of :data:`core.teams.TEAM_SIZES`),
 ``TOPOLOGY`` (the multi-agent topology a shared runner plays, e.g. the API-Bank
-and ToolHop team sizes), ``STYLE`` (the label of the records, e.g. the CrewAI
+and ToolHop team sizes, and the extension topologies of ``topologies/workflows``), ``STYLE`` (the label of the records, e.g. the CrewAI
 and AutoGen API-Bank / ToolHop runners) and ``COMMUNICATION_FORMAT`` (a format of
 :data:`core.communication.FORMATS`: how the agents report to each other). A
 runner reads a preset parameter with ``globals().get(<NAME>)`` (or
@@ -31,7 +31,7 @@ from types import ModuleType
 from core import teams
 from core.communication import FORMATS
 
-TOPOLOGIES = ("independent", "decentralized", "sequential", "centralized")
+TOPOLOGIES = ("independent", "decentralized", "sequential", "centralized", *teams.FIXED_TEAMS)
 _VALID = {
     "TEAM_SIZE": lambda value: value in teams.TEAM_SIZES,
     "TOPOLOGY": lambda value: value in TOPOLOGIES,

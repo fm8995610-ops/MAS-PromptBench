@@ -181,3 +181,18 @@ lcb:
           - review_worker
           - complexity_analyzer_worker
           - optimizer_worker
+
+  fan_out_fan_in:
+    recursion_limit: 20
+    tools:
+      coordinator: [python_exec]
+      worker: [python_exec]
+
+  iterative_refinement:
+    recursion_limit: 20
+    max_rounds: 3
+    tools:
+      generator: [python_exec]
+      critic_1: [python_exec]
+      critic_2: [python_exec]
+      verifier: [python_exec]

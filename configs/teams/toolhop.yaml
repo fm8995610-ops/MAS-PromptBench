@@ -1,0 +1,17 @@
+# Team specs for toolhop; schema in configs/teams/README.md. Text is sent to the model verbatim.
+# Only the extension topologies: the other toolhop topologies fix their roles in code, and the
+# agents' tools are supplied per instance, so no role lists a named tool.
+
+toolhop:
+  fan_out_fan_in:
+    tools:
+      coordinator: []
+      worker: []
+
+  iterative_refinement:
+    max_rounds: 3
+    tools:
+      generator: []
+      critic_1: []
+      critic_2: []
+      verifier: []

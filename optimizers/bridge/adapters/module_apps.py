@@ -190,3 +190,33 @@ class CentralizedAutoGenAPPSAdapter(CentralizedAPPSAdapter):
     topology = "centralized_autogen"
     framework = "autogen"
     module_name = "topologies.centralized.autogen.apps.autogen_apps"
+
+
+class _ExtensionAPPSAdapter(ModuleAPPSAdapter):
+    """An extension topology (:mod:`core.workflows`): the submission is the final turn's program and text only.
+
+    No program or text of another turn (a worker's subtask, a critic's snippet, a
+    failed decomposition) stands in for a missing final artifact.
+    """
+
+    def _extract_code_from_output(self, module, out: dict) -> str | None:
+        return None
+
+    def _fallback_raw(self, out: dict) -> str:
+        return ""
+
+
+class FanOutFanInAPPSAdapter(_ExtensionAPPSAdapter):
+    topology = "fan_out_fan_in"
+    framework = "langgraph"
+    prompt_topology = "fan_out_fan_in"
+    roles_ = ["coordinator", "worker"]
+    module_name = "topologies.fan_out_fan_in.apps.langgraph_apps"
+
+
+class IterativeRefinementAPPSAdapter(_ExtensionAPPSAdapter):
+    topology = "iterative_refinement"
+    framework = "langgraph"
+    prompt_topology = "iterative_refinement"
+    roles_ = ["generator", "critic_1", "critic_2", "verifier"]
+    module_name = "topologies.iterative_refinement.apps.langgraph_apps"

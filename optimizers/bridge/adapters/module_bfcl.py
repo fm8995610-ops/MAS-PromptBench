@@ -1,10 +1,11 @@
 """BFCL adapters backed by the real LangGraph topology and team-size modules.
 
 The per-topology BFCL adapters (``<topology>_bfcl.py``) re-build each graph
-inside the adapter. Team-size and communication variants instead execute the
-real runner module (``teamsizes/<topology>/bfcl/bfcl_r<N>.py`` or the
-``topologies/`` base runner), with the adapter's mutable prompts and the
-shared decoding helpers patched into the module for the duration of a call.
+inside the adapter. Team-size and communication variants and the extension
+topologies instead execute the real runner module (``teamsizes/<topology>/bfcl/bfcl_r<N>.py``,
+the ``topologies/`` base runner or ``topologies/<topology>/bfcl/langgraph_bfcl.py``), with the
+adapter's mutable prompts and the shared decoding helpers patched into the module
+for the duration of a call.
 """
 
 from __future__ import annotations
@@ -228,3 +229,19 @@ class ModuleBFCLAdapter:
     def _check_role(self, role: str) -> None:
         if role not in self.roles_:
             raise KeyError(f"Unknown role {role!r}; expected one of {self.roles_}")
+
+
+class FanOutFanInBFCLAdapter(ModuleBFCLAdapter):
+    topology = "fan_out_fan_in"
+    framework = "langgraph"
+    prompt_topology = "fan_out_fan_in"
+    roles_ = ["coordinator", "worker"]
+    module_name = "topologies.fan_out_fan_in.bfcl.langgraph_bfcl"
+
+
+class IterativeRefinementBFCLAdapter(ModuleBFCLAdapter):
+    topology = "iterative_refinement"
+    framework = "langgraph"
+    prompt_topology = "iterative_refinement"
+    roles_ = ["generator", "critic_1", "critic_2", "verifier"]
+    module_name = "topologies.iterative_refinement.bfcl.langgraph_bfcl"

@@ -328,3 +328,96 @@ topologies:
       apibank:
         debater: "Predicts the next API call in round 0, including ToolSearcher when needed; in later rounds, compares peers' API choices and argument evidence, then revises when peer reasoning is stronger."
 
+
+  fan_out_fan_in:
+    description: >
+      1 coordinator + 3 workers that share one role and one prompt. The
+      coordinator decomposes the task once into 3 complementary subtasks;
+      the 3 workers solve their subtasks in parallel and never see each
+      other's work; the same coordinator then synthesizes the workers'
+      results into the final answer. No iteration.
+    benchmarks:
+      gpqa:
+        coordinator: "Splits the MCQ into 3 complementary subquestions (e.g. principles, key computation, option elimination), then synthesizes the workers' findings and emits one of A/B/C/D."
+        worker: "Answers one assigned subquestion of the MCQ and reports the finding with its reasoning to the coordinator."
+      math:
+        coordinator: "Splits the competition math problem into 3 complementary subproblems, then combines the workers' results and emits the final answer in \\boxed{...}."
+        worker: "Solves one assigned subproblem, using the calculator for arithmetic, and reports the result and derivation to the coordinator."
+      hotpotqa:
+        coordinator: "Splits the multi-hop question into 3 complementary lookups (entities, bridge facts, comparison), then combines the workers' evidence and emits the short-form answer."
+        worker: "Resolves one assigned lookup by searching Wikipedia and reports the facts found, with their sources, to the coordinator."
+      lcb:
+        coordinator: "Splits the programming problem into 3 complementary parts (approach, implementation, edge-case tests), then merges the workers' results and emits the final Python program."
+        worker: "Completes one assigned part of the programming problem, using python_exec to check code, and reports the result to the coordinator."
+      apps:
+        coordinator: "Splits the programming problem into 3 complementary parts (approach, implementation, edge-case tests), then merges the workers' results and emits the final Python program."
+        worker: "Completes one assigned part of the programming problem, using python_exec to check code, and reports the result to the coordinator."
+      bfcl:
+        coordinator: "Splits the function-calling request into 3 complementary parts (intent, function choice, argument values), then combines the workers' results and emits the call(s) matching the schema."
+        worker: "Works out one assigned part of the function-calling request against the provided schemas and reports it to the coordinator."
+      swe:
+        coordinator: "Splits the GitHub issue into 3 complementary subtasks (localization, fix, verification), then combines the workers' findings and patches into one unified diff."
+        worker: "Works on one assigned subtask in its own copy of the repository and reports its findings and edits to the coordinator."
+      toolhop:
+        coordinator: "Splits the multi-hop tool-use question into 3 complementary parts of the tool chain, then combines the workers' results and emits the exact final answer."
+        worker: "Resolves one assigned part of the tool chain by calling the dynamic tools and reports the tool results to the coordinator."
+      apibank:
+        coordinator: "Splits the next-API-call prediction into 3 complementary parts (dialogue intent, API choice, argument values), then combines the workers' results and emits one bracketed API call."
+        worker: "Works out one assigned part of the next API call from the dialogue and API descriptions or ToolSearcher evidence and reports it to the coordinator."
+
+  iterative_refinement:
+    description: >
+      4 agents refine one candidate for at most 3 rounds: a generator, two
+      critics and a verifier. The generator writes the candidate, or revises
+      it from the previous round's feedback; the two critics review it in
+      parallel without changing it (one for correctness and requirements,
+      one for edge cases, tool use and regressions); the verifier reads the
+      candidate and both reviews, then accepts the candidate or returns
+      feedback to the generator. The final answer is the generator's latest
+      candidate.
+    benchmarks:
+      gpqa:
+        generator: "Answers the MCQ with reasoning and one of A/B/C/D, and revises the answer from the reviewers' feedback."
+        critic_1: "Checks the candidate's reasoning for scientific correctness and fit to the question; gives actionable feedback without changing the answer."
+        critic_2: "Checks the rejected options, edge cases and any calculation in the candidate; gives actionable feedback without changing the answer."
+        verifier: "Reads the candidate and both reviews and either accepts the answer or returns concrete feedback to the generator."
+      math:
+        generator: "Solves the competition math problem with the calculator and emits the answer in \\boxed{...}; revises the solution from the reviewers' feedback."
+        critic_1: "Checks the candidate's derivation and final answer for mathematical correctness; gives actionable feedback without changing the solution."
+        critic_2: "Checks edge cases, arithmetic (with the calculator) and the answer's final form; gives actionable feedback without changing the solution."
+        verifier: "Reads the candidate and both reviews and either accepts the solution or returns concrete feedback to the generator."
+      hotpotqa:
+        generator: "Answers the multi-hop question from Wikipedia evidence with a short-form answer, and revises it from the reviewers' feedback."
+        critic_1: "Checks that the candidate answers the question asked and that each hop is supported by evidence; gives actionable feedback without changing it."
+        critic_2: "Checks entity disambiguation, missing hops and answer format, using Wikipedia lookups when needed; gives actionable feedback without changing it."
+        verifier: "Reads the candidate and both reviews and either accepts the answer or returns concrete feedback to the generator."
+      lcb:
+        generator: "Writes a complete Python program that passes the hidden tests, and revises it from the reviewers' feedback."
+        critic_1: "Checks the candidate program's correctness against the problem statement and I/O format; gives actionable feedback without editing the code."
+        critic_2: "Tests the candidate program on edge cases and large inputs with python_exec; gives actionable feedback without editing the code."
+        verifier: "Reads the candidate program and both reviews and either accepts the program or returns concrete feedback to the generator."
+      apps:
+        generator: "Writes a complete Python program that passes the hidden tests, and revises it from the reviewers' feedback."
+        critic_1: "Checks the candidate program's correctness against the problem statement and I/O format; gives actionable feedback without editing the code."
+        critic_2: "Tests the candidate program on edge cases and large inputs with python_exec; gives actionable feedback without editing the code."
+        verifier: "Reads the candidate program and both reviews and either accepts the program or returns concrete feedback to the generator."
+      bfcl:
+        generator: "Emits the function call(s) that satisfy the request per the provided schema, and revises them from the reviewers' feedback."
+        critic_1: "Checks that the candidate call(s) fulfil the user's request with the right function(s); gives actionable feedback without changing them."
+        critic_2: "Checks argument names, types, required and optional parameters against the schema; gives actionable feedback without changing the call(s)."
+        verifier: "Reads the candidate call(s) and both reviews and either accepts them or returns concrete feedback to the generator."
+      swe:
+        generator: "Edits the repository to resolve the GitHub issue; the patch is the repository diff, revised from the reviewers' feedback."
+        critic_1: "Reads the candidate diff and the code it touches to check that it fixes the reported behavior; read-only, gives actionable feedback."
+        critic_2: "Reads the candidate diff for edge cases, unintended changes and regression risks; read-only, gives actionable feedback."
+        verifier: "Reads the candidate diff and both reviews and either accepts the patch or returns concrete feedback to the generator; read-only."
+      toolhop:
+        generator: "Calls the dynamic tools in sequence to answer the multi-hop question with the exact final answer, and revises it from the reviewers' feedback."
+        critic_1: "Checks that the candidate's tool chain answers the question asked and that the final answer follows from the tool results; gives actionable feedback."
+        critic_2: "Checks tool arguments, skipped hops and the exact answer format; gives actionable feedback without changing the answer."
+        verifier: "Reads the candidate and both reviews and either accepts the answer or returns concrete feedback to the generator."
+      apibank:
+        generator: "Predicts the next API call from the dialogue and API descriptions or ToolSearcher evidence, emits one bracketed API call, and revises it from the reviewers' feedback."
+        critic_1: "Checks that the candidate calls the right API for the user's current request; gives actionable feedback without changing the call."
+        critic_2: "Checks the candidate's argument names and values against the dialogue and API description; gives actionable feedback without changing the call."
+        verifier: "Reads the candidate call and both reviews and either accepts it or returns concrete feedback to the generator."

@@ -211,3 +211,18 @@ bfcl:
           - type_check_worker
           - disambiguator_worker
           - value_enricher_worker
+
+  fan_out_fan_in:
+    recursion_limit: 25
+    tools:
+      coordinator: []
+      worker: []
+
+  iterative_refinement:
+    recursion_limit: 25
+    max_rounds: 3
+    tools:
+      generator: []
+      critic_1: []
+      critic_2: []
+      verifier: []

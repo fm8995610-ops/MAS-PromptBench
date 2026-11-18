@@ -190,6 +190,27 @@ for _dataset in _TOOLUSE_DATASETS:
             )
 
 
+# The extension topologies: one LangGraph adapter per dataset, in its module_<dataset>.py.
+_EXTENSION_TOPOLOGY_PREFIXES = {"fan_out_fan_in": "FanOutFanIn", "iterative_refinement": "IterativeRefinement"}
+_EXTENSION_DATASET_PREFIXES = {
+    "bfcl": "BFCL",
+    "gpqa": "GPQA",
+    "hotpotqa": "HotpotQA",
+    "math": "MATH",
+    "apps": "APPS",
+    "lcb": "LCB",
+    "swe": "SWE",
+    "apibank": "APIBank",
+    "toolhop": "ToolHop",
+}
+
+for _dataset, _dataset_prefix in _EXTENSION_DATASET_PREFIXES.items():
+    for _topology, _topology_prefix in _EXTENSION_TOPOLOGY_PREFIXES.items():
+        DATASET_ADAPTERS[_dataset][_topology] = (
+            f"optimizers.bridge.adapters.module_{_dataset}:{_topology_prefix}{_dataset_prefix}Adapter"
+        )
+
+
 def datasets() -> list[str]:
     """Return registered dataset names."""
     return sorted(DATASET_ADAPTERS)

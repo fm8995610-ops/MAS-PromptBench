@@ -41,6 +41,8 @@ CENTRALIZED_FINAL_ROLES_BY_DATASET = {
     },
     "apibank": {"manager", "manager_r8", "manager_r10", "caller_worker", "validator_worker", "call_normalizer_worker"},
 }
+# The extension topologies: the coordinator synthesizes, the generator owns the candidate.
+EXTENSION_FINAL_ROLES = {"fan_out_fan_in": {"coordinator"}, "iterative_refinement": {"generator"}}
 SEQUENTIAL_FINAL_ROLES = {
     "bfcl": {"verifier"},
     "gpqa": {"verifier"},
@@ -66,6 +68,8 @@ def output_contract(dataset: str, topology: str, role: str) -> str:
         is_final_role = role_key in SEQUENTIAL_FINAL_ROLES.get(dataset_key, set())
     elif topology_key in {"centralized", "centralized_autogen"}:
         is_final_role = role_key in CENTRALIZED_FINAL_ROLES_BY_DATASET.get(dataset_key, CENTRALIZED_FINAL_ROLES)
+    elif topology_key in EXTENSION_FINAL_ROLES:
+        is_final_role = role_key in EXTENSION_FINAL_ROLES[topology_key]
     else:
         is_final_role = False
     if not is_final_role:

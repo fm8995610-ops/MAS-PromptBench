@@ -260,3 +260,30 @@ class CentralizedAutoGenSWEAdapter(CentralizedSWEAdapter):
     topology = "centralized_autogen"
     framework = "autogen"
     module_name = "topologies.centralized.autogen.swe.autogen_swe"
+
+
+class _ExtensionSWEAdapter(ModuleSWEAdapter):
+    """An extension topology (:mod:`core.workflows`): the submission is the final turn's patch and text only.
+
+    No text of another turn (a worker's subtask, a critic's review, a failed
+    decomposition) stands in for a missing final artifact.
+    """
+
+    def _fallback_raw(self, out: dict) -> str:
+        return ""
+
+
+class FanOutFanInSWEAdapter(_ExtensionSWEAdapter):
+    topology = "fan_out_fan_in"
+    framework = "langgraph"
+    prompt_topology = "fan_out_fan_in"
+    roles_ = ["coordinator", "worker"]
+    module_name = "topologies.fan_out_fan_in.swe.langgraph_swe"
+
+
+class IterativeRefinementSWEAdapter(_ExtensionSWEAdapter):
+    topology = "iterative_refinement"
+    framework = "langgraph"
+    prompt_topology = "iterative_refinement"
+    roles_ = ["generator", "critic_1", "critic_2", "verifier"]
+    module_name = "topologies.iterative_refinement.swe.langgraph_swe"

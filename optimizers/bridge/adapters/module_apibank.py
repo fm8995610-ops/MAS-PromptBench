@@ -28,6 +28,9 @@ CORE_TOPOLOGIES = {
     "centralized_autogen": ("centralized", "centralized_autogen"),
     "decentralized": ("decentralized", "decentralized_langgraph"),
     "decentralized_openai_agents": ("decentralized", "decentralized_openai_agents"),
+    # The extension topologies (topologies/workflows/apibank.py).
+    "fan_out_fan_in": ("fan_out_fan_in", "fan_out_fan_in_langgraph"),
+    "iterative_refinement": ("iterative_refinement", "iterative_refinement_langgraph"),
 }
 CORE_CLASS_NAMES = {
     "single": "SingleAPIBankAdapter",
@@ -38,6 +41,8 @@ CORE_CLASS_NAMES = {
     "centralized_autogen": "CentralizedAutoGenAPIBankAdapter",
     "decentralized": "DecentralizedAPIBankAdapter",
     "decentralized_openai_agents": "DecentralizedOpenAIAgentsAPIBankAdapter",
+    "fan_out_fan_in": "FanOutFanInAPIBankAdapter",
+    "iterative_refinement": "IterativeRefinementAPIBankAdapter",
 }
 
 

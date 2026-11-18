@@ -28,6 +28,9 @@ CORE_TOPOLOGIES = {
     "centralized_autogen": ("centralized", "centralized_autogen"),
     "decentralized": ("decentralized", "decentralized_langgraph"),
     "decentralized_openai_agents": ("decentralized", "decentralized_openai_agents"),
+    # The extension topologies (topologies/workflows/toolhop.py).
+    "fan_out_fan_in": ("fan_out_fan_in", "fan_out_fan_in_langgraph"),
+    "iterative_refinement": ("iterative_refinement", "iterative_refinement_langgraph"),
 }
 CORE_CLASS_NAMES = {
     "single": "SingleToolHopAdapter",
@@ -38,6 +41,8 @@ CORE_CLASS_NAMES = {
     "centralized_autogen": "CentralizedAutoGenToolHopAdapter",
     "decentralized": "DecentralizedToolHopAdapter",
     "decentralized_openai_agents": "DecentralizedOpenAIAgentsToolHopAdapter",
+    "fan_out_fan_in": "FanOutFanInToolHopAdapter",
+    "iterative_refinement": "IterativeRefinementToolHopAdapter",
 }
 
 

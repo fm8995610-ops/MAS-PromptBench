@@ -5,6 +5,7 @@ size in :data:`TEAM_SIZES`; :func:`spec` returns it as a :class:`TeamSpec`. A
 topologies/ LangGraph runner builds its team from ``spec(topology, dataset)``
 (r = :data:`BASE_SIZE`), and each teamsizes/ runner executes that runner with
 another r (:mod:`core.variant`). The agents' recursion limit is the same at every r.
+The two extension topologies (:data:`FIXED_TEAMS`) have one four-agent team.
 """
 
 from __future__ import annotations
@@ -19,6 +20,11 @@ from core.paths import CONFIGS_DIR
 CONFIG_DIR = CONFIGS_DIR / "teams"
 TEAM_SIZES = (2, 4, 8, 10)
 BASE_SIZE = 4
+# Extension topologies with one fixed team: their prompt roles in team order.
+FIXED_TEAMS = {
+    "fan_out_fan_in": ("coordinator", "worker"),
+    "iterative_refinement": ("generator", "critic_1", "critic_2", "verifier"),
+}
 
 _COUNT_WORDS = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine"}
 _DELEGATION_NOTE = (
@@ -62,6 +68,9 @@ class TeamSpec:
     workers: tuple[Worker, ...] = ()  # centralized
     manager_tools: tuple[str, ...] = ()  # centralized, besides the delegate tools
     max_turns: int | None = None  # centralized: manager + worker turns before the run stops
+    role_tools: tuple[tuple[str, tuple[str, ...]], ...] = ()  # fixed teams: (role, tools) in team order
+    n_workers: int | None = None  # fan_out_fan_in: workers sharing the worker role
+    max_rounds: int | None = None  # iterative_refinement: generate-review-verify rounds
 
     @property
     def n_agents(self) -> int:
@@ -75,7 +84,13 @@ class TeamSpec:
             return tuple(stage.role for stage in self.stages)
         if self.manager:
             return (self.manager, *(worker.role for worker in self.workers))
+        if self.role_tools:
+            return tuple(role for role, _ in self.role_tools)
         return (self.role,)
+
+    def tools(self, role: str) -> tuple[str, ...]:
+        """A fixed team's tools for ``role``."""
+        return dict(self.role_tools)[role]
 
     @property
     def delegation_note(self) -> str:
@@ -134,6 +149,22 @@ def _centralized(cfg: dict, size: int) -> dict:
     }
 
 
+def _fixed(topology: str):
+    """Builder of a fixed four-agent team: each role's tools, plus the topology's shape keys."""
+
+    def build(cfg: dict, size: int) -> dict:
+        if size != BASE_SIZE:
+            raise ValueError(f"{topology} has one team of {BASE_SIZE} agents, got size {size}")
+        fields = {"role_tools": tuple((role, tuple(cfg["tools"][role])) for role in FIXED_TEAMS[topology])}
+        if topology == "fan_out_fan_in":
+            fields["n_workers"] = BASE_SIZE - 1
+        else:
+            fields["max_rounds"] = cfg["max_rounds"]
+        return fields
+
+    return build
+
+
 def _worker(cfg: dict, role: str) -> Worker:
     """Worker ``role``: its ``tools_by_worker`` entry (default ``worker_tools``) and ``prompt_suffixes`` entry."""
     tools = cfg.get("tools_by_worker", {}).get(role, cfg["worker_tools"])
@@ -145,4 +176,5 @@ _FIELDS = {
     "decentralized": _replicated,
     "sequential": _sequential,
     "centralized": _centralized,
+    **{topology: _fixed(topology) for topology in FIXED_TEAMS},
 }

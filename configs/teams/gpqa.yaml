@@ -184,3 +184,18 @@ gpqa:
           - consistency_check_worker
           - evidence_gatherer_worker
           - confidence_reporter_worker
+
+  fan_out_fan_in:
+    recursion_limit: 15
+    tools:
+      coordinator: [calculator]
+      worker: [calculator]
+
+  iterative_refinement:
+    recursion_limit: 15
+    max_rounds: 3
+    tools:
+      generator: [calculator]
+      critic_1: [calculator]
+      critic_2: [calculator]
+      verifier: [calculator]

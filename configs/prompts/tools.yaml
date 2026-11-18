@@ -106,3 +106,25 @@ decentralized:
   toolhop:  *toolhop_dynamic_tools
   apibank:  *apibank_dynamic_apis
 
+
+fan_out_fan_in:
+  gpqa:     *calculator
+  math:     *calculator
+  hotpotqa: *single_hotpotqa_wikipedia
+  bfcl:     *bfcl_function_calling
+  lcb:      *python_exec
+  apps:     *python_exec
+  swe:      *swe_tools_strreplace
+  toolhop:  *toolhop_dynamic_tools
+  apibank:  *apibank_dynamic_apis
+
+iterative_refinement:
+  gpqa:     *calculator
+  math:     *calculator
+  hotpotqa: *single_hotpotqa_wikipedia
+  bfcl:     *bfcl_function_calling
+  lcb:      *python_exec
+  apps:     *python_exec
+  swe:      *swe_tools_strreplace
+  toolhop:  *toolhop_dynamic_tools
+  apibank:  *apibank_dynamic_apis

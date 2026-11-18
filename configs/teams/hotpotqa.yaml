@@ -186,3 +186,18 @@ hotpotqa:
           - citation_worker
           - entity_disambiguator_worker
           - answer_simplifier_worker
+
+  fan_out_fan_in:
+    recursion_limit: 20
+    tools:
+      coordinator: [wikipedia_search, wikipedia_page]
+      worker: [wikipedia_search, wikipedia_page]
+
+  iterative_refinement:
+    recursion_limit: 20
+    max_rounds: 3
+    tools:
+      generator: [wikipedia_search, wikipedia_page]
+      critic_1: [wikipedia_search, wikipedia_page]
+      critic_2: [wikipedia_search, wikipedia_page]
+      verifier: [wikipedia_search, wikipedia_page]

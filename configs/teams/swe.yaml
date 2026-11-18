@@ -188,3 +188,18 @@ swe:
           - regression_check_worker
           - test_designer_worker
           - commit_summarizer_worker
+
+  fan_out_fan_in:
+    recursion_limit: 60
+    tools:
+      coordinator: [file_read, str_replace, list_dir, search_repo, shell_exec]
+      worker: [file_read, str_replace, list_dir, search_repo, shell_exec]
+
+  iterative_refinement:
+    recursion_limit: 60
+    max_rounds: 3
+    tools:
+      generator: [file_read, str_replace, list_dir, search_repo, shell_exec]
+      critic_1: [file_read, list_dir, search_repo]
+      critic_2: [file_read, list_dir, search_repo]
+      verifier: [file_read, list_dir, search_repo]

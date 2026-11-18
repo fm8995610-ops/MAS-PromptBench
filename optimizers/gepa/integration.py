@@ -58,6 +58,8 @@ SUPPORTED_FRAMEWORKS_BY_TOPOLOGY: Mapping[str, frozenset[str]] = {
     "sequential": frozenset({"langgraph", "crewai"}),
     "centralized": frozenset({"langgraph", "autogen"}),
     "decentralized": frozenset({"langgraph", "openai_agents"}),
+    "fan_out_fan_in": frozenset({"langgraph"}),
+    "iterative_refinement": frozenset({"langgraph"}),
 }
 
 

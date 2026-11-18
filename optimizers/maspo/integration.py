@@ -9,6 +9,9 @@ backend with logical request seeds. Topology wiring:
   workers;
 * sequential: the native stage order, final stage terminal, successor = next
   stage, predecessor = previous stage;
+* fan_out_fan_in: wired like centralized, with the coordinator as the hub;
+* iterative_refinement: critics, verifier, then the generator (terminal); each
+  critic's successor is the verifier, the verifier's is the generator;
 * single/independent/decentralized: the one shared replica prompt, scored by
   full-system global credit.
 
@@ -39,6 +42,9 @@ from optimizers.protocol.session import RunnerSession
 
 from . import search
 from .search import PROPOSAL_TEMPERATURE, TaskType
+
+# The role that produces the final output of each extension topology.
+EXTENSION_TERMINALS = {"fan_out_fan_in": "coordinator", "iterative_refinement": "generator"}
 
 
 @dataclass(frozen=True)
@@ -182,13 +188,24 @@ class MASPOOptimizer:
                 raise NativeIntegrationError("MASPO requires the exact centralized manager")
             terminal = managers[0]
             role_order = [role for role in roles if role != terminal] + [terminal]
+        elif cell.topology in EXTENSION_TERMINALS:
+            terminal = EXTENSION_TERMINALS[cell.topology]
+            if terminal not in roles:
+                raise NativeIntegrationError(f"MASPO requires the {cell.topology} {terminal} role")
+            role_order = [role for role in roles if role != terminal] + [terminal]
         else:
             terminal = roles[-1]
             role_order = roles
         workers = [role for role in role_order if role != terminal]
-        if cell.topology == "centralized":
+        if cell.topology in {"centralized", "fan_out_fan_in"}:
             successor: dict[str, str | None] = {role: terminal if role != terminal else None for role in role_order}
             predecessors = {terminal: list(workers), **{role: [terminal] for role in workers}}
+        elif cell.topology == "iterative_refinement":
+            critics = [role for role in workers if role != "verifier"]
+            if "verifier" not in workers or not critics:
+                raise NativeIntegrationError("MASPO requires the generator, critic and verifier roles")
+            successor = {**dict.fromkeys(critics, "verifier"), "verifier": terminal, terminal: None}
+            predecessors = {**{role: [terminal] for role in critics}, "verifier": critics, terminal: ["verifier"]}
         elif cell.topology == "sequential":
             successor = {
                 role: role_order[i + 1] if i + 1 < len(role_order) else None for i, role in enumerate(role_order)

@@ -20,6 +20,8 @@ from optimizers.bridge.output_contracts import append_output_contract
 from optimizers.bridge.registry import TEAM_SIZES  # noqa: F401  (re-exported to the dataset adapters)
 
 BASE_TOPOLOGIES = ("independent", "decentralized", "sequential", "centralized")
+# One fixed four-agent LangGraph team each, freeform messages only.
+EXTENSION_TOPOLOGIES = ("fan_out_fan_in", "iterative_refinement")
 COMMUNICATIONS_FORMATS = ("freeform", "semi_structured", "structured_soft")
 DEFAULT_CORE_TEAM_SIZE = 4
 COMMUNICATION_FIELDS = (
@@ -137,6 +139,10 @@ def profile_for(dataset: str, base_topology: str, team_size: int | None = None) 
         manager, workers = centralized_roles(dataset, effective_team_size)
         roles = [manager, *workers]
         return {"roles": roles, "final_role": manager, "stage_roles": None, "worker_roles": tuple(workers)}
+    if base_topology in EXTENSION_TOPOLOGIES:
+        roles = list(roles_from_yaml(dataset, base_topology))
+        # The first role is the final one: the coordinator or the generator.
+        return {"roles": roles, "final_role": roles[0], "stage_roles": None, "worker_roles": None}
     raise ValueError(f"unsupported topology {base_topology!r}")
 
 
@@ -152,6 +158,8 @@ _TOPOLOGY_MODULES = {
     "centralized_autogen": "topologies.centralized.autogen.{ds}.autogen_{ds}",
     "decentralized": "topologies.decentralized.langgraph.{ds}.langgraph_{ds}",
     "decentralized_openai_agents": "topologies.decentralized.openai_agents.{ds}.openai_agents_{ds}",
+    "fan_out_fan_in": "topologies.fan_out_fan_in.{ds}.langgraph_{ds}",
+    "iterative_refinement": "topologies.iterative_refinement.{ds}.langgraph_{ds}",
 }
 
 
@@ -353,6 +361,9 @@ class CommonToolUseAdapterBase:
         return "\n".join(fields)
 
     def role_detail(self, role: str, out: dict) -> str:
+        if self.runner_topology in EXTENSION_TOPOLOGIES:
+            texts = [item.get("content", "") for item in out.get("messages") or [] if item.get("source") == role]
+            return f"{role}_last_message={str(texts[-1] if texts else '')[:1200]}"
         if "by_stage" in out:
             return f"{role}_text={str((out.get('by_stage') or {}).get(role, ''))[:1200]}"
         if role == self.final_role and isinstance(out.get("manager"), dict):

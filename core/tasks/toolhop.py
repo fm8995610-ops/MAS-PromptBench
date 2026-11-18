@@ -882,7 +882,7 @@ def _write_messages(path: Path, messages: list[dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w") as f:
         for message in messages:
-            f.write(f"=== {str(message.get('role', '?')).upper()} ===\n")
+            f.write(f"=== {str(message.get('role') or message.get('agent') or '?').upper()} ===\n")
             if message.get("content"):
                 f.write(str(message.get("content")) + "\n")
             for tool_call in message.get("tool_calls") or []:
