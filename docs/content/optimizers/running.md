@@ -28,8 +28,10 @@ A cell is a dataset plus a runtime: topology, framework, communication format, t
 | Independent with 8 agents | `--topology independent_r8`, or `--topology independent --team-size 8` |
 | Centralized with structured reports | `--topology centralized_communications_structured_soft` |
 | Llama as the task model | `--model llama` (`meta-llama/Llama-3.1-8B-Instruct`; `qwen` is `Qwen/Qwen3.5-9B`) |
+| Fan-out/Fan-in or Iterative Refinement | `--topology fan_out_fan_in` or `--topology iterative_refinement`, with `--study new_topologies` |
+| Seed prompts from the second set | `--prompt-set P2`, with `--study prompt_set2` |
 
-Team-size and communication runtimes exist for HotpotQA, LiveCodeBench, BFCL, API-Bank and ToolHop; [Command-Line Flags](../reference/cli.md#run-protocol) lists every key. A cell outside a method's part of the experiment grid stops with an error unless you pass `--allow-any-cell`; [Optimizers](index.md#the-eight-methods) says which cells each method covers.
+Team-size and communication runtimes exist for HotpotQA, LiveCodeBench, BFCL, MATH, SWE-bench, API-Bank and ToolHop; the extension topologies have neither. [Command-Line Flags](../reference/cli.md#run-protocol) lists every key. A cell outside a method's part of the experiment grid stops with an error unless its [extension study](#run-an-extension-study) admits it or you pass `--allow-any-cell`; [Optimizers](index.md#the-eight-methods) says which cells each method covers.
 
 ## Run a job
 
@@ -100,7 +102,7 @@ python -m optimizers.protocol.aggregate runs/ --out runs/summary.json
 
 | Column | Content |
 | --- | --- |
-| `method`, `task`, `runtime`, `model` | The cell; `runtime` is its registry key. |
+| `method`, `task`, `runtime`, `model` | The cell; `runtime` is its registry key, followed by `[P2]` for a cell started from P2. |
 | `seeds` | `0,1,2` for a complete cell. |
 | `base`, `deployed` | Test means of the seed and deployed bundles, averaged over seeds. |
 | `delta_pp`, `std_pp` | Mean and standard deviation of the per-seed gain, in percentage points. |
@@ -108,13 +110,39 @@ python -m optimizers.protocol.aggregate runs/ --out runs/summary.json
 | `fallbacks` | Seeds that kept the seed bundle, out of 3. |
 | `min_p_holm` | Smallest Holm-adjusted per-seed exact McNemar p-value, for binary scores. |
 
-One detail line per seed follows each cell. A cell with a missing seed or infrastructure-invalid test data prints as `incomplete` with the reason. Skipped files, such as non-conformant jobs, are logged as warnings.
+One detail line per seed follows each cell. A cell with a missing seed or infrastructure-invalid test data prints as `incomplete` with the reason. Skipped files, such as non-conformant jobs and the jobs of an extension study, are logged as warnings.
 
 - `--family` sets the Holm family: `task` (dataset × model, the default), `method` or `none`.
 - `--bootstrap` sets the replicates (10,000 by default).
 - `--include-nonconformant` adds smoke-budget and off-grid jobs.
+- `--study <name>` reports one [extension study](#run-an-extension-study) instead of the grid.
+- `--group-by` adds one `group` line per group of cells that share the listed fields, for example `task,communication`: per seed the mean over the group's cells, then the mean and sample standard deviation of the three seed gains.
 
 `--out` writes the full JSON summary; see [Aggregate summary](../evaluation/outputs.md#aggregate-summary).
+
+## Run an extension study
+
+Four [extension studies](../evaluation/protocol.md#extension-studies) add cells outside the experiment grid: `new_topologies`, `prompt_set2`, `protocol_extension` and `team_size_extension`. A job runs a study's cell only when you name the study:
+
+```bash title="One job of the new_topologies study"
+python -m optimizers.protocol.run --method mipro --dataset hotpotqa \
+  --topology fan_out_fan_in --model qwen --seed 0 --study new_topologies \
+  --out runs/new_topologies/mipro/hotpotqa/fan_out_fan_in/qwen/0
+```
+
+`optimizers.protocol.studies` lists a study's jobs without calling a model: one `optimizers.protocol.run` command per job, each with `--study` and its own `--out` under `--out-root` (`<out-root>/<method>/<task>/<registry key>/[p2/]qwen/<seed>`). P2 cells also get `--prompt-set P2`.
+
+```bash title="List the jobs, or the sizes of every study"
+python -m optimizers.protocol.studies prompt_set2 --out-root runs/prompt_set2 > jobs.txt
+python -m optimizers.protocol.studies --counts
+```
+
+The freeform, four-agent cells of `protocol_extension` and `team_size_extension` are grid cells, so their jobs are the grid jobs and their results serve both. Aggregate a study on its own, here with one summary per task and format:
+
+```bash title="Aggregate the protocol_extension study"
+python -m optimizers.protocol.aggregate runs/ --study protocol_extension \
+  --group-by task,communication --out runs/protocol_extension_summary.json
+```
 
 ## Spread the load
 

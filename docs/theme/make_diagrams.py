@@ -1,4 +1,4 @@
-"""Generate the five topology diagrams as theme-aware inline SVG snippets.
+"""Generate the seven topology diagrams as theme-aware inline SVG snippets.
 
 Colours come from CSS custom properties in docs/theme/assets/docs.css (--tc is set per
 diagram), so the same SVG reads correctly in light and dark themes.
@@ -189,8 +189,68 @@ def decentralized():
     )
 
 
+def fan_out_fan_in():
+    b = []
+    b.append(io(46, 130, "Task", w=70))
+    b.append(arrow(81, 130, 101, 130, "edge-io", size=6))
+    b.append(node(158, 130, 110, 54, "Coordinator", "decomposes", cls="node-strong", text_cls="t-on"))
+    ys = [55, 130, 205]
+    for i, y in enumerate(ys):
+        b.append(arrow(213, 130, 260, y))
+        b.append(node(310, y, 96, 42, f"Worker {i + 1}", f"subtask {i + 1}"))
+        b.append(arrow(358, y, 400, 130))
+    b.append(node(457, 130, 110, 54, "Coordinator", "synthesizes", cls="node-strong", text_cls="t-on"))
+    b.append(arrow(512, 130, 540, 130, "edge-io", size=6))
+    b.append(io(574, 130, "Answer", w=64))
+    b.append(text(158, 92, "3 subtasks (JSON)"))
+    b.append(text(457, 92, "reports"))
+    b.append(
+        text(310, 256, "The coordinator plans once and synthesizes · workers share one prompt and never see each other")
+    )
+    return svg(
+        "fan_out_fan_in",
+        268,
+        "Fan-out/Fan-in topology: a coordinator splits the task into three subtasks, three workers solve them "
+        "in parallel, and the coordinator synthesizes their reports into the answer.",
+        "".join(b),
+        top=22,
+    )
+
+
+def iterative_refinement():
+    b = []
+    b.append(io(46, 120, "Task", w=70))
+    b.append(arrow(81, 120, 101, 120, "edge-io", size=6))
+    b.append(node(158, 120, 110, 54, "Generator", "writes, revises", cls="node-strong", text_cls="t-on"))
+    critics = [(310, 50, "Critic 1", "correctness"), (310, 190, "Critic 2", "edge cases")]
+    for x, y, label, sub in critics:
+        up = y < 120
+        b.append(arrow(213, 105 if up else 135, 262, y + (8 if up else -8)))
+        b.append(node(x, y, 96, 42, label, sub))
+        b.append(arrow(358, y + (8 if up else -8), 410, 106 if up else 134))
+    b.append(arrow(213, 120, 408, 120, "edge-soft", size=6))
+    b.append(node(458, 120, 96, 50, "Verifier", "passed?"))
+    b.append(arrow(506, 120, 540, 120, "edge-io", size=6))
+    b.append(io(574, 120, "Answer", w=64))
+    b.append(text(523, 104, "pass"))
+    b.append(text(310, 114, "candidate"))
+    # fail: the verifier's and critics' feedback goes back to the generator (at most 3 rounds)
+    b.append('<path class="edge-soft" d="M458 145 C458 262, 158 262, 158 155"/>')
+    b.append('<path class="head" d="M158 147 L154 155 L162 155Z" opacity=".6"/>')
+    b.append(text(310, 252, "fail: feedback from the verifier and both critics"))
+    b.append(text(310, 280, "At most 3 rounds · critics and verifier never edit · the answer is the latest candidate"))
+    return svg(
+        "iterative_refinement",
+        292,
+        "Iterative Refinement topology: a generator writes a candidate, two critics review it in parallel, and a "
+        "verifier accepts it or sends feedback back to the generator, for at most three rounds.",
+        "".join(b),
+        top=18,
+    )
+
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    for fn in (single, independent, sequential, centralized, decentralized):
+    for fn in (single, independent, sequential, centralized, decentralized, fan_out_fan_in, iterative_refinement):
         (OUT / f"{fn.__name__}.svg").write_text(fn())
         print("wrote", fn.__name__)

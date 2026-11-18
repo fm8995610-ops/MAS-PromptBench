@@ -16,11 +16,13 @@ MAS-PromptBench/
 │   └── apibank/apibank_upstream/           # vendored API-Bank source
 ├── configs/
 │   ├── generate_role_prompts.py     # writes the seed prompts with an LLM
-│   ├── prompts/<topology>/<dataset>/<role>.txt
+│   ├── prompts/<topology>/<dataset>/<role>.txt   # seed prompts (P1)
+│   ├── prompt_sets/p2/              # the frozen second seed-prompt set and its manifest.json
 │   └── teams/<dataset>.yaml         # team specs per topology and team size
 ├── core/                            # code shared by every runner
 │   └── tasks/<dataset>.py           # one task module per dataset
 ├── topologies/<topology>/[<framework>/]<dataset>/<framework>_<dataset>.py
+├── topologies/workflows/<dataset>.py   # shared runner of the two extension topologies
 ├── teamsizes/<topology>/<dataset>/<dataset>_r<r>.py
 ├── communications/<topology>/<dataset>/<dataset>_<format>.py
 ├── optimizers/
@@ -55,20 +57,22 @@ Each layer imports only the layers above it. The protocol loads the methods by n
 | --- | --- |
 | `core/tasks/<dataset>.py` | Loading, prompt text, tools, answer extraction, reference scorer, records, batch summary. |
 | `settings.py`, `llm.py` | Endpoint and decoding, read at call time; chat-client builders for every framework. |
-| `prompts.py`, `output_contracts.py` | A role's seed prompt plus its protected final-output contract. |
-| `teams.py`, `variant.py` | Team specs per (topology, dataset, r); running a runner's source with a preset `TEAM_SIZE`, `TOPOLOGY`, `STYLE` or `COMMUNICATION_FORMAT`. |
+| `prompts.py`, `output_contracts.py`, `prompt_sets.py` | A role's seed prompt plus its protected final-output contract; the seed-prompt sets P1 and the frozen P2, checked against its manifest. |
+| `teams.py`, `variant.py` | Team specs per (topology, dataset, r), and the fixed four-agent teams of the extension topologies (`FIXED_TEAMS`); running a runner's source with a preset `TEAM_SIZE`, `TOPOLOGY`, `STYLE` or `COMMUNICATION_FORMAT`. |
+| `workflows.py` | The LangGraph graphs of Fan-out/Fan-in and Iterative Refinement; a runner supplies one agent turn. |
 | `communication.py` | The three inter-agent formats (`CommPolicy`): contract, handoff rendering, parse metrics. |
 | `cli.py`, `batch.py`, `logs.py` | Shared command line; batch loop (`attempt`, `run_batch`); console logging. |
 | `telemetry.py`, `thinking.py`, `voting.py` | Token and call counts; `<think>` removal; gold-free majority vote of ensembles. |
 | `calculator.py`, `code_tasks.py`, `bfcl_calls.py` | Calculator tool; code extraction, `python_exec`, guarded calls and code-task records; BFCL call parsing. |
 | `swe_sandbox.py`, `agent_runs.py`, `runtime.py` | SWE-bench shell sandbox; API-Bank and ToolHop runners whose agents call the endpoint directly; replay-safe LangChain histories and `row_timeout`. |
-| `paths.py` | Repository folders: the root, `configs/`, `configs/prompts/`, `benchmarks/` and `results/`. |
+| `paths.py` | Repository folders: the root, `configs/`, `configs/prompts/`, `configs/prompt_sets/`, `benchmarks/` and `results/`. |
 
 ## Runners
 
 - **Topologies.** `topologies/<topology>/[<framework>/]<dataset>/<framework>_<dataset>.py`. `single` and `independent` are LangGraph only; `sequential` adds CrewAI, `centralized` AutoGen and `decentralized` the OpenAI Agents SDK. A runner wires its framework and takes everything else from `core`.
+- **Extension topologies.** `topologies/fan_out_fan_in/<dataset>/langgraph_<dataset>.py` and `topologies/iterative_refinement/<dataset>/langgraph_<dataset>.py` run the shared runner `topologies/workflows/<dataset>.py` with `TOPOLOGY` preset (`core.variant.load`); the graphs are in `core/workflows.py`.
 - **Team sizes.** `teamsizes/<topology>/<dataset>/<dataset>_r<r>.py` runs the LangGraph runner's source with `TEAM_SIZE=r` (`core.variant.load`). API-Bank and ToolHop vote over r replicas instead (`teamsizes/apibank_common.py`, `toolhop_common.py`).
-- **Communication formats.** `communications/<topology>/<dataset>/<dataset>_<format>.py` loads the LangGraph runner as its own module with `COMMUNICATION_FORMAT` preset (`core.variant.module`).
+- **Communication formats.** `communications/<topology>/<dataset>/<dataset>_<format>.py` loads the LangGraph runner as its own module with `COMMUNICATION_FORMAT` preset (`core.variant.module`), for seven datasets (not GPQA or APPS).
 
 ## One task through a runner
 
@@ -90,7 +94,7 @@ python -m optimizers.protocol.run --method gepa --dataset hotpotqa --topology ce
   --model qwen --seed 0 --out runs/x
 ```
 
-1. **Job setup.** Check the cell against the grid (`cells.py`), load the fixed splits (test rows stay locked until selection), and build the adapter, the metric scorer and the seed bundle (each role's shipped prompt). `job.json` seals the job's identity.
+1. **Job setup.** Check the cell against the grid (`cells.py`) or the study named with `--study` (`studies.py`), load the fixed splits (test rows stay locked until selection), and build the adapter, the metric scorer and the seed bundle (each role's shipped prompt, or its prompt in the frozen P2 set with `--prompt-set P2`). `job.json` seals the job's identity.
 2. **Optimize.** The method gets a `ProtocolRunner`, a `BudgetLedger` of 600 usable rollouts and the train and validation rows; it returns its incumbent bundle (`optimization.json`).
 3. **One rollout.** Install the bundle's prompts, set `MODEL_ID`, `REQUEST_SEED` and the phase decoding, and call `adapter.run_example`, which runs the runner's solve code in a private copy of its module (`import_isolated_real_module`). The dataset metric scores the prediction. Infrastructure failures are retried up to twice and never charged.
 4. **Final validation.** Uncharged and greedy, with paired request seeds. The incumbent is deployed only if its validation mean is strictly higher than the seed bundle's; `selection.json` locks the decision.
@@ -104,7 +108,7 @@ The protocol scores with the bridge's dataset metrics, which are cheaper than th
 | To change | Edit | Notes |
 | --- | --- | --- |
 | An agent's prompt | `configs/prompts/<topology>/<dataset>/<role>.txt` | The CrewAI runners read `sequential/`, the AutoGen runners `centralized/` and the Agents SDK runners `decentralized/`. To regenerate, see [Prompt generation](cli.md#prompt-generation). The optimizers never write these files. |
-| A team | `configs/teams/<dataset>.yaml` | API-Bank and ToolHop fix their roles in code. |
+| A team | `configs/teams/<dataset>.yaml` | API-Bank and ToolHop fix their roles in code, except under the two extension topologies. |
 | The required final-answer format | `core/output_contracts.py` | The bridge adapters carry their own copy, `optimizers/bridge/output_contracts.py`. |
 | A scorer | `core/tasks/<dataset>.py` | The protocol's metric is `metric` in `optimizers/bridge/datasets/<dataset>.py`. |
 | The model endpoint of runs | `VLLM_BASE_URL`, `MODEL_ID`, `OPENAI_API_KEY` | See [Task model and decoding](environment.md#task-model-and-decoding). |
@@ -112,6 +116,8 @@ The protocol scores with the bridge's dataset metrics, which are cheaper than th
 | The protocol's budget, decoding or splits | `optimizers/protocol/config.py` | Hashed into every job's identity (`protocol_hash`), so a change makes jobs incomparable with earlier ones. |
 | A method's settings | its settings dataclass | Listed under [Method settings](../optimizers/index.md#method-settings). |
 | The experiment grid | `optimizers/protocol/cells.py` | Jobs outside it need `--allow-any-cell` and are non-conformant. |
+| The extension studies | `optimizers/protocol/studies.py` | Each study's cells, run with `--study`; `EXPECTED_STUDY_COUNTS` pins their sizes. |
+| The second seed-prompt set | `configs/prompt_sets/p2/` | Frozen by `manifest.json`: an edited file is rejected when the set loads. |
 | A baseline sweep grid | `DATASETS`, `TOPOLOGIES`, `FORMATS`, `RVALUES` for `scripts/run_*.sh`; `TOPOS` inside `run_topologies.sh` | Row limits are the `LIMIT` table in each script. See [Sweep launchers](environment.md#sweep-launchers). |
 | The evaluation IDs or splits | `benchmarks/<dataset>/<dataset>_eval_ids.json`, `<dataset>_splits.json` | The `test` split is the evaluation set. |
 | Which pairs an optimizer can target | `DATASET_ADAPTERS` in `optimizers/bridge/registry.py` | See [Add a Topology](../extending/add-topology.md). |

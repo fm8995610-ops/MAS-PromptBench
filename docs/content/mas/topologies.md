@@ -1,6 +1,6 @@
 # Workflow Topologies
 
-MAS-PromptBench runs every task under five ways of wiring agents together, from one agent to a peer debate. This page defines what a multi-agent system is in the benchmark, compares the five topologies and shows which frameworks implement each.
+MAS-PromptBench runs every task under five ways of wiring agents together, from one agent to a peer debate, plus two extension topologies with a fixed four-agent team. This page defines what a multi-agent system is in the benchmark, compares the topologies and shows which frameworks implement each.
 { .lede }
 
 ## How a multi-agent system is modeled
@@ -21,9 +21,9 @@ Prompt optimization changes only the prompts \( s_1, \dots, s_n \). The model, t
 | \( P \) | Free text by default; the formats in [Communication Protocols](communication-protocols.md) |
 | \( n \) | The team specs in [`configs/teams/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/teams), 4 agents by default; varied in [Team Sizes](team-sizes.md) |
 
-The seed prompts were written by an LLM from the role catalog in [`configs/prompts/roles.yaml`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/prompts/roles.yaml), the domain and tool lists next to it, and the template `configs/prompts/meta_prompt.txt`. Optimizers read them and never overwrite them. A team spec, `configs/teams/<dataset>.yaml`, names each topology's roles, their tools and order, and the turn caps, for every team size; ToolHop and API-Bank fix their roles in code instead.
+The seed prompts were written by an LLM from the role catalog in [`configs/prompts/roles.yaml`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/prompts/roles.yaml), the domain and tool lists next to it, and the template `configs/prompts/meta_prompt.txt`. Optimizers read them and never overwrite them. A team spec, `configs/teams/<dataset>.yaml`, names each topology's roles, their tools and order, and the turn caps, for every team size; ToolHop and API-Bank fix their roles in code instead and declare only the two extension topologies.
 
-## The five topologies
+## The five base topologies
 
 | Topology | Shape | Who talks to whom | Frameworks | Default size | Protocol `--topology` |
 | --- | --- | --- | --- | --- | --- |
@@ -50,9 +50,29 @@ The last column is what `python -m optimizers.protocol.run --topology` takes; `-
 
 </div>
 
+## Extension topologies
+
+Two more topologies run on all nine datasets, on LangGraph only, each with one fixed four-agent team:
+
+| Topology | Shape | Who talks to whom | Frameworks | Team | Protocol `--topology` |
+| --- | --- | --- | --- | --- | --- |
+| [Fan-out/Fan-in](fan-out-fan-in.md) | Plan, parallel subtasks, synthesis | Coordinator and each worker; workers never see each other | LangGraph | 1 coordinator + 3 workers, 1 round | `fan_out_fan_in` |
+| [Iterative Refinement](iterative-refinement.md) | Generate, review, verify, revise | Critics and verifier read the generator's candidate; feedback goes back to the generator | LangGraph | generator + 2 critics + verifier, at most 3 rounds | `iterative_refinement` |
+
+They have no team-size or communication-format variants. Their optimizer cells are outside the experiment grid; the `new_topologies` [extension study](../evaluation/protocol.md#extension-studies) runs them with `--study new_topologies`.
+
+<div class="cards" markdown>
+
+- [Fan-out/Fan-in](fan-out-fan-in.md)
+  A coordinator splits the task, three workers solve the parts in parallel, the coordinator synthesizes.
+- [Iterative Refinement](iterative-refinement.md)
+  A generator revises one candidate from two critics and a verifier for up to three rounds.
+
+</div>
+
 ## Framework by topology
 
-Every topology runs on every one of the nine datasets: 72 runner modules in all. Single and Independent have one implementation each; Sequential, Centralized and Decentralized have two, so you can compare frameworks on the same task.
+Every topology runs on every one of the nine datasets. The five base topologies have 72 runner modules in all: Single and Independent have one implementation each; Sequential, Centralized and Decentralized have two, so you can compare frameworks on the same task. The two extension topologies add 18 LangGraph runners.
 
 | Topology | LangGraph | CrewAI | AutoGen | OpenAI Agents SDK |
 | --- | --- | --- | --- | --- |
@@ -61,11 +81,13 @@ Every topology runs on every one of the nine datasets: 72 runner modules in all.
 | Sequential | `sequential/langgraph/<ds>/langgraph_<ds>.py` | `sequential/crewai/<ds>/crewai_<ds>.py` | | |
 | Centralized | `centralized/langgraph/<ds>/langgraph_<ds>.py` | | `centralized/autogen/<ds>/autogen_<ds>.py` | |
 | Decentralized | `decentralized/langgraph/<ds>/langgraph_<ds>.py` | | | `decentralized/openai_agents/<ds>/openai_agents_<ds>.py` |
+| Fan-out/Fan-in | `fan_out_fan_in/<ds>/langgraph_<ds>.py` | | | |
+| Iterative Refinement | `iterative_refinement/<ds>/langgraph_<ds>.py` | | | |
 
-Paths are under `topologies/`. `<ds>` is the dataset folder: `gpqa`, `hotpotqa`, `math`, `lcb`, `apps`, `swe`, `bfcl`, `toolhop` or `apibank`. The runners are thin: the command line, batch loop, model clients, team specs, prompts and one task module per dataset live in the shared `core/` package. See [Repository Map](../reference/repository.md).
+Paths are under `topologies/`. `<ds>` is the dataset folder: `gpqa`, `hotpotqa`, `math`, `lcb`, `apps`, `swe`, `bfcl`, `toolhop` or `apibank`. The runners are thin: the command line, batch loop, model clients, team specs, prompts and one task module per dataset live in the shared `core/` package. The extension runners are a few lines each: they run one shared runner per dataset, `topologies/workflows/<ds>.py`, with `TOPOLOGY` preset, and both graphs live in `core/workflows.py`. See [Repository Map](../reference/repository.md).
 
 !!! note "ToolHop and API-Bank"
-    The ToolHop and API-Bank runners call the endpoint through the `openai` client and build their topology in plain Python. Their CrewAI and AutoGen variants run the LangGraph runner's code under another `STYLE` label; the Agents SDK variant runs the SDK debate engine.
+    The ToolHop and API-Bank runners call the endpoint through the `openai` client and build the five base topologies in plain Python. Their CrewAI and AutoGen variants run the LangGraph runner's code under another `STYLE` label; the Agents SDK variant runs the SDK debate engine. Under the extension topologies they run the LangGraph graphs of `core/workflows.py`, with one model call (API-Bank) or tool loop (ToolHop) per turn.
 
 ## Run a topology
 
@@ -76,4 +98,4 @@ python -m topologies.centralized.autogen.hotpotqa.autogen_hotpotqa --batch --lim
   --out-dir results/topologies_baseline/centralized_autogen_hotpotqa
 ```
 
-Every runner takes the same command line; the [task pages](../tasks/index.md) list each dataset's extra options and how to select its eval IDs. To sweep all eight topology variants over all nine datasets on the eval IDs, run `scripts/run_topologies.sh`. It reads `VLLM_BASE_URL`, `MODEL_ID`, `DATASETS` and `OUT_ROOT` (default `results/topologies_baseline`) and runs each cell as its own process.
+Every runner takes the same command line; the [task pages](../tasks/index.md) list each dataset's extra options and how to select its eval IDs. To sweep the eight variants of the five base topologies over all nine datasets on the eval IDs, run `scripts/run_topologies.sh`. It reads `VLLM_BASE_URL`, `MODEL_ID`, `DATASETS` and `OUT_ROOT` (default `results/topologies_baseline`) and runs each cell as its own process. It does not run the extension topologies; start their runners directly.

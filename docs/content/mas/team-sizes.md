@@ -12,7 +12,7 @@ Each multi-agent topology also runs with 2, 4, 8 and 10 agents. This page shows 
 
 ## What n changes
 
-Single is excluded: one agent has no team size. For the other four topologies, `n = 4` is the baseline: the team of the LangGraph runners in `topologies/`.
+Single is excluded: one agent has no team size. So are the two extension topologies, [Fan-out/Fan-in](fan-out-fan-in.md) and [Iterative Refinement](iterative-refinement.md), which have one fixed four-agent team. For the other four topologies, `n = 4` is the baseline: the team of the LangGraph runners in `topologies/`.
 
 | Topology | What n sets | n = 2 | n = 4 | n = 8 | n = 10 |
 | --- | --- | --- | --- | --- | --- |
@@ -40,7 +40,7 @@ For example, the HotpotQA Sequential pipeline at each size:
     Apart from ToolHop and API-Bank, the Independent and Decentralized runners read their size from `INDEPENDENT_N_AGENTS` or `DECENTRALIZED_N_AGENTS` first and only fall back to the n of the team spec. Unset both before running team-size cells.
 
 !!! note "ToolHop and API-Bank"
-    These two datasets have no team spec. For them every team-size runner goes through a shared wrapper (`teamsizes/toolhop_common.py`, `teamsizes/apibank_common.py`). It runs n seeded copies of the topology's answering role (`solver`, `verifier`, `manager` or `debater`) and majority-votes their answers, for all four topologies. The optimizer adapters for these team sizes run the real topology at size n instead.
+    These two datasets have no team spec for the four multi-agent topologies; theirs declares only the two extension topologies. For them every team-size runner goes through a shared wrapper (`teamsizes/toolhop_common.py`, `teamsizes/apibank_common.py`). It runs n seeded copies of the topology's answering role (`solver`, `verifier`, `manager` or `debater`) and majority-votes their answers, for all four topologies. The optimizer adapters for these team sizes run the real topology at size n instead.
 
 ## Files
 
@@ -88,7 +88,7 @@ It writes each cell to `results/teamsizes/r<N>/<topology>_<dataset>/` (`OUT_ROOT
 
 ## Optimize a size
 
-Pass `--team-size N` to the run protocol, or use the key `<topology>_r<N>`. The bridge has team-size adapters for HotpotQA, LiveCodeBench, BFCL, ToolHop and API-Bank; the experiment grid covers HotpotQA, LiveCodeBench and BFCL with GEPA, MIPRO, MAPRO and MASPO, and other cells need `--allow-any-cell`. Decentralized jobs keep 2 rounds at every size. For example, MIPRO on a Centralized team of 8:
+Pass `--team-size N` to the run protocol, or use the key `<topology>_r<N>`. The bridge has team-size adapters for HotpotQA, LiveCodeBench, BFCL, MATH, SWE-bench, ToolHop and API-Bank. The experiment grid covers HotpotQA, LiveCodeBench and BFCL with GEPA, MIPRO, MAPRO and MASPO; the `team_size_extension` [extension study](../evaluation/protocol.md#extension-studies) covers MATH, SWE-bench and API-Bank at n = 4, 8 and 10 with GEPA, MIPRO and MASPO (`--study team_size_extension`); other cells need `--allow-any-cell`. Decentralized jobs keep 2 rounds at every size. For example, MIPRO on a Centralized team of 8:
 
 ```bash title="MIPRO on Centralized, 8 agents · HotpotQA"
 python -m optimizers.protocol.run --method mipro --dataset hotpotqa \

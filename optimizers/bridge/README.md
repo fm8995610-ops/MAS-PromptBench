@@ -6,7 +6,7 @@ Part of [optimizers/](../README.md).
 
 ## Overview
 
-The registry covers all 9 datasets on every topology and framework of `topologies/`, plus the team-size and communication variants of HotpotQA, LCB, BFCL, API-Bank and ToolHop.
+The registry covers all 9 datasets on every topology and framework of `topologies/`, including the extension topologies `fan_out_fan_in` and `iterative_refinement`, plus the team-size and communication variants of HotpotQA, LCB, BFCL, MATH, SWE-bench, API-Bank and ToolHop.
 
 ### Directory layout
 
@@ -46,7 +46,7 @@ Environment variables are listed in [`env.py`](env.py) and described in [Environ
 
 ## Adding a pair
 
-A **pair** is `dataset + topology + execution framework`, e.g. `bfcl/single`, `bfcl/sequential_crewai`, `bfcl/decentralized_openai_agents`. Team-size and communication variants register as `<topology>_r<r>` and `<topology>_communications_<format>`.
+A **pair** is `dataset + topology + execution framework`, e.g. `bfcl/single`, `bfcl/sequential_crewai`, `bfcl/decentralized_openai_agents`. Team-size and communication variants register as `<topology>_r<r>` and `<topology>_communications_<format>`; the extension topologies as `fan_out_fan_in` and `iterative_refinement` (`FanOutFanIn<DS>Adapter`, `IterativeRefinement<DS>Adapter` in `adapters/module_<dataset>.py`).
 
 1. Add a dataset loader `datasets/<dataset>.py` ([contract](#dataset-loader-contract)).
 2. Add one or more adapters under `adapters/` ([contract](#adapter-contract)).

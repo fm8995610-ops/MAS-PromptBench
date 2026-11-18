@@ -1,6 +1,6 @@
 # Topologies
 
-This folder holds reference implementations of **5 multi-agent topologies**, evaluated across **9 benchmark datasets** — the core of MAS-PromptBench. Each `(topology, dataset)` pair is **runnable**: `--batch` evaluates a slice and writes predictions and per-instance records under `results/`; without it, the GPQA, HotpotQA, MATH, LiveCodeBench and APPS runners run a canned demo and the other four (BFCL, SWE-bench, API-Bank, ToolHop) a small batch.
+This folder holds reference implementations of **5 multi-agent topologies**, plus **2 extension topologies** (`fan_out_fan_in`, `iterative_refinement`), evaluated across **9 benchmark datasets** — the core of MAS-PromptBench. Each `(topology, dataset)` pair is **runnable**: `--batch` evaluates a slice and writes predictions and per-instance records under `results/`; without it, the GPQA, HotpotQA, MATH, LiveCodeBench and APPS runners run a canned demo and the other four (BFCL, SWE-bench, API-Bank, ToolHop) a small batch.
 
 Each pair is also an **optimizer target**: the prompt optimizers mutate the per-role prompts in `configs/prompts/` and re-run it to measure improvement (see [Prompt optimization](#prompt-optimization)).
 
@@ -13,6 +13,8 @@ Each pair is also an **optimizer target**: the prompt optimizers mutate the per-
 | `sequential` | linear pipeline | stage → stage | LangGraph, CrewAI |
 | `centralized` | hub-and-spoke | via manager only | LangGraph, AutoGen |
 | `decentralized` | peer debate | all-to-all, per round | LangGraph, OpenAI Agents SDK |
+| `fan_out_fan_in` | plan, parallel subtasks, synthesis | coordinator ↔ each worker; workers never see each other | LangGraph |
+| `iterative_refinement` | generate → review → verify, ≤ 3 rounds | critics and verifier read the candidate; feedback to the generator | LangGraph |
 
 ### Directory layout
 
@@ -23,7 +25,10 @@ topologies/
 ├── independent/             # LangGraph only
 ├── sequential/{langgraph,crewai}/
 ├── centralized/{langgraph,autogen}/
-└── decentralized/{langgraph,openai_agents}/
+├── decentralized/{langgraph,openai_agents}/
+├── fan_out_fan_in/          # LangGraph only: <dataset>/langgraph_<dataset>.py
+├── iterative_refinement/    # LangGraph only: <dataset>/langgraph_<dataset>.py
+└── workflows/<dataset>.py   # the shared runner of both extension topologies
 ```
 
 Path pattern: `topologies/<topology>/[<framework>/]<dataset>/<framework>_<dataset>.py`. Shared runner code (CLI, batch loop, team specs, one task module per dataset) lives in [`core/`](../core/); see the [repository map](../docs/content/reference/repository.md) and [Add a Dataset](../docs/content/extending/add-dataset.md).
@@ -161,6 +166,52 @@ N peers debate over R rounds (default 4×2); from round 1 each peer sees every o
 
 **Implementations:** `decentralized/langgraph/`, `decentralized/openai_agents/` (`agents_sdk_base.py`; needs an [isolated install](#install-the-openai-agents-sdk)). After Du et al. 2023 ([arXiv:2305.14325](https://arxiv.org/abs/2305.14325)).
 
+### Extension topologies
+
+Two more topologies run on all nine datasets, on LangGraph only, each with **one fixed four-agent team** (no team-size or communication-format variants). Their graphs are in [`core/workflows.py`](../core/workflows.py); `workflows/<dataset>.py` implements one agent turn per dataset, and each `<topology>/<dataset>/langgraph_<dataset>.py` runs it with `TOPOLOGY` preset (`core/variant.py`).
+
+#### `fan_out_fan_in` — decompose, solve in parallel, synthesize
+
+A coordinator decomposes the task once into 3 complementary subtasks (a JSON `{"subtasks": [...]}` reply); 3 workers sharing one role and one prompt solve them in parallel without seeing each other; the same coordinator synthesizes their reports into the answer. A plan that is not 3 distinct non-empty subtasks ends the run without an answer, scored as a wrong answer. On SWE-bench each worker edits its own clone of the repository and reports its diff.
+
+<div align="left">
+
+<pre>
+                              ┌──────────┐
+                         ┌───>│ Worker 1 │───┐
+  ┌─────────────┐        │    └──────────┘   │      ┌──────────────┐
+  │ Coordinator │        │    ┌──────────┐   │      │ Coordinator  │
+  │ (decompose) │────────┼───>│ Worker 2 │───┼─────>│ (synthesize) │──> answer
+  └─────────────┘        │    └──────────┘   │      └──────────────┘
+    3 subtasks           │    ┌──────────┐   │
+    (JSON)               └───>│ Worker 3 │───┘
+                              └──────────┘
+         workers share one prompt and never see each other
+</pre>
+
+</div>
+
+#### `iterative_refinement` — generate, review, verify, revise
+
+A generator writes a candidate; two critics review it in parallel without changing it (critic 1: correctness and requirements; critic 2: edge cases, tool use and regressions); a verifier reads the candidate and both reviews and replies `{"passed": bool, "feedback": str}`. On a fail the generator revises, for at most 3 rounds; a malformed verdict is a fail. The answer is the generator's latest candidate. On SWE-bench the critics and the verifier get read-only tools.
+
+<div align="left">
+
+<pre>
+                        ┌──────────┐
+                   ┌───>│ Critic 1 │───┐
+  ┌───────────┐    │    └──────────┘   │    ┌──────────┐
+  │ Generator │────┤                   ├───>│ Verifier │──> pass: latest candidate
+  └───────────┘    │    ┌──────────┐   │    └────┬─────┘
+        ^          └───>│ Critic 2 │───┘         │
+        │               └──────────┘             │
+        └──────── fail: feedback (≤ 3 rounds) ───┘
+</pre>
+
+</div>
+
+Docs: [Fan-out/Fan-in](../docs/content/mas/fan-out-fan-in.md), [Iterative Refinement](../docs/content/mas/iterative-refinement.md).
+
 ---
 
 ## Usage
@@ -206,4 +257,4 @@ The runners put it first on `PYTHONPATH` themselves and exit with status 1 if th
 
 ## Prompt optimization
 
-Every runner loads each agent's prompt from `configs/prompts/<topology>/<dataset>/<role>.txt`. The eight [prompt optimizers](../optimizers/README.md) — GEPA, MIPRO, MAPRO, MASPO, HiveMind, MAMUT-GEPA, MASPOB and TAVO — improve a pair by mutating those role prompts and re-scoring the real runner through the [bridge](../optimizers/bridge/README.md).
+Every runner loads each agent's prompt from `configs/prompts/<topology>/<dataset>/<role>.txt`. The eight [prompt optimizers](../optimizers/README.md) — GEPA, MIPRO, MAPRO, MASPO, HiveMind, MAMUT-GEPA, MASPOB and TAVO — improve a pair by mutating those role prompts and re-scoring the real runner through the [bridge](../optimizers/bridge/README.md). The extension topologies' cells run in the `new_topologies` extension study (`--study new_topologies`, see the [run protocol](../optimizers/protocol/README.md#extension-studies)).

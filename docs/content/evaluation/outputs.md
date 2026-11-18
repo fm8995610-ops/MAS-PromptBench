@@ -36,7 +36,8 @@ The job summary that aggregation reads:
 | --- | --- |
 | `status`, `protocol_id`, `protocol_conformant` | `completed`; `mas-promptbench`; whether the budget, the cell and the reflection model follow the protocol. |
 | `cell`, `cell_id` | The full job identity (method, task, runtime, budget, optimizer seed, reflection model, protocol and split hashes) and its short hash. |
-| `grid_cell`, `registry_key`, `source_tables` | The grid configuration, the bridge key of its runtime, and the experiment tables that include it. |
+| `grid_cell`, `registry_key`, `source_tables` | The grid configuration (with `prompt_set` for a cell started from P2), the bridge key of its runtime, and the experiment tables that include it. |
+| `study` | Only for a cell that exists in an [extension study](protocol.md#extension-studies) alone: the study's name, also in `job.json`. |
 | `optimizer_seed`, `condition_id` | The seed, and the hash of the method-independent evaluation condition. |
 | `optimization` | `status`, `failure_kind`, `stop_reason`, `budget`, `usage` and `elapsed_seconds` of the optimization phase. |
 | `selection` | `selection_id`, `selected_candidate`, `fallback_reason`, `baseline_validation_score`, `incumbent_validation_score`, `validation_delta`. |
@@ -57,7 +58,7 @@ The deployment decision, sealed before any test row is loaded. It holds the `see
 | `invalid_incumbent_bundle` | The incumbent could not be executed by the cell's runtime. |
 | `invalid_record:<id>:<status>`, `duplicate_example:<id>`, `score_out_of_range:<id>`, `unpaired_validation_ids`, `empty_validation` | The validation records could not be compared. |
 
-Every bundle is stored as `roles` (role name to prompt text), `demos`, `metadata` and `bundle_sha256`. The deployed prompts are `deployed_bundle.roles`; MIPRO's demos are rendered into the role prompts when they run.
+Every bundle is stored as `roles` (role name to prompt text), `demos`, `metadata` and `bundle_sha256`. A seed bundle from P2 names the set and the SHA-256 of its `manifest.json` in `metadata`. The deployed prompts are `deployed_bundle.roles`; MIPRO's demos are rendered into the role prompts when they run.
 
 ```bash title="Print the deployed prompts"
 python -c "import json; s = json.load(open('runs/gepa/hotpotqa/centralized/qwen/0/selection.json')); \
@@ -78,11 +79,11 @@ python -c "import json; s = json.load(open('runs/gepa/hotpotqa/centralized/qwen/
 
 ## Aggregate summary
 
-`python -m optimizers.protocol.aggregate ... --out summary.json` writes `schema`, `protocol_id`, `family`, `bootstrap_replicates` and one entry per cell in `cells`:
+`python -m optimizers.protocol.aggregate ... --out summary.json` writes `schema`, `protocol_id`, `family`, `bootstrap_replicates` and one entry per cell in `cells` (with `--group-by`, also `group_by` and one entry per group of cells in `groups`: `group`, `n_cells`, `status`, and for a complete group `per_seed`, `macro_baseline`, `macro_deployed`, `mean_delta_pp` and `std_delta_pp`):
 
 | Field | Content |
 | --- | --- |
-| `cell`, `registry_key`, `source_tables` | Method, task, topology, framework, communication, team size and task model. |
+| `cell`, `registry_key`, `source_tables` | Method, task, topology, framework, communication, team size and task model, and `prompt_set` for a P2 cell. |
 | `status` | `complete`, or `incomplete` with `problems` (missing seeds, duplicate seeds, infrastructure-invalid test data). |
 | `seeds_present`, `per_seed_job`, `fallbacks` | Seeds found; per seed the selection, fallback reason, validation scores, charged rollouts, stop reason and status; seeds that kept the seed bundle. |
 | `per_seed` | Per seed `n`, `baseline`, `deployed` and `delta_pp`. |

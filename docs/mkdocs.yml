@@ -77,6 +77,8 @@ nav:
       - Sequential: mas/sequential.md
       - Centralized: mas/centralized.md
       - Decentralized: mas/decentralized.md
+      - Fan-out/Fan-in: mas/fan-out-fan-in.md
+      - Iterative Refinement: mas/iterative-refinement.md
       - Communication Protocols: mas/communication-protocols.md
       - Team Sizes: mas/team-sizes.md
   - Optimizers:

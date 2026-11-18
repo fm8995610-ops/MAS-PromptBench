@@ -75,7 +75,7 @@ All runners share one command line, plus a few options per dataset:
 Without `--batch`, the GPQA, HotpotQA, MATH, LiveCodeBench and APPS runners play a built-in demo; the BFCL, SWE-bench, ToolHop and API-Bank runners have none and run a small batch (5, 2, 5 and 2 instances). Every output file is emptied when a batch starts. Without `--out-dir` or `--out`, some runners write to their own folder under `results/` and others only print their scores, so pass one. Progress goes to stderr; set `LOG_LEVEL` to change how much. [Command-Line Flags](../reference/cli.md) lists every option.
 
 !!! tip "Score the evaluation IDs"
-    For seven tasks the first instances are exactly the eval IDs, so `--limit` with the eval-ID count scores the reported set. BFCL and SWE-bench are samples: pass their IDs to `--only`, as their pages show. `scripts/run_topologies.sh` runs every topology on every task this way.
+    For seven tasks the first instances are exactly the eval IDs, so `--limit` with the eval-ID count scores the reported set. BFCL and SWE-bench are samples: pass their IDs to `--only`, as their pages show. `scripts/run_topologies.sh` runs every base topology on every task this way.
 
 ## Optimize a task
 
@@ -86,6 +86,6 @@ python -m optimizers.protocol.run --method <key> --dataset <task> --topology <to
   --model qwen --seed 0 --out runs/<key>/<task>/<topology>/qwen/0
 ```
 
-`<key>` is one of `gepa`, `mipro`, `mapro`, `maspo`, `hivemind`, `mamut_gepa`, `maspob` or `tavo`. The experiment grid pairs GEPA, MIPRO, MAPRO and MASPO with every task and every topology runner, in each of its frameworks (on Single, GEPA and MIPRO only), and all eight methods with the multi-agent LangGraph teams of HotpotQA, LiveCodeBench and BFCL. Other combinations need `--allow-any-cell` and are reported as non-conformant.
+`<key>` is one of `gepa`, `mipro`, `mapro`, `maspo`, `hivemind`, `mamut_gepa`, `maspob` or `tavo`. The experiment grid pairs GEPA, MIPRO, MAPRO and MASPO with every task and every base-topology runner, in each of its frameworks (on Single, GEPA and MIPRO only), and all eight methods with the multi-agent LangGraph teams of HotpotQA, LiveCodeBench and BFCL. The [extension studies](../evaluation/protocol.md#extension-studies) add more cells, such as the two extension topologies on every task, run with `--study`. Other combinations need `--allow-any-cell` and are reported as non-conformant.
 
 During optimization, every rollout is scored 0 or 1 by the task's protocol metric. Most tasks use the runner's own scorer; HotpotQA uses exact match only, LiveCodeBench and APPS run only the first 3 tests, and SWE-bench uses a structural patch check. See [Run an Optimizer](../optimizers/running.md) and [Evaluation Protocol](../evaluation/protocol.md).

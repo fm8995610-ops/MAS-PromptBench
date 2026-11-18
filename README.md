@@ -34,7 +34,7 @@ MAS-PromptBench measures when prompt optimization improves multi-agent LLM syste
 
 - **Optimizer** — GEPA, MIPRO, MAPRO, MASPO, HiveMind, MAMUT-GEPA, MASPOB, and TAVO.
 - **Task dataset** — GPQA-Diamond, HotpotQA, MATH, LiveCodeBench, APPS, BFCL, SWE-bench Verified, API-Bank, and ToolHop.
-- **Workflow Topology** — `single`, `independent`, `sequential`, `centralized`, and `decentralized`, implemented across LangGraph, CrewAI, AutoGen, and the OpenAI Agents SDK.
+- **Workflow Topology** — `single`, `independent`, `sequential`, `centralized`, and `decentralized`, implemented across LangGraph, CrewAI, AutoGen, and the OpenAI Agents SDK, plus two extension topologies on LangGraph, `fan_out_fan_in` and `iterative_refinement`.
 - **Communication format** — three inter-agent message formats (`freeform`, `semi_structured`, `structured_soft`).
 - **Team size** — the number of agents per team, `r ∈ {2, 4, 8, 10}`.
 - **Task model** — `Qwen/Qwen3.5-9B`, plus `meta-llama/Llama-3.1-8B-Instruct` for a subset of cells.
@@ -48,7 +48,7 @@ MAS-PromptBench measures when prompt optimization improves multi-agent LLM syste
 | [`assets/`](assets/)                 | logo and overview images                                                                                            |
 | [`benchmarks/`](benchmarks/)         | evaluation ids, optimization splits, and the API-Bank source                                                        |
 | [`communications/`](communications/) | inter-agent communication-format variants                                                                           |
-| [`configs/`](configs/)               | seed role prompts (`prompts/<topology>/<dataset>/<role>.txt`) and team specs                                        |
+| [`configs/`](configs/)               | seed role prompts (`prompts/<topology>/<dataset>/<role>.txt`), the frozen set `prompt_sets/p2/`, team specs         |
 | [`core/`](core/)                     | shared runner code and one task module per dataset                                                                  |
 | [`docs/`](docs/)                     | source of the [documentation site](docs/content/index.md): tutorials, configuration and CLI reference               |
 | [`models/`](models/)                 | vLLM serve scripts (Qwen3.5-9B / 122B, Llama-3.1-8B)                                                                |
@@ -56,7 +56,7 @@ MAS-PromptBench measures when prompt optimization improves multi-agent LLM syste
 | [`scripts/`](scripts/)               | sweep launchers                                                                                                     |
 | [`teamsizes/`](teamsizes/)           | team-size variants (number of agents per team)                                                                      |
 | [`tests/`](tests/)                   | unit tests and golden behavior snapshots                                                                            |
-| [`topologies/`](topologies/)         | the core benchmark — 5 topologies × 9 datasets, one runnable pair each                                              |
+| [`topologies/`](topologies/)         | the core benchmark — 5 topologies × 9 datasets, one runnable pair each, plus 2 extension topologies × 9 datasets    |
 
 ---
 
@@ -119,6 +119,8 @@ python -m optimizers.protocol.run --method gepa --dataset math --topology centra
     --model qwen --seed 0 --out runs/gepa/math/centralized/qwen/0
 python -m optimizers.protocol.aggregate runs/ --out runs/summary.json   # paired summary over seeds 0-2
 ```
+
+Four extension studies add cells outside the experiment grid — the two extension topologies, a second seed-prompt set, and communication formats and team sizes on MATH, SWE-bench, and API-Bank; run them with `--study <name>` (see [the run protocol](optimizers/protocol/README.md#extension-studies)).
 
 See [optimizers/README.md](optimizers/README.md).
 

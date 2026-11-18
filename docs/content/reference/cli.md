@@ -1,6 +1,6 @@
 # Command-Line Flags
 
-Every command-line option of the runners, the run protocol, the aggregation, the prompt generator and the golden recorder, with its default in the code. Environment variables are on [Environment Variables](environment.md).
+Every command-line option of the runners, the run protocol, the extension-study listing, the aggregation, the prompt generator and the golden recorder, with its default in the code. Environment variables are on [Environment Variables](environment.md).
 { .lede }
 
 ## Invoke a runner
@@ -65,16 +65,18 @@ The sweep launchers in `scripts/` take no options; their [environment variables]
 | --- | --- | --- |
 | `--method` | required | `gepa`, `mipro`, `mapro`, `maspo`, `hivemind`, `mamut_gepa`, `maspob`, `tavo` or `identity` (the seed prompts). |
 | `--dataset` | required | `apibank`, `apps`, `bfcl`, `gpqa`, `hotpotqa`, `lcb`, `math`, `swe` or `toolhop`. |
-| `--topology` | required | A base topology or a registry key such as `sequential_crewai`, `independent_r8` or `centralized_communications_structured_soft`. |
+| `--topology` | required | A base topology, an extension topology (`fan_out_fan_in`, `iterative_refinement`) or a registry key such as `sequential_crewai`, `independent_r8` or `centralized_communications_structured_soft`. |
 | `--framework` | `langgraph` | `langgraph`, `crewai`, `autogen` or `openai_agents`. |
 | `--team-size` | `4` (`single`: 1) | `2`, `4`, `8` or `10`. |
 | `--communication` | `freeform` | `freeform`, `semi_structured` or `structured_soft`. |
+| `--prompt-set` | `P1` | Seed prompts: `P1` (`configs/prompts/`) or the frozen `P2` (`configs/prompt_sets/p2/`). |
+| `--study` | none | Admit the cells of one [extension study](../evaluation/protocol.md#extension-studies): `new_topologies`, `prompt_set2`, `protocol_extension` or `team_size_extension`. |
 | `--model` | required | `qwen` (`Qwen/Qwen3.5-9B`), `llama` (`meta-llama/Llama-3.1-8B-Instruct`) or a full model ID. |
 | `--seed` | required | Optimizer seed `0`, `1` or `2`. |
 | `--out` | required | Job folder. |
 | `--budget` | `600` | Usable rollouts; a smaller value makes a non-conformant smoke run. |
 | `--phase` | `all` | `optimize`, `validate`, `test` or `all` (whatever is missing). |
-| `--allow-any-cell` | off | Run a cell outside the experiment grid. |
+| `--allow-any-cell` | off | Run a cell outside the experiment grid and the named study, as a non-conformant job. |
 | `--task-endpoints` | `$TASK_ENDPOINTS`, else `$VLLM_BASE_URL` | Comma-separated task endpoints. |
 | `--evaluation-cache DIR` | `<out>/evaluations` | Shared folder of content-addressed evaluations. |
 | `--quiet` | off | No progress lines; errors are still logged. |
@@ -86,10 +88,21 @@ A registry key sets the framework, team size or communication format itself; an 
 | --- | --- | --- |
 | `single`, `independent`, `sequential`, `centralized`, `decentralized` | all nine | LangGraph |
 | `sequential_crewai`, `centralized_autogen`, `decentralized_openai_agents` | all nine | CrewAI, AutoGen, OpenAI Agents SDK |
-| `<topology>_r<r>` | `hotpotqa`, `lcb`, `bfcl`, `apibank`, `toolhop` | [team size](../mas/team-sizes.md) r ∈ {2, 4, 8, 10} |
-| `<topology>_communications_<format>` | `hotpotqa`, `lcb`, `bfcl`, `apibank`, `toolhop` | [communication format](../mas/communication-protocols.md) |
+| `fan_out_fan_in`, `iterative_refinement` | all nine | LangGraph, 4 agents, freeform only ([Fan-out/Fan-in](../mas/fan-out-fan-in.md), [Iterative Refinement](../mas/iterative-refinement.md)) |
+| `<topology>_r<r>` | `hotpotqa`, `lcb`, `bfcl`, `math`, `swe`, `apibank`, `toolhop` | [team size](../mas/team-sizes.md) r ∈ {2, 4, 8, 10} |
+| `<topology>_communications_<format>` | `hotpotqa`, `lcb`, `bfcl`, `math`, `swe`, `apibank`, `toolhop` | [communication format](../mas/communication-protocols.md) |
 
-Here `<topology>` is `independent`, `sequential`, `centralized` or `decentralized`. The job exits with status 2 on a job, evaluation or installation error. Stdout carries only the one-line JSON summary.
+Here `<topology>` is `independent`, `sequential`, `centralized` or `decentralized`. The extension topologies take no other framework, team size or format; their cells, and the P2 cells, run with `--study`. The job exits with status 2 on a job, evaluation or installation error. Stdout carries only the one-line JSON summary.
+
+## Extension studies
+
+`python -m optimizers.protocol.studies [STUDY]` prints one `optimizers.protocol.run` command per job of a study, without a model call.
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `STUDY` | none | `new_topologies`, `prompt_set2`, `protocol_extension` or `team_size_extension`; without it, the counts are printed. |
+| `--out-root` | `runs` | Root of the jobs' `--out` folders: `<out-root>/<method>/<task>/<registry key>/[p2/]qwen/<seed>`. |
+| `--counts` | off | Print every study's configuration count, job count and the cells it shares with the grid. |
 
 ## Aggregate
 
@@ -102,22 +115,26 @@ Here `<topology>` is `independent`, `sequential`, `centralized` or `decentralize
 | `--bootstrap` | `10000` | Bootstrap replicates (at least 100). |
 | `--family` | `task` | Holm family: `task` (dataset × model), `method`, or `none` (one family). |
 | `--include-nonconformant` | off | Include smoke-budget, off-grid and other non-conformant jobs. |
+| `--study` | none | Report one extension study, its shared grid cells included; without it, study-only jobs are skipped. |
+| `--group-by` | none | Comma-separated fields of `method`, `task`, `topology`, `framework`, `communication`, `team_size`, `task_model`, `prompt_set`: one seed-level summary per group of cells. |
 | `--log-level` | `$LOG_LEVEL`, else `INFO` | Console level. |
 
 It prints a tab-separated table to stdout and exits with status 1 when it finds no job result. [Read Run Outputs](../evaluation/outputs.md#aggregate-summary) explains the summary.
 
 ## Prompt generation
 
-`python configs/generate_role_prompts.py` writes the seed prompts in `configs/prompts/`; [Add a Dataset](../extending/add-dataset.md#4-seed-prompts) explains how.
+`python configs/generate_role_prompts.py` writes the seed prompts in `configs/prompts/` (P1); [Add a Dataset](../extending/add-dataset.md#4-seed-prompts) explains how. With `--prompt-set P2` it writes `configs/prompt_sets/p2/` and, when no file failed, freezes the set with `manifest.json` ([Seed-prompt sets](../evaluation/protocol.md#seed-prompt-sets)).
 
 | Option | Default | Meaning |
 | --- | --- | --- |
 | `--base-url` | `$PROMPT_GEN_BASE_URL`, else `http://localhost:8200/v1` | Generator endpoint. |
 | `--api-key` | `$PROMPT_GEN_API_KEY`, else `EMPTY` | API key. |
 | `--model` | `$PROMPT_GEN_MODEL`, else `Qwen/Qwen3.5-122B-A10B-FP8` | Generator model. |
-| `--temperature` | `0.0` | Sampling temperature. |
-| `--seed` | `42` | Request seed. |
-| `--force` | off | Overwrite existing prompt files. |
+| `--prompt-set` | `P1` | `P1` (`configs/prompts/`) or `P2` (`configs/prompt_sets/p2/`). A frozen set is never written again. |
+| `--temperature` | `0.0` (P2: `1.0`) | Sampling temperature. |
+| `--top-p` | not sent (P2: `1.0`) | Nucleus sampling. |
+| `--seed` | `42` (P2: `1`) | Request seed. |
+| `--force` | off | Overwrite existing prompt files (P1 only). |
 | `--only` | none | `<topology>`, `<topology>/<dataset>` or `<topology>/<dataset>/<role>`; repeatable. |
 
 ## Tests

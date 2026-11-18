@@ -12,7 +12,7 @@ MAS-PromptBench optimizes the system prompts of a multi-agent system while the m
 
 ## What gets optimized
 
-A multi-agent system \( M \) is a topology plus a set of roles: a planner, a solver, a manager, a debater and so on. Each role has a system prompt, and the seed prompts live in `configs/prompts/<topology>/<dataset>/<role>.txt`. A method treats the joint set \( \pi = (\pi_1, \dots, \pi_K) \) of role prompts as the only variable; the model, the topology wiring, the tools and the scorer stay fixed. MIPRO's few-shot demos are rendered into the role prompts, so they are part of \( \pi \) too.
+A multi-agent system \( M \) is a topology plus a set of roles: a planner, a solver, a manager, a debater and so on. Each role has a system prompt, and the seed prompts live in `configs/prompts/<topology>/<dataset>/<role>.txt` (a job started with `--prompt-set P2` takes them from the frozen second set in `configs/prompt_sets/p2/`). A method treats the joint set \( \pi = (\pi_1, \dots, \pi_K) \) of role prompts as the only variable; the model, the topology wiring, the tools and the scorer stay fixed. MIPRO's few-shot demos are rendered into the role prompts, so they are part of \( \pi \) too.
 
 The quantity of interest is the prompt-optimization gain on the held-out test split:
 
@@ -39,11 +39,13 @@ No method writes to `configs/`. Optimized prompts stay in the job's `--out` fold
 
 A grid cell is one (dataset, topology, framework, communication format, team size, task model) configuration of the experiment grid in `optimizers/protocol/cells.py`, run once per optimizer seed:
 
-- **GEPA and MIPRO** cover every dataset on all five topologies, in each topology's native framework and in LangGraph, plus the communication formats and team sizes on HotpotQA, LiveCodeBench and BFCL, and those three datasets with `meta-llama/Llama-3.1-8B-Instruct`.
+- **GEPA and MIPRO** cover every dataset on all five base topologies, in each topology's native framework and in LangGraph, plus the communication formats and team sizes on HotpotQA, LiveCodeBench and BFCL, and those three datasets with `meta-llama/Llama-3.1-8B-Instruct`.
 - **MAPRO and MASPO** cover the same cells except `single`.
 - **HiveMind, MAMUT-GEPA, MASPOB and TAVO** cover HotpotQA, LiveCodeBench and BFCL on the four multi-agent LangGraph topologies.
 
 The built-in `identity` method returns the seed prompts without a rollout; it runs on any grid configuration and gives the seed baseline of a cell. Any method runs on any registered pair with `--allow-any-cell`, as a non-conformant job.
+
+Four [extension studies](../evaluation/protocol.md#extension-studies) add conformant cells outside the grid, each run with `--study <name>`: GEPA, MIPRO, MAPRO and MASPO on the two extension topologies, [Fan-out/Fan-in](../mas/fan-out-fan-in.md) and [Iterative Refinement](../mas/iterative-refinement.md), for all nine datasets (`new_topologies`) and on HotpotQA, LiveCodeBench and BFCL from the second seed-prompt set P2 (`prompt_set2`); GEPA, MIPRO and MASPO on MATH, SWE-bench and API-Bank with the three communication formats (`protocol_extension`) and with 8 and 10 agents (`team_size_extension`). With `--study`, `identity` also runs on their runtime conditions.
 
 ## One protocol for every method
 
@@ -60,7 +62,7 @@ The methods differ only in step 1. Their reflection or proposal calls go to `Qwe
 Every rollout runs through [`optimizers/bridge/`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/bridge), which wraps the topology runners instead of re-implementing them, so an optimized prompt runs unchanged in the benchmark.
 
 1. **Adapter** (`adapters/`). One class per (dataset, registry key) pair exposes the per-role prompts (`roles()`, `get_prompt()`, `set_prompt()`) and `run_example()`, one execution of the real runner. It patches the runner module's prompt loader, model client, endpoint and team size in a private copy of the module.
-2. **Registry** (`registry.py`). Maps each dataset and key, such as `sequential_crewai` or `centralized_r8`, to its adapter class.
+2. **Registry** (`registry.py`). Maps each dataset and key, such as `sequential_crewai`, `centralized_r8` or `fan_out_fan_in`, to its adapter class.
 3. **Programs** (`programs.py`, `mipro_programs.py`). Register one DSPy predictor per role, so GEPA and MIPRO edit the role instructions through `named_predictors()`. The other methods pass their candidates to the protocol's runner, directly or through its `RunnerSession`, which runs the same adapter.
 4. **Metric** (`datasets/<dataset>.py`). `load_all()` and `metric()`, which returns a 0 or 1 score and feedback text for reflection.
 

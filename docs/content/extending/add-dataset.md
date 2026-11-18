@@ -12,6 +12,7 @@ The steps use `<ds>` for the dataset's short name. Use the same name everywhere:
 | Output contract | `core/output_contracts.py` | The protected final-output instruction of the answering roles. |
 | Team | `configs/teams/<ds>.yaml`, read by `core/teams.py` (`TeamSpec`) | The agents at team size r ∈ {2, 4, 8, 10}. |
 | Topology runners | `topologies/<topology>/[<framework>/]<ds>/<framework>_<ds>.py` | The framework wiring: graph, crew, group chat or debate. |
+| Extension topologies | `topologies/workflows/<ds>.py`, entries in `topologies/fan_out_fan_in/` and `topologies/iterative_refinement/` | One agent turn for the graphs of `core/workflows.py`. |
 | Team sizes | `teamsizes/<topology>/<ds>/<ds>_r<r>.py`, via `core/variant.py` | The LangGraph runner with another r. |
 | Communication formats | `core/communication.py` (`CommPolicy`), `communications/<topology>/<ds>/<ds>_<format>.py` | How agents report to each other, and the parse metrics. |
 | Evaluation IDs and splits | `benchmarks/<ds>/<ds>_eval_ids.json`, `<ds>_splits.json` | The reported instances and the optimizers' fixed splits. |
@@ -40,7 +41,7 @@ python -m communications.<topology>.<ds>.<ds>_structured_soft         # with COM
 
 ## 2. Team spec
 
-`configs/teams/<ds>.yaml` has one entry per multi-agent topology, following the [schema](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/teams/README.md): a replicated role (`independent`, `decentralized`), the r stages (`sequential`), or a manager and its r - 1 workers (`centralized`). `recursion_limit` is the same at every r and is omitted when the agents make plain model calls. All text is sent to the model verbatim.
+`configs/teams/<ds>.yaml` has one entry per multi-agent topology, following the [schema](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/teams/README.md): a replicated role (`independent`, `decentralized`), the r stages (`sequential`), a manager and its r - 1 workers (`centralized`), or each role's `tools` in the one four-agent team of `fan_out_fan_in` and `iterative_refinement` (plus `max_rounds`). `recursion_limit` is the same at every r and is omitted when the agents make plain model calls. All text is sent to the model verbatim.
 
 ## 3. Topology runners
 
@@ -67,7 +68,7 @@ def main(argv=None) -> int:
                     demo=_canned_demo, source=task.SOURCE, add_arguments=task.add_arguments)
 ```
 
-[`topologies/single/math/langgraph_math.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/topologies/single/math/langgraph_math.py) is a complete single-agent example. The `core/llm.py` docstring lists the client builders for every runner style.
+[`topologies/single/math/langgraph_math.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/topologies/single/math/langgraph_math.py) is a complete single-agent example. For the two extension topologies, write one runner, `topologies/workflows/<ds>.py`, that reads `TOPOLOGY` from its preset globals and implements one agent turn (`call(request) -> Turn`) for `core.workflows.run_team`, and two entries that run it with `TOPOLOGY` preset; [`topologies/workflows/math.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/topologies/workflows/math.py) is the shortest example. The `core/llm.py` docstring lists the client builders for every runner style.
 
 !!! warning "Module attributes are an interface"
     Read them at call time, keep their names, and keep when they are called (how many clients a row builds, when a prompt is loaded). The optimizer adapters patch or read `_load_prompt`, `SYSTEM_PROMPT`, `_build_llm`, `_build_client`, `VLLM_BASE_URL`, `MODEL_ID`, `N_AGENTS`, `N_ROUNDS`, `_RECURSION_LIMIT` and `_OUTPUT_FORMAT_NUDGE`. HiveMind patches `DELEGATION_TOOLS`, `DELEGATION_NAMES`, `MANAGER_TOOLS`, `_manager_tool_node` and `_MANAGER_TERMINATE_NUDGE` of the centralized LangGraph runners. The golden harness reads `solve`, `run_one`, `run_batch`, `load_instances` and the scorers.
@@ -85,14 +86,15 @@ Seed prompts are written by an LLM. For every `(topology, dataset, role)` in `ro
 Add the dataset to the three YAML files in `configs/prompts/`:
 
 - `domains.yaml`: one line, `<ds>: "..."`. The generator only visits datasets listed here.
-- `roles.yaml`: under `topologies.<topology>.benchmarks` for each of the five topologies, `<ds>:` with `<role>: "<job description>"`. Role names must match what the runners and the team spec load.
+- `roles.yaml`: under `topologies.<topology>.benchmarks` for each of the seven topologies, `<ds>:` with `<role>: "<job description>"`. Role names must match what the runners and the team spec load; the extension topologies use `coordinator` and `worker`, and `generator`, `critic_1`, `critic_2` and `verifier`.
 - `tools.yaml`: under each topology, `<ds>:` with the tool list. A missing entry becomes `None.`, which tells the prompt to use no tools.
 
 Then generate; existing files are skipped unless you pass `--force`:
 
 ```bash title="Write the new prompt files"
 python configs/generate_role_prompts.py --only single/<ds> --only independent/<ds> \
-  --only sequential/<ds> --only centralized/<ds> --only decentralized/<ds>
+  --only sequential/<ds> --only centralized/<ds> --only decentralized/<ds> \
+  --only fan_out_fan_in/<ds> --only iterative_refinement/<ds>
 ```
 
 The generator defaults to `Qwen/Qwen3.5-122B-A10B-FP8` at `http://localhost:8200/v1`, temperature 0 and seed 42 ([options](../reference/cli.md#prompt-generation)). The CrewAI, AutoGen and Agents SDK runners read the prompts of their topology folder.
@@ -104,7 +106,8 @@ Add one sentence to `DATASET_CONTRACTS` in `core/output_contracts.py` that names
 - `single` and `independent`: roles in `PRIMARY_FINAL_ROLES` (`solver`, `caller`, `coder`, `patcher`, `planner`);
 - `decentralized`: `debater`;
 - `sequential`: `SEQUENTIAL_FINAL_ROLES["<ds>"]`;
-- `centralized`: `CENTRALIZED_FINAL_ROLES_BY_DATASET["<ds>"]`.
+- `centralized`: `CENTRALIZED_FINAL_ROLES_BY_DATASET["<ds>"]`;
+- `fan_out_fan_in` and `iterative_refinement`: `coordinator` and `generator` for every dataset (`EXTENSION_FINAL_ROLES`), so nothing to add.
 
 The bridge adapters attach their own copy at execution time, so make the same entries in `optimizers/bridge/output_contracts.py`, whose contracts also carry the `PROTECTED FINAL OUTPUT CONTRACT:` header. [Output contracts](../evaluation/protocol.md#output-contracts) explains how they are applied.
 
@@ -153,7 +156,7 @@ Ship two files in `benchmarks/<ds>/`, with IDs equal to the `id` values of `load
 ## 9. Optimizer bridge
 
 1. Add `optimizers/bridge/datasets/<ds>.py` from [`templates/dataset_template.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/bridge/templates/dataset_template.py): `load_all()` returns `dspy.Example`s with an `id` and a `task_instance` input, and `metric(example, prediction, ...)` returns `dspy.Prediction(score=..., feedback=...)`. The protocol imports the module by the dataset name.
-2. Add adapters under `optimizers/bridge/adapters/`, usually a `module_<ds>.py` whose classes subclass `ModuleAdapterBase` (`module_common.py`) as `module_lcb.py` does, and register them in `DATASET_ADAPTERS` in `optimizers/bridge/registry.py`. [Add a Topology](add-topology.md#4-bridge-adapters) covers the adapter contract.
+2. Add adapters under `optimizers/bridge/adapters/`, usually a `module_<ds>.py` whose classes subclass `ModuleAdapterBase` (`module_common.py`) as `module_lcb.py` does, and register them in `DATASET_ADAPTERS` in `optimizers/bridge/registry.py`. The extension topologies register through `_EXTENSION_DATASET_PREFIXES` there, which expects `FanOutFanIn<Prefix>Adapter` and `IterativeRefinement<Prefix>Adapter` in `module_<ds>.py`. [Add a Topology](add-topology.md#4-bridge-adapters) covers the adapter contract.
 3. A new dataset is outside the experiment grid, so protocol jobs on it need `--allow-any-cell` and are non-conformant. Run the adapter's `run_example()` on one example, then the optimization phase on a [smoke budget](../optimizers/running.md#smoke-runs), and check that `job.json`, `optimization.json` and `optimization/optimizer_result.json` exist under `--out`:
 
 ```bash title="Smoke-test the bridge"
@@ -179,7 +182,7 @@ The sweep scripts list their datasets and row limits in code: add `<ds>` to the 
 ## Checklist
 
 1. `core/tasks/<ds>.py` with its tests, and `configs/teams/<ds>.yaml`.
-2. Eight topology runners, plus team-size and communication modules if you add those variants.
+2. Eight topology runners and the shared extension-topology runner with its two entries, plus team-size and communication modules if you add those variants.
 3. YAML entries and generated prompts under `configs/prompts/<topology>/<ds>/`.
 4. Contract and final roles in `core/output_contracts.py` and `optimizers/bridge/output_contracts.py`.
 5. `<ds>_eval_ids.json` and `<ds>_splits.json` in `benchmarks/<ds>/`.

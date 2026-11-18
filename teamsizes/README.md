@@ -2,11 +2,11 @@
 
 This MAS-PromptBench study measures how **team size `r`** — the number of agents in a multi-agent system — affects each `(topology, dataset)` pair. It mirrors the LangGraph variants in [`topologies/`](../topologies/README.md), swept over `r ∈ {2, 4, 8, 10}`.
 
-Like the base pairs, the HotpotQA, LCB, BFCL, API-Bank and ToolHop team sizes are **optimizer targets** for the prompt optimizers in [`optimizers/`](../optimizers/README.md).
+Like the base pairs, the HotpotQA, LCB, BFCL, MATH, SWE-bench, API-Bank and ToolHop team sizes are **optimizer targets** for the prompt optimizers in [`optimizers/`](../optimizers/README.md).
 
 ## Overview
 
-`r` is swept over the **4 multi-agent topologies** — `single` is excluded (one agent has no team size).
+`r` is swept over the **4 multi-agent topologies** — `single` is excluded (one agent has no team size), and so are the two extension topologies `fan_out_fan_in` and `iterative_refinement`, which have one fixed four-agent team.
 
 | Topology | What `r` sizes |
 |---|---|

@@ -4,7 +4,7 @@ Everything for the documentation site lives in this folder:
 
 ```text
 docs/
-├── mkdocs.yml          site config and navigation (33 pages)
+├── mkdocs.yml          site config and navigation (35 pages)
 ├── requirements.txt    mkdocs + pymdown-extensions (pinned)
 ├── content/            the Markdown pages; topology diagrams in content/_snippets/
 │                       (reference/ is the configuration and CLI reference the READMEs link to)
@@ -38,6 +38,8 @@ stay as they are.
 - The repository READMEs link into `docs/content/` with relative paths and anchors; find them with
   `grep -rn 'docs/content/' --include='*.md' .` before you rename a page or a heading.
 - Change a topology diagram: edit `docs/theme/make_diagrams.py` and run `python docs/theme/make_diagrams.py`.
+  It writes the five base-topology diagrams; `fan_out_fan_in.svg` and `iterative_refinement.svg` use its
+  helpers and classes, with a fallback colour because `docs.css` defines no `--t-<topology>` for them.
 - Follow `docs/theme/AUTHORING.md` for voice, page shape and the Markdown features the theme styles
   (fact strips, card grids, callouts, tabs, code titles).
 

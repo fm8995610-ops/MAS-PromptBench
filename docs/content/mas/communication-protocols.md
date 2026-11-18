@@ -6,8 +6,8 @@ The same topology can pass messages as free text, as tagged reports or as JSON. 
 <div class="facts" markdown>
 <div><span>Formats</span>3</div>
 <div><span>Topologies</span>4</div>
-<div><span>Datasets</span>6</div>
-<div><span>Runners</span>72</div>
+<div><span>Datasets</span>7</div>
+<div><span>Runners</span>84</div>
 </div>
 
 ## What a format changes
@@ -17,7 +17,7 @@ A format governs only the inter-agent hand-off: the report an agent passes to th
 Each topology runner applies the format itself through its communication policy, defined in [`core/communication.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/core/communication.py), in two places:
 
 1. **In the prompts.** A format contract is appended to every agent's system prompt, telling it how to write its report and to put the final artifact after it.
-2. **In the hand-offs.** Before a receiver reads another agent's output, the runner re-renders that text in the chosen format, so the receiver always gets a well-formed message. The HotpotQA and LiveCodeBench runners, the Sequential and Centralized BFCL runners, and the ToolHop and API-Bank runners do this; the SWE-bench runners and the Decentralized BFCL runner use the prompt contract only.
+2. **In the hand-offs.** Before a receiver reads another agent's output, the runner re-renders that text in the chosen format, so the receiver always gets a well-formed message. The HotpotQA and LiveCodeBench runners, the Sequential and Centralized BFCL runners, and the ToolHop and API-Bank runners do this; the MATH and SWE-bench runners and the Decentralized BFCL runner use the prompt contract only, so their agents write the format themselves and hand-offs pass on as written.
 
 In Independent, replicas never exchange messages, so only the prompt contract applies there. Malformed reports are never rejected or re-prompted.
 
@@ -84,6 +84,7 @@ Each dataset suggests its own optional tags and payload fields:
 | HotpotQA | `[ENTITIES]`, `[HOPS]`, `[ANSWER_CANDIDATE]` | `entities`, `hops`, `evidence`, `answer_candidate` | `Answer: <short-form>` |
 | LiveCodeBench | `[APPROACH]`, `[COMPLEXITY]`, `[EDGE_CASES]`, `[CODE_STATUS]` | `approach`, `complexity`, `edge_cases`, `tests`, `code_status` | fenced `python` block |
 | BFCL | `[FUNCTION_CHOICE]`, `[ARG_PLAN]`, `[CALL_CANDIDATE]` | `function_choice`, `arg_plan`, `call_candidate` | fenced `json` call list |
+| MATH | `[PROBLEM_PLAN]`, `[DERIVATION]`, `[CHECKS]`, `[ANSWER_CANDIDATE]` | `problem_plan`, `derivation`, `checks`, `answer_candidate` | `\boxed{...}` |
 | ToolHop | `[TOOL_CHAIN]`, `[OBSERVATIONS]`, `[ANSWER_CANDIDATE]` | `tool_chain`, `observations`, `answer_candidate` | `<answer>...</answer>` |
 | API-Bank | none; one short sentence per section, final call after `[NEXT]` | `api_choice`, `call_candidate` | one bracketed API call |
 | SWE-bench | `[BUG_LOCATION]`, `[PATCH_PLAN]`, `[RISK_OR_REGRESSION]` | `bug_location`, `root_cause`, `patch_plan`, `regression_risk`, `tests_or_checks` | the repository diff |
@@ -93,7 +94,7 @@ Each dataset suggests its own optional tags and payload fields:
 Runners exist for every combination of:
 
 - **Topologies:** `independent`, `sequential`, `centralized`, `decentralized`. Each runs the LangGraph runner of that topology.
-- **Datasets:** `hotpotqa`, `lcb`, `bfcl`, `toolhop`, `apibank`, `swe`.
+- **Datasets:** `hotpotqa`, `math`, `lcb`, `bfcl`, `toolhop`, `apibank`, `swe`.
 - **Formats:** `freeform`, `semi_structured`, `structured_soft`.
 
 The path pattern is `communications/<topology>/<dataset>/<dataset>_<format>.py`. Each file is a few lines: it calls `install` from [`communications/communication_formats.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/communications/communication_formats.py), which loads the topology runner as a module of its own with the format preset, records its hand-offs and scores its reports.
@@ -104,7 +105,7 @@ The path pattern is `communications/<topology>/<dataset>/<dataset>_<format>.py`.
 python -m communications.centralized.hotpotqa.hotpotqa_structured_soft --batch --limit 100
 ```
 
-All 72 runners share the runners' command line (`--batch`, `--limit`, `--offset`, `--only`, `--out-dir`, `--out`); the BFCL runners add `--category`. They have no demo, and without `--limit` they run every row. Results go to `results/communications_baseline/<topology>_<dataset>_<format>/results.jsonl` (BFCL: one subfolder per category) unless you pass `--out-dir` or `--out`, and the file is emptied first. ToolHop cells need `export TOOLHOP_ALLOW_DATASET_EXEC=1`.
+All 84 runners share the runners' command line (`--batch`, `--limit`, `--offset`, `--only`, `--out-dir`, `--out`); the BFCL runners add `--category`. They have no demo, and without `--limit` they run every row. Results go to `results/communications_baseline/<topology>_<dataset>_<format>/results.jsonl` (BFCL: one subfolder per category) unless you pass `--out-dir` or `--out`, and the file is emptied first. ToolHop cells need `export TOOLHOP_ALLOW_DATASET_EXEC=1`.
 
 Each row holds the dataset's usual score fields plus `communication_format`, the parsed reports and the rendered hand-offs (`communication_inflight_handoffs`). The parse metrics judge each agent's own text against the format: `communication_parse_rate` is the share of reports that parse as written, and `communication_all_parse_ok` is true when all do. The re-rendered reports always parse; their rate is reported separately as `communication_render_parse_rate`.
 
@@ -119,11 +120,11 @@ FORMATS="freeform structured_soft" \
 bash scripts/run_communications.sh
 ```
 
-The script runs BFCL and SWE-bench on their eval IDs (BFCL one category at a time) and the other datasets with fixed limits (HotpotQA, ToolHop and API-Bank 100, LiveCodeBench 50). It sets `TOOLHOP_ALLOW_DATASET_EXEC=1` unless you set it, and reads `VLLM_BASE_URL` and `MODEL_ID` like every runner.
+The script runs BFCL and SWE-bench on their eval IDs (BFCL one category at a time) and the other datasets with fixed limits (HotpotQA, MATH, ToolHop and API-Bank 100, LiveCodeBench 50). MATH is not in the default `DATASETS`; list it to sweep it, for example `DATASETS="math"`. It sets `TOOLHOP_ALLOW_DATASET_EXEC=1` unless you set it, and reads `VLLM_BASE_URL` and `MODEL_ID` like every runner.
 
 ## Optimize a cell
 
-Pass `--communication <format>` to the run protocol, or use the key `<topology>_communications_<format>`. The bridge has adapters for HotpotQA, LiveCodeBench, BFCL, ToolHop and API-Bank; the experiment grid covers HotpotQA, LiveCodeBench and BFCL with GEPA, MIPRO, MAPRO and MASPO, and other cells need `--allow-any-cell`. For example, MASPO on Sequential LiveCodeBench with Structured messages:
+Pass `--communication <format>` to the run protocol, or use the key `<topology>_communications_<format>`. The bridge has adapters for HotpotQA, LiveCodeBench, BFCL, MATH, SWE-bench, ToolHop and API-Bank. The experiment grid covers HotpotQA, LiveCodeBench and BFCL with GEPA, MIPRO, MAPRO and MASPO; the `protocol_extension` [extension study](../evaluation/protocol.md#extension-studies) covers MATH, SWE-bench and API-Bank with GEPA, MIPRO and MASPO (`--study protocol_extension`); other cells need `--allow-any-cell`. The extension topologies have no format variants. For example, MASPO on Sequential LiveCodeBench with Structured messages:
 
 ```bash title="MASPO on Sequential · LiveCodeBench · Structured"
 python -m optimizers.protocol.run --method maspo --dataset lcb \

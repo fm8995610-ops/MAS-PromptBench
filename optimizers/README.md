@@ -2,7 +2,7 @@
 
 Eight prompt optimizers — **GEPA**, **MIPRO**, **MAPRO**, **MASPO**, **HiveMind**, **MAMUT-GEPA**, **MASPOB** and **TAVO** — improve the seed prompts in `configs/prompts/` by running the **real** topology runners and re-scoring. Each mutates a pair's per-role prompts and measures the gain on the actual multi-agent runner — not a mirrored copy of it — so an optimized prompt runs unchanged in the benchmark.
 
-This part is **optional** — the base benchmark runs without it (see [topologies/](../topologies/)). Every `(topology, dataset)` pair is an optimizer target, including the [`teamsizes/`](../teamsizes/) and [`communications/`](../communications/) variants.
+This part is **optional** — the base benchmark runs without it (see [topologies/](../topologies/)). Every `(topology, dataset)` pair is an optimizer target, including the two extension topologies and the [`teamsizes/`](../teamsizes/) and [`communications/`](../communications/) variants.
 
 ## Overview
 
@@ -17,7 +17,7 @@ This part is **optional** — the base benchmark runs without it (see [topologie
 | **MASPOB** | `maspob` | prompt-variant bandit with a GATv2 surrogate (LinUCB) | [`maspob/`](maspob/) | Table 6 |
 | **TAVO** | `tavo` | trajectory credit assignment + shared verbalized-policy overlay | [`tavo/`](tavo/) | Table 6 |
 
-All eight share one [run protocol](protocol/README.md) — 600 rollouts per job, deployment only if strictly better than the seeds on validation, scoring on a held-out test split — each with its method's upstream settings. MASPOB also needs `torch`, `torch_geometric` and `sentence-transformers` (CPU is enough).
+All eight share one [run protocol](protocol/README.md) — 600 rollouts per job, deployment only if strictly better than the seeds on validation, scoring on a held-out test split — each with its method's upstream settings. Four [extension studies](protocol/README.md#extension-studies) add cells outside these tables (`--study <name>`): GEPA, MIPRO, MAPRO and MASPO on the extension topologies `fan_out_fan_in` and `iterative_refinement` and from the second seed-prompt set P2; GEPA, MIPRO and MASPO on the communication formats and team sizes of MATH, SWE-bench and API-Bank. MASPOB also needs `torch`, `torch_geometric` and `sentence-transformers` (CPU is enough).
 
 ### Directory layout
 
@@ -64,6 +64,6 @@ python -m optimizers.protocol.aggregate runs/ --out runs/summary.json
 
 ## Inputs and outputs
 
-- **Input** — `configs/prompts/<topology>/<dataset>/<role>.txt`, the seed prompts. **Read-only**: no optimizer modifies `configs/`.
+- **Input** — `configs/prompts/<topology>/<dataset>/<role>.txt`, the seed prompts, or with `--prompt-set P2` the frozen set in `configs/prompt_sets/p2/`. **Read-only**: no optimizer modifies `configs/`.
 - **Splits** — fixed train / validation / test ids in `benchmarks/<dataset>/<dataset>_splits.json`; `test` is the reported evaluation set, so optimization never sees a reported instance.
 - **Output** — job artifacts under `--out` (`runs/` is **gitignored**); the repository ships only the seeds.

@@ -152,7 +152,7 @@ Each method's knobs are one frozen dataclass, listed on [Optimizers](../optimize
 
 | Variable | `run_topologies.sh` | `run_teamsizes.sh` | `run_communications.sh` |
 | --- | --- | --- | --- |
-| `DATASETS` | all 9 | all 9 | `hotpotqa lcb bfcl toolhop apibank swe` |
+| `DATASETS` | all 9 | all 9 | `hotpotqa lcb bfcl toolhop apibank swe` (`math` when listed) |
 | `TOPOLOGIES` | not read (the 8 runner folders in `TOPOS`) | `independent sequential centralized decentralized` | same |
 | `RVALUES` | not read | `2 4 8 10` | not read |
 | `FORMATS` | not read | not read | `freeform semi_structured structured_soft` |

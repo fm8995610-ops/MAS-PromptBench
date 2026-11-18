@@ -19,7 +19,7 @@ When does prompt optimization improve a multi-agent LLM system? These docs show 
 </div>
 
 <div class="hero-meta">
-<span><b>9</b> tasks</span><span><b>5</b> topologies</span><span><b>4</b> frameworks</span><span><b>3</b> protocols</span><span><b>4</b> team sizes</span><span><b>8</b> optimizers</span>
+<span><b>9</b> tasks</span><span><b>7</b> topologies</span><span><b>4</b> frameworks</span><span><b>3</b> protocols</span><span><b>4</b> team sizes</span><span><b>8</b> optimizers</span>
 </div>
 
 </div>
@@ -48,7 +48,7 @@ Each factor is varied on its own while the others stay at their defaults.
 - [Tasks](tasks/index.md)
   GPQA-Diamond, HotpotQA, MATH, LiveCodeBench, APPS, SWE-bench Verified, BFCL, ToolHop and API-Bank.
 - [Workflow Topologies](mas/topologies.md)
-  Single, Independent, Sequential, Centralized and Decentralized.
+  Single, Independent, Sequential, Centralized and Decentralized, plus Fan-out/Fan-in and Iterative Refinement.
 - [Communication Protocols](mas/communication-protocols.md)
   Freeform, Semi-structured and Structured messages.
 - [Team Sizes](mas/team-sizes.md)

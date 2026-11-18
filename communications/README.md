@@ -7,7 +7,7 @@ A study of a single question: **does the inter-agent communication *format* affe
 | Axis | Values |
 |---|---|
 | Topologies (4) | `independent`, `sequential`, `centralized`, `decentralized` |
-| Datasets (6) | `hotpotqa`, `lcb`, `bfcl`, `toolhop`, `apibank`, `swe` |
+| Datasets (7) | `hotpotqa`, `math`, `lcb`, `bfcl`, `toolhop`, `apibank`, `swe` |
 | Formats (3) | `freeform`, `semi_structured`, `structured_soft` |
 
 ### Directory layout
@@ -38,9 +38,9 @@ from communications import communication_formats
 communication_formats.install(globals(), topology="independent", dataset="hotpotqa", fmt="freeform")
 ```
 
-`install` loads the matching LangGraph runner (`topologies/<topology>/[langgraph/]<dataset>/langgraph_<dataset>.py`) as a module of its own with `COMMUNICATION_FORMAT` preset, so pairs never interfere. The runner's `COMMUNICATION` policy (**`core/communication.py`**) appends the format's contract to the agents' system prompts; the HotpotQA and LCB runners, and the sequential and centralized BFCL runners, also render each hand-off in the format. `install` adds `solve` (hand-offs recorded, reports scored), `run_one` / `run_batch` and the `core.cli` command line.
+`install` loads the matching LangGraph runner (`topologies/<topology>/[langgraph/]<dataset>/langgraph_<dataset>.py`) as a module of its own with `COMMUNICATION_FORMAT` preset, so pairs never interfere. The runner's `COMMUNICATION` policy (**`core/communication.py`**) appends the format's contract to the agents' system prompts; the HotpotQA, LCB, ToolHop and API-Bank runners, and the sequential and centralized BFCL runners, also render each hand-off in the format. The MATH runners, like the SWE-bench ones, use the prompt contract only: the agents write the format themselves and hand-offs are passed on as written. `install` adds `solve` (hand-offs recorded, reports scored), `run_one` / `run_batch` and the `core.cli` command line.
 
-Scoring is unchanged: only the *messages agents pass to each other* differ. Each run reuses the topology runner and the dataset's official scorer, and the final answer the scorer reads stays in the expected format — HotpotQA emits `Answer: <short-form>`, LCB the final fenced Python block, BFCL the final fenced JSON call list, ToolHop `<answer>...</answer>`, API-Bank one bracketed API call (`[ApiName(arg='value')]`), and SWE-bench the repository diff.
+Scoring is unchanged: only the *messages agents pass to each other* differ. Each run reuses the topology runner and the dataset's official scorer, and the final answer the scorer reads stays in the expected format — HotpotQA emits `Answer: <short-form>`, MATH the final `\boxed{...}` answer, LCB the final fenced Python block, BFCL the final fenced JSON call list, ToolHop `<answer>...</answer>`, API-Bank one bracketed API call (`[ApiName(arg='value')]`), and SWE-bench the repository diff.
 
 ---
 
@@ -137,4 +137,4 @@ FORMATS="freeform structured_soft" \
 bash scripts/run_communications.sh
 ```
 
-Knobs: `TOPOLOGIES` / `DATASETS` / `FORMATS` (which pairs to sweep), plus the endpoint variables above. BFCL and SWE-bench pairs run their [evaluation IDs](../benchmarks/README.md); the others use the per-dataset `--limit` in the script ([sweep launchers](../docs/content/reference/environment.md#sweep-launchers)).
+Knobs: `TOPOLOGIES` / `DATASETS` / `FORMATS` (which pairs to sweep), plus the endpoint variables above. The default `DATASETS` leaves out `math`; list it to sweep the MATH pairs (`--limit 100`). BFCL and SWE-bench pairs run their [evaluation IDs](../benchmarks/README.md); the others use the per-dataset `--limit` in the script ([sweep launchers](../docs/content/reference/environment.md#sweep-launchers)).

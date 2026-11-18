@@ -122,7 +122,7 @@ The same steps work for any cell. The runner module picks the baseline; the prot
 - [Tasks](../tasks/index.md)
   Scorers, data and flags for each of the nine datasets.
 - [Workflow Topologies](../mas/topologies.md)
-  How the five topologies route work between agents.
+  How the seven topologies route work between agents.
 - [Run an Optimizer](../optimizers/running.md)
   Budgets, phases and settings for the eight optimizers.
 - [Command-Line Flags](../reference/cli.md)

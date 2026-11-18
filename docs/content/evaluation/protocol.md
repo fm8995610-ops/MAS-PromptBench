@@ -58,7 +58,7 @@ The optimizers never draw their own splits. Each dataset ships `benchmarks/<data
 
 ## One job, three phases
 
-A job is one method, one cell and one optimizer seed in {0, 1, 2}. A cell is (task, topology, framework, communication format, team size, task model).
+A job is one method, one cell and one optimizer seed in {0, 1, 2}. A cell is (task, topology, framework, communication format, team size, task model); a cell started from the second seed-prompt set also names it ([Seed-prompt sets](#seed-prompt-sets)).
 
 1. **Optimize.** The method gets the train and validation rows, the frozen seed bundle and a budget of 600 usable full-system rollouts, and returns its incumbent bundle.
 2. **Final validation.** Uncharged and greedy. The seed and the incumbent run on the full validation split with paired per-item request seeds. The incumbent is deployed only if its validation mean is strictly higher; a tie, a regression, an unusable record or an infrastructure-invalid optimization keeps the seed bundle. The decision is sealed in `selection.json` before any test row is loaded.
@@ -73,7 +73,33 @@ A rollout is one complete multi-agent execution of one row, scored by the datase
 - **Usable** rollouts end in `success` or `semantic_failure`, which includes wrong or malformed answers. Only these are charged.
 - **Infrastructure failures** are an exception before a scored observation (connection error, timeout, 5xx, BadRequest), transport-error text, no model call, or a scorer exception. They are never charged, are retried twice with the same request seed, and then return unusable.
 - Batches reserve budget before dispatch and are trimmed at the cap, so a job never overshoots 600.
-- A `--budget` other than 600, an off-grid cell or another reflection model makes a job non-conformant; aggregation skips it by default.
+- A `--budget` other than 600, an off-grid cell (outside the grid and not admitted by its [extension study](#extension-studies)) or another reflection model makes a job non-conformant; aggregation skips it by default.
+
+## Seed-prompt sets
+
+A job's seed bundle comes from one of two seed-prompt sets ([`core/prompt_sets.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/core/prompt_sets.py)):
+
+| Set | Files | How it was generated | Covers |
+| --- | --- | --- | --- |
+| `P1` (default) | `configs/prompts/<topology>/<dataset>/<role>.txt` | temperature 0, seed 42 | every topology, dataset and role; the set the runners load |
+| `P2` | `configs/prompt_sets/p2/<topology>/<dataset>/<role>.txt` | temperature 1.0, top-p 1.0, seed 1 | the four multi-agent topologies on HotpotQA, LiveCodeBench and BFCL (30 prompts) |
+
+Both sets come from the same meta prompt and the same role, tool and domain catalogs, written by `Qwen/Qwen3.5-122B-A10B-FP8` ([Prompt generation](../reference/cli.md#prompt-generation)). P2 was generated once and frozen: `manifest.json` records the generation settings and, per prompt file, the SHA-256 of its generator input and of its text. Loading the set checks every file against the manifest, so an edited set is rejected, and the generator refuses to write a frozen set again.
+
+`run --prompt-set P2` starts the seed bundle, and so the baseline, from P2. The prompt set enters a job's identity only when it is not P1, so P1 jobs keep the `cell_id` they had before prompt sets existed; aggregation keeps P2 cells apart from P1 cells.
+
+## Extension studies
+
+Four studies in [`optimizers/protocol/studies.py`](https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/protocol/studies.py) add cells outside the experiment grid, all on LangGraph with `Qwen/Qwen3.5-9B` and optimizer seeds 0 to 2:
+
+| Study | Methods | Tasks | Runtimes | Configurations | Jobs |
+| --- | --- | --- | --- | ---: | ---: |
+| `new_topologies` | GEPA, MIPRO, MAPRO, MASPO | all nine | [Fan-out/Fan-in](../mas/fan-out-fan-in.md) and [Iterative Refinement](../mas/iterative-refinement.md), 4 agents | 72 | 216 |
+| `prompt_set2` | GEPA, MIPRO, MAPRO, MASPO | HotpotQA, LiveCodeBench, BFCL | the four multi-agent topologies, 4 agents, from P2 | 48 | 144 |
+| `protocol_extension` | GEPA, MIPRO, MASPO | MATH, SWE-bench, API-Bank | the four multi-agent topologies × three communication formats, 4 agents | 108 | 324 |
+| `team_size_extension` | GEPA, MIPRO, MASPO | MATH, SWE-bench, API-Bank | the four multi-agent topologies, freeform, 4, 8 and 10 agents | 108 | 324 |
+
+A job runs a study's cell only when the study is named with `--study`, and such a job is conformant. The freeform, four-agent cells of the last two studies (36 each) are grid cells: run with `--study`, they are the very grid jobs, with their source tables, so their results are shared. Only study-only jobs record `study` in `job.json` and `result.json`. The studies do not add to the experiment grid itself (`build_grid`: 612 configurations, 1,836 jobs).
 
 ## Decoding and seeds
 
@@ -109,7 +135,7 @@ The bridge's APPS loader keeps only `interview` problems; all APPS evaluation ID
 
 ## Output contracts
 
-`core/output_contracts.py` fixes the final answer format per dataset. The role that emits the answer gets a `PROTECTED FINAL OUTPUT CONTRACT` block before its prompt and a reminder after it. That role is the solver-type role in Single and Independent, the `debater` in Decentralized, the last stage in Sequential (for example `writer` for HotpotQA) and the manager plus the answer-producing workers in Centralized.
+`core/output_contracts.py` fixes the final answer format per dataset. The role that emits the answer gets a `PROTECTED FINAL OUTPUT CONTRACT` block before its prompt and a reminder after it. That role is the solver-type role in Single and Independent, the `debater` in Decentralized, the last stage in Sequential (for example `writer` for HotpotQA), the manager plus the answer-producing workers in Centralized, the `coordinator` in Fan-out/Fan-in and the `generator` in Iterative Refinement.
 
 | Dataset | Required ending |
 | --- | --- |
@@ -137,4 +163,4 @@ Counts are totals for the row across every agent and round, so they grow with te
 
 ## Statistics
 
-`optimizers.protocol.aggregate` pairs the three optimizer seeds of each cell. Per seed it reports the seed and deployed test means and their difference; across seeds, the mean and standard deviation of the difference, a seed-stratified paired bootstrap 95% interval (10,000 replicates) and, for binary scores, an exact McNemar test per seed with Holm correction inside a family (dataset × model by default). A cell is complete only when all three seeds have valid test data. See [Aggregate the seeds](../optimizers/running.md#aggregate-the-seeds).
+`optimizers.protocol.aggregate` pairs the three optimizer seeds of each cell. Per seed it reports the seed and deployed test means and their difference; across seeds, the mean and standard deviation of the difference, a seed-stratified paired bootstrap 95% interval (10,000 replicates) and, for binary scores, an exact McNemar test per seed with Holm correction inside a family (dataset × model by default). A cell is complete only when all three seeds have valid test data. By default it reports the grid and skips study-only jobs; `--study <name>` reports one extension study instead, shared grid cells included, and `--group-by` adds seed-level summaries over groups of cells. See [Aggregate the seeds](../optimizers/running.md#aggregate-the-seeds).

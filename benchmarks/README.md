@@ -12,7 +12,7 @@ curated manifest automatically, so no setup is required.
 
 ## Benchmark Matrix
 
-**5 topologies** — `single`, `independent`, `sequential`, `centralized` and `decentralized`, described in [topologies/](../topologies/README.md#overview).
+**5 topologies** — `single`, `independent`, `sequential`, `centralized` and `decentralized`, plus the 2 extension topologies `fan_out_fan_in` and `iterative_refinement`, described in [topologies/](../topologies/README.md#overview).
 
 **9 datasets** — each scored by its task module (`core/tasks/<dataset>.py`):
 

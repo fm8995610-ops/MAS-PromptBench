@@ -15,7 +15,7 @@ The benchmark models a MAS as a tuple \( \mathcal{M} = (\mathcal{A}, G, P) \):
 - \( G \) is the **workflow topology**: who sends work to whom.
 - \( P \) is the **communication protocol**: the format of the messages agents exchange.
 
-Model weights never change. Optimization edits only the joint set of role prompts \( \pi \). The seed prompts \( \pi^0 \) live in `configs/prompts/<topology>/<dataset>/<role>.txt`, and no optimizer writes to them.
+Model weights never change. Optimization edits only the joint set of role prompts \( \pi \). The seed prompts \( \pi^0 \) live in `configs/prompts/<topology>/<dataset>/<role>.txt`, and no optimizer writes to them. A second, frozen seed set, P2 in `configs/prompt_sets/p2/`, starts the jobs of the `prompt_set2` [extension study](../evaluation/protocol.md#seed-prompt-sets).
 
 ## The prompt-optimization gain
 
@@ -36,7 +36,7 @@ The benchmark varies one factor at a time and holds the others at their defaults
 - [Task](../tasks/index.md)
   Nine datasets in three domains: reasoning, coding and tool calling.
 - [Workflow topology](../mas/topologies.md)
-  Single, Independent, Sequential, Centralized and Decentralized, on four frameworks.
+  Single, Independent, Sequential, Centralized and Decentralized, on four frameworks, plus Fan-out/Fan-in and Iterative Refinement on LangGraph.
 - [Communication protocol](../mas/communication-protocols.md)
   Freeform, Semi-structured or Structured messages between agents.
 - [Team size](../mas/team-sizes.md)
@@ -49,7 +49,7 @@ Every agent runs on the task model `Qwen/Qwen3.5-9B`; `meta-llama/Llama-3.1-8B-I
 ## Vocabulary
 
 Cell
-:   One runtime configuration: task, topology, framework, communication format, team size and task model, such as *BFCL · Sequential (CrewAI) · freeform · 4 agents · Qwen3.5-9B*.
+:   One runtime configuration: task, topology, framework, communication format, team size and task model (and the seed-prompt set, when it is P2), such as *BFCL · Sequential (CrewAI) · freeform · 4 agents · Qwen3.5-9B*.
 
 Job
 :   One optimizer on one cell with one optimizer seed (0, 1 or 2). It optimizes, selects on validation and scores seed and deployed prompts on the same test examples.
@@ -59,6 +59,9 @@ Runner
 
 Role and seed prompt
 :   A position in the topology (stage, worker, manager, peer) and the system-prompt file it starts from.
+
+Extension study
+:   A named set of cells outside the experiment grid, such as the two extension topologies on every dataset, run with `--study <name>`. See [Extension studies](../evaluation/protocol.md#extension-studies).
 
 Splits and eval IDs
 :   Fixed `train`, `validation` and `test` IDs per dataset in `benchmarks/<dataset>/<dataset>_splits.json`. `test` is the evaluation set, also listed in `<dataset>_eval_ids.json`; `train` and `validation` never overlap it. See [Evaluation Protocol](../evaluation/protocol.md).

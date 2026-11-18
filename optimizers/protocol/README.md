@@ -1,6 +1,6 @@
 # Run Protocol
 
-**`mas-promptbench`** is the one run protocol for every prompt optimizer. A **job** is `(method, cell, optimizer seed ∈ {0, 1, 2})`; a **cell** is `(task, topology, framework, communication, team size, task model)`.
+**`mas-promptbench`** is the one run protocol for every prompt optimizer. A **job** is `(method, cell, optimizer seed ∈ {0, 1, 2})`; a **cell** is `(task, topology, framework, communication, team size, task model)`, plus the seed-prompt set when it is not P1.
 
 Part of [optimizers/](../README.md). Every rollout runs through the [real-runner bridge](../bridge/README.md); the seed prompts in `configs/prompts/` are **read-only**.
 
@@ -17,7 +17,7 @@ Request seeds are offset by 0 / 1000 / 2000 per optimizer seed. `aggregate` pair
 | Module | Contents |
 |---|---|
 | `run`, `aggregate` | job CLI; seed aggregation CLI |
-| `config`, `settings`, `cells` | frozen constants; environment; experiment grid |
+| `config`, `settings`, `cells`, `studies` | frozen constants; environment; experiment grid; extension studies |
 | `runner`, `adapter_output` | `ProtocolRunner`; adapter output → record fields |
 | `budget`, `seeding` | `BudgetLedger`; request and paired evaluation seeds |
 | `schema`, `errors` | `CellSpec`, `PromptBundle`, `RunRecord`, `OptimizerResult`, `StopReason`; all exceptions |
@@ -74,14 +74,37 @@ python -m optimizers.protocol.run --method gepa --dataset hotpotqa --topology se
 python -m optimizers.protocol.aggregate runs/ --out runs/summary.json
 ```
 
-- `--topology` is a base topology (refined by `--framework`, `--team-size`, `--communication`) or a registry key such as `sequential_crewai`; `--model` is `qwen` (`Qwen/Qwen3.5-9B`) or `llama` (`meta-llama/Llama-3.1-8B-Instruct`).
-- Cells outside the grid (`cells.py`: 612 configurations, 1,836 jobs) need `--allow-any-cell`; `identity` runs on any grid runtime condition.
+- `--topology` is a base topology (refined by `--framework`, `--team-size`, `--communication`), an extension topology (`fan_out_fan_in`, `iterative_refinement`: LangGraph, 4 agents, freeform only) or a registry key such as `sequential_crewai`; `--model` is `qwen` (`Qwen/Qwen3.5-9B`) or `llama` (`meta-llama/Llama-3.1-8B-Instruct`).
+- `--prompt-set P2` starts the seed bundle from the frozen second set (`configs/prompt_sets/p2/`, [`core/prompt_sets.py`](../../core/prompt_sets.py)); default `P1`, `configs/prompts/`.
+- Cells outside the grid (`cells.py`: 612 configurations, 1,836 jobs) need `--allow-any-cell`, unless `--study` names the [extension study](#extension-studies) they belong to; `identity` runs on any grid (or named study) runtime condition.
 - **Non-conformant** jobs — `--budget` below 600 (smoke runs), an off-grid cell, or another `REFLECTION_MODEL_ID` — are skipped by `aggregate` unless `--include-nonconformant`.
 - `--phase optimize|validate|test` runs one phase from saved artifacts; `all` (default) runs what is missing. An interrupted optimization never restarts silently (use a fresh `--out`); evaluations resume per item.
 - An Agents SDK job (`decentralized_openai_agents`) restarts itself with the SDK's isolated install first on `PYTHONPATH`; without a usable SDK it exits with status 2.
 - Logs go to stderr; stdout carries only the job's one-line JSON summary.
 
 Every option: [Command-Line Flags](../../docs/content/reference/cli.md#run-protocol); every environment variable: [Environment Variables](../../docs/content/reference/environment.md#run-protocol). Artifacts under `--out` (JSON, no absolute paths or host names): `job.json`, `optimization/`, `optimization.json`, `evaluations/`, `selection.json`, `test.json`, `result.json`.
+
+### Extension studies
+
+`studies.py` defines four studies beyond the grid, all LangGraph with the Qwen task model and seeds 0–2:
+
+| Study | Methods | Tasks | Runtimes | Configurations | Jobs |
+|---|---|---|---|---:|---:|
+| `new_topologies` | GEPA, MIPRO, MAPRO, MASPO | all 9 | `fan_out_fan_in`, `iterative_refinement` | 72 | 216 |
+| `prompt_set2` | GEPA, MIPRO, MAPRO, MASPO | `hotpotqa`, `lcb`, `bfcl` | 4 multi-agent topologies, r = 4, seeds from P2 | 48 | 144 |
+| `protocol_extension` | GEPA, MIPRO, MASPO | `math`, `swe`, `apibank` | 4 multi-agent topologies × 3 formats, r = 4 | 108 (36 in the grid) | 324 |
+| `team_size_extension` | GEPA, MIPRO, MASPO | `math`, `swe`, `apibank` | 4 multi-agent topologies, freeform, r ∈ {4, 8, 10} | 108 (36 in the grid) | 324 |
+
+- `run --study <name>` admits the study's cells; such jobs are conformant. A study cell that is also a grid cell (the freeform r = 4 cells of the last two studies) is that grid cell, with its source tables, so its job and results are shared.
+- Study-only jobs record `study` in `job.json` and `result.json`; a P2 cell records `prompt_set` in `grid_cell`. `CellSpec.prompt_set` enters the job identity only when it is not P1, so P1 `cell_id`s are unchanged; `study` never does.
+- `aggregate` skips study-only jobs unless `--study <name>`, which reports that study, shared grid cells included. `--group-by task,communication` (any fields of `method`, `task`, `topology`, `framework`, `communication`, `team_size`, `task_model`, `prompt_set`) adds one summary per group: per seed the mean over the group's cells, then the mean and sample std of the three seed deltas. P2 cells aggregate apart from P1 cells.
+- The studies do not add to the grid (`build_grid`, `EXPECTED_COUNTS`); `EXPECTED_STUDY_COUNTS` pins their sizes.
+
+```bash
+python -m optimizers.protocol.studies --counts                                         # sizes of every study
+python -m optimizers.protocol.studies new_topologies --out-root runs/new_topologies     # one run command per job
+python -m optimizers.protocol.aggregate runs/ --study protocol_extension --group-by task,communication
+```
 
 ### Smoke budgets
 

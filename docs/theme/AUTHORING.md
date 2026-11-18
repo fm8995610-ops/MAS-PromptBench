@@ -112,7 +112,8 @@ description (one sentence). Keep the blank lines around the list.
 
 **Diagrams** — topology diagrams already exist as snippets; include one with
 `--8<-- "diagrams/sequential.svg"` on its own line (names: single, independent,
-sequential, centralized, decentralized). Don't draw other diagrams.
+sequential, centralized, decentralized, fan_out_fan_in, iterative_refinement). Don't draw
+other diagrams.
 
 **Math** — `\( \Delta \)` inline, `\[ ... \]` display.
 
@@ -128,6 +129,10 @@ sequential, centralized, decentralized). Don't draw other diagrams.
   `single` and `independent` are LangGraph-only (no framework folder). `sequential`:
   langgraph, crewai. `centralized`: langgraph, autogen. `decentralized`: langgraph,
   openai_agents (OpenAI Agents SDK). Every topology × dataset pair exists (72 modules).
+  Two extension topologies, `fan_out_fan_in` and `iterative_refinement`, are LangGraph-only
+  (`topologies/<topology>/<ds>/langgraph_<ds>.py`, 18 modules): each entry runs the shared
+  runner `topologies/workflows/<ds>.py` with `TOPOLOGY` preset; graphs in `core/workflows.py`;
+  one fixed four-agent team, no team-size or communication variants.
   Shared code (CLI, batch loop, clients, settings, team specs, prompts, one task module per
   dataset in `core/tasks/`) lives in `core/`.
 - Datasets (folder/CLI names): `gpqa`, `hotpotqa`, `math`, `lcb` (LiveCodeBench),
@@ -147,12 +152,12 @@ sequential, centralized, decentralized). Don't draw other diagrams.
   `benchmarks/<ds>/<ds>_splits.json` (`test` = eval IDs). `--limit N` selects exactly the
   eval IDs for every dataset except bfcl (stratified 100: 40/20/20/20) and swe (fixed 30),
   which take `--only`.
-- Team specs: `configs/teams/<dataset>.yaml` (all but toolhop and apibank), team size
-  r ∈ {2, 4, 8, 10}, r = 4 for the `topologies/` runners.
+- Team specs: `configs/teams/<dataset>.yaml` (toolhop and apibank: the extension topologies
+  only), team size r ∈ {2, 4, 8, 10}, r = 4 for the `topologies/` runners.
 - Communication-protocol runners: `python -m communications.<topology>.<dataset>.<dataset>_<format>`
   for topologies independent/sequential/centralized/decentralized, datasets
-  hotpotqa/lcb/bfcl/toolhop/apibank/swe, formats `freeform`, `semi_structured`,
-  `structured_soft` (shown to readers as Freeform / Semi-structured / Structured); 72 runners.
+  hotpotqa/math/lcb/bfcl/toolhop/apibank/swe, formats `freeform`, `semi_structured`,
+  `structured_soft` (shown to readers as Freeform / Semi-structured / Structured); 84 runners.
   Default output: `results/communications_baseline/<topology>_<dataset>_<format>/results.jsonl`.
 - Team-size runners: `teamsizes/<topology>/<dataset>/<dataset>_r<N>.py`, N ∈ {2,4,8,10},
   topologies independent/sequential/centralized/decentralized, all 9 datasets (144). They
@@ -175,7 +180,11 @@ sequential, centralized, decentralized). Don't draw other diagrams.
   --seed {0,1,2} --out runs/...`; `python -m optimizers.protocol.aggregate runs/`.
 - Env: `TASK_ENDPOINTS` (else `VLLM_BASE_URL`), `REFLECTION_MODEL_BASE_URL` (default
   `http://localhost:8200/v1`). Reflection model `Qwen/Qwen3.5-122B-A10B-FP8`.
-- Cells outside the experiment grid (`optimizers/protocol/cells.py`) need `--allow-any-cell`.
+- Cells outside the experiment grid (`optimizers/protocol/cells.py`) need `--allow-any-cell`,
+  unless `--study <name>` names their extension study (`optimizers/protocol/studies.py`:
+  `new_topologies`, `prompt_set2`, `protocol_extension`, `team_size_extension`).
+- `--prompt-set P2` starts a job from the frozen second seed-prompt set,
+  `configs/prompt_sets/p2/` (`core/prompt_sets.py`).
 - A job writes `result.json` under `--out`; `test.delta_pp` is Δ in percentage points.
 - Seed prompts: `configs/prompts/<topology>/<dataset>/<role>.txt` (read-only for optimizers).
 
