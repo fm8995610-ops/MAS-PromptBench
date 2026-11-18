@@ -71,14 +71,15 @@ nav:
           - ToolHop: tasks/toolhop.md
           - API-Bank: tasks/api-bank.md
   - Multi-Agent Systems:
-      - Workflow Topologies: mas/topologies.md
-      - Single: mas/single.md
-      - Independent: mas/independent.md
-      - Sequential: mas/sequential.md
-      - Centralized: mas/centralized.md
-      - Decentralized: mas/decentralized.md
-      - Fan-out/Fan-in: mas/fan-out-fan-in.md
-      - Iterative Refinement: mas/iterative-refinement.md
+      - Workflow Topologies:
+          - All Topologies: mas/topologies.md
+          - Single: mas/single.md
+          - Independent: mas/independent.md
+          - Sequential: mas/sequential.md
+          - Centralized: mas/centralized.md
+          - Decentralized: mas/decentralized.md
+          - Fan-out/Fan-in: mas/fan-out-fan-in.md
+          - Iterative Refinement: mas/iterative-refinement.md
       - Communication Protocols: mas/communication-protocols.md
       - Team Sizes: mas/team-sizes.md
   - Optimizers:
