@@ -4,7 +4,9 @@ team size, model) cells exist, and how each maps to a real-runner adapter.
 Table 2 runs each topology in its native framework; Tables 3-7 use LangGraph;
 Tables 4/5 vary communication format / team size on the application tasks;
 Table 6 adds the four extra methods; Table 7 repeats the application cells
-with a second task model. A cell shared by several tables is one job.
+with a second task model. A cell shared by several tables is one job. The
+extension studies (``studies.py``) add cells outside these tables; a job runs
+one of them only when its study is named with ``--study``.
 """
 
 from __future__ import annotations
@@ -12,7 +14,15 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass, replace
 
-from .config import COMMUNICATIONS, PROTOCOL_ID, TASK_MODELS, TEAM_SIZES, TOPOLOGIES
+from .config import (
+    COMMUNICATIONS,
+    DEFAULT_PROMPT_SET,
+    EXTENSION_TOPOLOGIES,
+    PROTOCOL_ID,
+    TASK_MODELS,
+    TEAM_SIZES,
+    TOPOLOGIES,
+)
 from .errors import UnsupportedBaselineCell
 from .schema import CellSpec
 
@@ -62,29 +72,28 @@ class GridCell:
     team_size: int
     task_model: str = QWEN_MODEL
     source_tables: tuple[int, ...] = ()
+    prompt_set: str = DEFAULT_PROMPT_SET
 
     @property
     def identity(self) -> tuple[object, ...]:
         """Method and runtime condition, without the source tables."""
-        return (
-            self.method,
-            self.task,
-            self.topology,
-            self.framework,
-            self.communication,
-            self.team_size,
-            self.task_model,
-        )
+        return (self.method, *self.runner_identity)
 
     @property
     def runner_identity(self) -> tuple[object, ...]:
         """Method-independent runtime condition (shared seed-bundle baseline)."""
-        return (self.task, self.topology, self.framework, self.communication, self.team_size, self.task_model)
+        condition = (self.task, self.topology, self.framework, self.communication, self.team_size, self.task_model)
+        return _with_prompt_set(condition, self.prompt_set)
 
     @property
     def registry_key(self) -> str:
         """The bridge registry key of the runtime condition."""
         return registry_key(self.topology, self.framework, self.communication, self.team_size)
+
+
+def _with_prompt_set(key: tuple[object, ...], prompt_set: str) -> tuple[object, ...]:
+    """``key`` plus the prompt set when it is not P1, so P1 keys are those of the paper grid."""
+    return key if prompt_set == DEFAULT_PROMPT_SET else (*key, prompt_set)
 
 
 def _supports(method: str, topology: str) -> bool:
@@ -162,22 +171,39 @@ def grid_assertions() -> dict[str, int]:
 
 
 def find_cell(
-    method: str, task: str, topology: str, framework: str, communication: str, team_size: int, task_model: str
+    method: str,
+    task: str,
+    topology: str,
+    framework: str,
+    communication: str,
+    team_size: int,
+    task_model: str,
+    prompt_set: str = DEFAULT_PROMPT_SET,
+    cells: Iterable[GridCell] | None = None,
 ) -> GridCell | None:
-    """The grid cell with exactly this identity, or None."""
+    """The grid cell (or the cell of ``cells``) with exactly this identity, or None."""
     key = (method, task, topology, framework, communication, 1 if topology == "single" else team_size, task_model)
-    for cell in build_grid(include_llama=True):
+    key = _with_prompt_set(key, prompt_set)
+    for cell in build_grid(include_llama=True) if cells is None else cells:
         if cell.identity == key:
             return cell
     return None
 
 
 def runner_condition_in_grid(
-    task: str, topology: str, framework: str, communication: str, team_size: int, task_model: str
+    task: str,
+    topology: str,
+    framework: str,
+    communication: str,
+    team_size: int,
+    task_model: str,
+    prompt_set: str = DEFAULT_PROMPT_SET,
+    cells: Iterable[GridCell] | None = None,
 ) -> bool:
-    """Whether any method's grid cell uses this runtime condition."""
+    """Whether any method's grid cell (or any cell of ``cells``) uses this runtime condition."""
     key = (task, topology, framework, communication, 1 if topology == "single" else team_size, task_model)
-    return any(cell.runner_identity == key for cell in build_grid(include_llama=True))
+    key = _with_prompt_set(key, prompt_set)
+    return any(cell.runner_identity == key for cell in (build_grid(include_llama=True) if cells is None else cells))
 
 
 def required_cells(method: str) -> tuple[GridCell, ...]:
@@ -188,7 +214,7 @@ def required_cells(method: str) -> tuple[GridCell, ...]:
 
 
 def _grid_key(value) -> tuple[object, ...]:
-    return (
+    key = (
         value.method,
         value.task,
         value.topology,
@@ -197,19 +223,25 @@ def _grid_key(value) -> tuple[object, ...]:
         value.team_size,
         value.task_model,
     )
+    return _with_prompt_set(key, value.prompt_set)
 
 
 def validate_cell(method: str, cell: CellSpec) -> None:
-    """Fail before any model call unless ``cell`` is exactly one of ``method``'s grid cells."""
+    """Fail before any model call unless ``cell`` is exactly one of ``method``'s grid cells
+    or a cell of the extension study it was admitted under (``cell.study``)."""
+    from .studies import in_study
+
     if cell.protocol_id != PROTOCOL_ID:
         raise UnsupportedBaselineCell(f"{method} requires protocol_id={PROTOCOL_ID!r}, got {cell.protocol_id!r}")
     if cell.method != method:
         raise UnsupportedBaselineCell(f"expected method={method!r}, got {cell.method!r}")
-    if _grid_key(cell) not in {_grid_key(candidate) for candidate in required_cells(method)}:
+    in_paper_grid = _grid_key(cell) in {_grid_key(candidate) for candidate in required_cells(method)}
+    if not in_paper_grid and not (cell.study and in_study(cell, cell.study)):
         raise UnsupportedBaselineCell(
             "cell is not in the experiment grid: "
             f"task={cell.task}, topology={cell.topology}, framework={cell.framework}, "
-            f"communication={cell.communication}, team_size={cell.team_size}, task_model={cell.task_model}"
+            f"communication={cell.communication}, team_size={cell.team_size}, task_model={cell.task_model}, "
+            f"prompt_set={cell.prompt_set}"
         )
 
 
@@ -223,6 +255,10 @@ def in_grid(cell: CellSpec) -> bool:
 # Mapping to the real-runner registry
 def registry_key(topology: str, framework: str, communication: str = "freeform", team_size: int = 4) -> str:
     """The ``optimizers.bridge.registry`` topology key for one runtime condition."""
+    if topology in EXTENSION_TOPOLOGIES:
+        if framework != "langgraph" or communication != "freeform" or team_size != 4:
+            raise ValueError(f"{topology} exists only as the four-agent LangGraph runtime with freeform messages")
+        return topology
     if topology not in TOPOLOGIES:
         raise ValueError(f"unknown topology {topology!r}")
     if framework != "langgraph":
@@ -252,7 +288,7 @@ def parse_registry_key(key: str) -> dict[str, object]:
             return {"topology": topology, "framework": "langgraph", "communication": key[len(prefix) :]}
         if key.startswith(f"{topology}_r") and key[len(topology) + 2 :].isdigit():
             return {"topology": topology, "framework": "langgraph", "team_size": int(key[len(topology) + 2 :])}
-    if key in TOPOLOGIES:
+    if key in TOPOLOGIES or key in EXTENSION_TOPOLOGIES:
         return {"topology": key}
     raise ValueError(f"unknown topology or registry key {key!r}")
 

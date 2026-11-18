@@ -1,0 +1,133 @@
+{
+ "files": {
+  "centralized/bfcl/caller_worker.txt": {
+   "input_sha256": "ee7e6f708dba3c45a06659a2b56b6f89bc2c8c7b63ce543929e29f18451b15fb",
+   "sha256": "6d6da752f69f83fa13814ada386153de1fe59526cc4639e2a9e5c059448fcfcc"
+  },
+  "centralized/bfcl/inspector_worker.txt": {
+   "input_sha256": "bca36e42696393ace5b2f0498a68a8e8124eb6c64178a974f1aa04953752a802",
+   "sha256": "2b41ad4ad4b78cfe79eae2fd7e15b9b837d8ea2f6a854dd4655543cee380b286"
+  },
+  "centralized/bfcl/manager.txt": {
+   "input_sha256": "c40ac8c14a49e79dae74c210c46a5827fec732132d82310c06381394ba2a236a",
+   "sha256": "d751a32c45086ecc91ed40882b7a3deacd51f6b5b505671311230c2a1f441e44"
+  },
+  "centralized/bfcl/validator_worker.txt": {
+   "input_sha256": "82ed1fdd89c7bb2d7a459d697efa3367b0544e1ad77ed76c8751d876924ee916",
+   "sha256": "651131ea57911ae39a5114d53e53a6fe4f9181bad8b0aa5e02c9b9ce977301ca"
+  },
+  "centralized/hotpotqa/manager.txt": {
+   "input_sha256": "cdce2544a633f291491aea3c22d9c447309433e4f160803854f7e31e087e40a3",
+   "sha256": "94adeef053790502bb119117e7e51480d6c7f29df6fa3f4e70f9a168bfcbe361"
+  },
+  "centralized/hotpotqa/reasoner_worker.txt": {
+   "input_sha256": "44bbe002013411bdbbba44d9e6324c6d5840a9f5b7c788f77042719053d2da3f",
+   "sha256": "f93e9ffe2bce3d9ff1d212c5b6992c90a6ff90098e74912cb09db0e4bf6ecf8c"
+  },
+  "centralized/hotpotqa/retriever_worker.txt": {
+   "input_sha256": "2f2927d8b85624f69dd79b4367b2581bf6229291e7784254afc4b7ecc2ff5300",
+   "sha256": "7d5f8589243ddb64bc302b862633adfc7ff9fc0adf2180922f66b16dfe04998f"
+  },
+  "centralized/hotpotqa/writer_worker.txt": {
+   "input_sha256": "24ae7a8502a3cd88ee9f4cff0554c2e0094b5a1e48d986ed36c2021308e26540",
+   "sha256": "15bd4007363a71d286cb3c310c43a3474e07c26a01ef9284b9f0fadc49160397"
+  },
+  "centralized/lcb/analyzer_worker.txt": {
+   "input_sha256": "b1fba5f162ad3b908a2b6ae413a69be0b787a30fed9933cbb3bfeed8d0577bb3",
+   "sha256": "ac2b5a32c1a99e4d445cdec242db7eff22701fbb69a104442c95defd638faf18"
+  },
+  "centralized/lcb/coder_worker.txt": {
+   "input_sha256": "d5f3ae4adb4f9472a3c1c6df87132991a27fe9d12f58e311e34009c21b5d0605",
+   "sha256": "b464fddcb553354d5f317894adaf63355ecbbe129b614aa57c353d428cd3030e"
+  },
+  "centralized/lcb/manager.txt": {
+   "input_sha256": "10c6975fbf125d01c42d42a4e1ce7651f50e2807057d420d303d8ea5d3fb5758",
+   "sha256": "7e33a1e4855a996ef4639074b135f27fa2556522cf8783608ccce03e890796d9"
+  },
+  "centralized/lcb/tester_worker.txt": {
+   "input_sha256": "41e5deea6fb0108d9b674cae155e87393303863cd98d84a061deb49fc97f5e12",
+   "sha256": "f3284cb07235c5d9820a8ada68338ce23db6505bd0b00f0b5465f7ac8d09588a"
+  },
+  "decentralized/bfcl/debater.txt": {
+   "input_sha256": "e94f2740328c032407e1e9f21bd724a977c22e8214d92985fc3b9376100f71a9",
+   "sha256": "e5d9f3af5b4cef4469aafa03a5b2d1df73ef9291e1f127333ed687b8ac0229ad"
+  },
+  "decentralized/hotpotqa/debater.txt": {
+   "input_sha256": "c3cfc0ed1e56d28a6ce436f13f0ad975680d197f1e9675dd6ada7b9a98d4b95a",
+   "sha256": "1e6ed7fc4c21171fb4c8e9cbb0d2d0e554c8ad2afdb3eac5b1304f542aa77eb5"
+  },
+  "decentralized/lcb/debater.txt": {
+   "input_sha256": "ec5e8561d5c1a170d9a961067a1ddb435086b073a384462815b6c1bc973cfc72",
+   "sha256": "cbef84caabedd866d8ace2a9bab11561fb2fe7f15e09c0d6ad7360dbd8116494"
+  },
+  "independent/bfcl/caller.txt": {
+   "input_sha256": "326b8d0a78f9ca31225976fc799f38af690e25a218b9fed4d19f40aa24591591",
+   "sha256": "0e566199764b872cfcff24f22d14216b1cc3d0b79c63b055243f21ad4e576db9"
+  },
+  "independent/hotpotqa/solver.txt": {
+   "input_sha256": "069679abe8510033f8b98851a25dd1cb3c6353d2902e1ec07c664b504c92d4e4",
+   "sha256": "4637038d70b440ecd9194c49b1dc6cfe7a2e7ac4d20a53a19b9892af5d3ddaf9"
+  },
+  "independent/lcb/coder.txt": {
+   "input_sha256": "79f27292398e48d43398e14d42ebcf4c6b716d84ca0eba343387ba6b19355f10",
+   "sha256": "e1a12037c0879be15f73ae2095a7a8db275bf06b37622bc76ca1891ff77e2b4c"
+  },
+  "sequential/bfcl/analyzer.txt": {
+   "input_sha256": "efee43bd45548632947171fb1ef85e261f30ebd6a1204f846c36ea6cc3f1d3fd",
+   "sha256": "7ca12bfdca910bbf83dbfbbbaf3fafeab3992ac4af9c97c259e93d3a16b1440f"
+  },
+  "sequential/bfcl/caller.txt": {
+   "input_sha256": "960c764035fedabd3356bde9bfc0c250017bdc69670b7d5c4931e481679f6f31",
+   "sha256": "80e6f81d2a453cfdfa3a04cd64f288cf106f9cd807494a6e8e290932f622004a"
+  },
+  "sequential/bfcl/inspector.txt": {
+   "input_sha256": "3d40f33348847193808442a2472e725cbe0b77359d3f11bb9edb342c6643781e",
+   "sha256": "1aa9f8a2dc5647ebd5f9c351d09ed88905c5a2cc9779b3b2977a29b52e3df317"
+  },
+  "sequential/bfcl/verifier.txt": {
+   "input_sha256": "a9ae166c82c5fc55728c9931032614835c589de78a1cd8b0445b97617166be16",
+   "sha256": "e4302d1989bf1fc9375d863a531dd3536a3745f88ee93693e030f519b2536288"
+  },
+  "sequential/hotpotqa/planner.txt": {
+   "input_sha256": "9df4b84c6574f94b9d279e56c1cc4affcb760968c43e5e9470fa7ad00ab3d694",
+   "sha256": "45a35dfd1a4e16c841d3e2f25595d379046e4dbce4763ea21399bc7f261d4685"
+  },
+  "sequential/hotpotqa/reasoner.txt": {
+   "input_sha256": "f41a1abf9a2136bcd57cf08894610514a8f44b4669e4477e9f86b618ae9ffa36",
+   "sha256": "2ef7188e1c6133891cb17bef21f427672e23545bab84fb8deeba1e8626f05a37"
+  },
+  "sequential/hotpotqa/retriever.txt": {
+   "input_sha256": "991b8e6454b3a94cfbd64998c12b405ba6bb429af971010a04d25c2409c65887",
+   "sha256": "952e7f82d8ed4032e4eecf92ecffac035fd2bb74c1e177a16b9de02a331227a2"
+  },
+  "sequential/hotpotqa/writer.txt": {
+   "input_sha256": "bd5ff7db7633a97ebf428844c5ba1aff1d198ba2cb23bfba91c4dac09ec8064e",
+   "sha256": "1fd4435df29b7771f0387b64c37244eba3189de3f49a27518c2d87554e96717f"
+  },
+  "sequential/lcb/analyzer.txt": {
+   "input_sha256": "4d8aa2def12de90c4c937ac82c73d24f5ad186163997427016bc00975c1c589f",
+   "sha256": "da08ce134b3899c25e4a868aa91286a5db2765e44e78b6fd1edcabc3ad72c39b"
+  },
+  "sequential/lcb/coder.txt": {
+   "input_sha256": "7485c1728e7c1676a887fa3fbccb08f85f72f45599714997c18b31692e37a8d6",
+   "sha256": "c26328544179fed5bf09b552626f6f3210f528e14f096cdd0ffb3299cb4000f0"
+  },
+  "sequential/lcb/debugger.txt": {
+   "input_sha256": "9e99c2dcd1ff75a04a29d5a20eb73a44fd3a7bba14331528ac934b2acc16e61d",
+   "sha256": "70b3ffc492533f8f3a8d542284b50ee123be98a740146b6b94f8431b2d11a826"
+  },
+  "sequential/lcb/tester.txt": {
+   "input_sha256": "b8615195a0e5e8fca805d3641665af51bfcd166050a055a824345849d77a32ff",
+   "sha256": "a01fecb4a05a8867579e967b7873ca234ba908c1c7fb29a48f28769d11d083a0"
+  }
+ },
+ "generator": {
+  "meta_prompt_sha256": "f0f9c7db728ae967b7f55361cbb9b57b1d6a0a7d6c409f398535586dd51f80fe",
+  "model": "Qwen/Qwen3.5-122B-A10B-FP8",
+  "seed": 1,
+  "temperature": 1.0,
+  "top_p": 1.0
+ },
+ "name": "P2",
+ "schema": "mas-promptbench-prompt-set"
+}

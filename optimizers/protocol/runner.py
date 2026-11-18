@@ -33,6 +33,7 @@ from contextlib import contextmanager, nullcontext
 from dataclasses import asdict, dataclass, field
 from typing import Any, Literal, Protocol
 
+from core import prompt_sets
 from topologies.decentralized.openai_agents.agents_sdk_base import FRAMEWORK as SDK_FRAMEWORK
 from topologies.decentralized.openai_agents.agents_sdk_base import load_agents_sdk
 
@@ -51,7 +52,7 @@ from .adapter_output import (
 from .artifacts import ArtifactStore, scrub_text
 from .budget import BudgetLedger
 from .cells import registry_key as cell_registry_key
-from .config import MAX_INFRASTRUCTURE_RETRIES, TASK_DECODING, TASKS
+from .config import DEFAULT_PROMPT_SET, MAX_INFRASTRUCTURE_RETRIES, TASK_DECODING, TASKS
 from .errors import (
     JobError,
     PreObservationInfrastructureFailure,
@@ -421,10 +422,22 @@ class AdapterRuntime:
         return adapter
 
     def seed_bundle(self) -> PromptBundle:
-        """The frozen starting bundle: each role's shipped seed prompt."""
+        """The frozen starting bundle: each role's shipped seed prompt, or its prompt in the cell's frozen set."""
+        if self.cell.prompt_set == DEFAULT_PROMPT_SET:
+            return PromptBundle(
+                roles=dict(self.seed_prompts),
+                metadata={"source": "seed_prompts", "runtime_implementation_id": self.implementation_id},
+            )
+        frozen = prompt_sets.load(self.cell.prompt_set)
+        topology = getattr(self._adapter, "prompt_topology", self.cell.topology)
         return PromptBundle(
-            roles=dict(self.seed_prompts),
-            metadata={"source": "seed_prompts", "runtime_implementation_id": self.implementation_id},
+            roles={role: frozen.prompt(topology, self.cell.task, role) for role in self.required_roles},
+            metadata={
+                "source": "prompt_set",
+                "prompt_set": frozen.name,
+                "prompt_set_manifest_sha256": frozen.digest,
+                "runtime_implementation_id": self.implementation_id,
+            },
         )
 
     def environment(self, request_seed: int, evaluation: bool) -> dict[str, str]:

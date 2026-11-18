@@ -1,4 +1,9 @@
-"""Generate initial role system prompts for every (topology, dataset, role)."""
+"""Generate initial role system prompts for every (topology, dataset, role).
+
+The shipped set P1 is written to configs/prompts/ (greedy, seed 42). ``--prompt-set P2``
+samples a second set from the same meta prompt and catalogs into configs/prompt_sets/p2/
+(temperature 1.0, top-p 1.0, seed 1) and freezes it with a manifest (core/prompt_sets.py).
+"""
 
 from __future__ import annotations
 
@@ -11,7 +16,16 @@ from pathlib import Path
 import yaml
 from openai import OpenAI
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # run as a script from any directory
+
+from core import prompt_sets
+
 PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
+# Decoding per prompt set: P1 is deterministic; P2 samples so that it differs from P1.
+SET_DECODING = {
+    "P1": {"temperature": 0.0, "top_p": None, "seed": 42},
+    "P2": {"temperature": 1.0, "top_p": 1.0, "seed": 1},
+}
 
 
 def strip_thinking(text: str) -> str:
@@ -56,9 +70,16 @@ def main() -> int:
         "--model",
         default=os.environ.get("PROMPT_GEN_MODEL", "Qwen/Qwen3.5-122B-A10B-FP8"),
     )
-    parser.add_argument("--temperature", type=float, default=0.0)
-    parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--force", action="store_true", help="Overwrite existing outputs.")
+    parser.add_argument(
+        "--prompt-set",
+        choices=prompt_sets.PROMPT_SETS,
+        default=prompt_sets.DEFAULT_PROMPT_SET,
+        help="P1: configs/prompts/ (default); P2: the frozen second set under configs/prompt_sets/p2/.",
+    )
+    parser.add_argument("--temperature", type=float, default=None, help="Default: 0.0 for P1, 1.0 for P2.")
+    parser.add_argument("--top-p", type=float, default=None, help="Default: not sent for P1, 1.0 for P2.")
+    parser.add_argument("--seed", type=int, default=None, help="Default: 42 for P1, 1 for P2.")
+    parser.add_argument("--force", action="store_true", help="Overwrite existing outputs (P1 only).")
     parser.add_argument(
         "--only",
         action="append",
@@ -66,6 +87,13 @@ def main() -> int:
         help="Restrict to <topology> or <topology>/<dataset> or <topology>/<dataset>/<role>.",
     )
     args = parser.parse_args()
+    for name, value in SET_DECODING[args.prompt_set].items():
+        if getattr(args, name) is None:
+            setattr(args, name, value)
+    frozen_set = args.prompt_set != prompt_sets.DEFAULT_PROMPT_SET
+    output_dir = prompt_sets.directory(args.prompt_set)
+    if frozen_set and (args.force or (output_dir / prompt_sets.MANIFEST).exists()):
+        parser.error(f"prompt set {args.prompt_set} is generated once and frozen; it cannot be overwritten")
 
     meta_prompt = (PROMPTS_DIR / "meta_prompt.txt").read_text()
     domains = yaml.safe_load((PROMPTS_DIR / "domains.yaml").read_text())
@@ -88,9 +116,14 @@ def main() -> int:
 
     total_count = finish_count = skipped_count = failed_count = 0
     run_start_time = time.time()
+    inputs: dict[str, str] = {}  # file key -> rendered meta prompt, recorded in a frozen set's manifest
+    sampling = {"temperature": args.temperature, "seed": args.seed}
+    if args.top_p is not None:
+        sampling["top_p"] = args.top_p
 
     print(
-        f"generator: model={args.model}  base_url={args.base_url}  temperature={args.temperature}  seed={args.seed}",
+        f"generator: prompt_set={args.prompt_set}  model={args.model}  base_url={args.base_url}  "
+        + "  ".join(f"{name}={value}" for name, value in sampling.items()),
         file=sys.stderr,
     )
 
@@ -114,12 +147,8 @@ def main() -> int:
                 if not _selected(topology, dataset, role):
                     continue
                 total_count += 1
-                output_path = PROMPTS_DIR / topology / dataset / f"{role}.txt"
-                if output_path.exists() and not args.force:
-                    skipped_count += 1
-                    print(f"[skip]  {topology}/{dataset}/{role}", file=sys.stderr)
-                    continue
-
+                key = f"{topology}/{dataset}/{role}.txt"
+                output_path = output_dir / key
                 user_message = render(
                     meta_prompt,
                     DOMAIN_BACKGROUND=domain_description,
@@ -128,14 +157,18 @@ def main() -> int:
                     ROLE=role,
                     ROLE_DESC=role_description,
                 )
+                inputs[key] = user_message
+                if output_path.exists() and not args.force:
+                    skipped_count += 1
+                    print(f"[skip]  {topology}/{dataset}/{role}", file=sys.stderr)
+                    continue
 
                 call_start_time = time.time()
                 try:
                     response = client.chat.completions.create(
                         model=args.model,
                         messages=[{"role": "user", "content": user_message}],
-                        temperature=args.temperature,
-                        seed=args.seed,
+                        **sampling,
                     )
                     generated_prompt = strip_thinking(response.choices[0].message.content)
                     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -152,6 +185,11 @@ def main() -> int:
         f"\ndone: {finish_count}/{total_count} finish, {skipped_count} skipped, {failed_count} failed  [{total_elapsed:.0f}s]",
         file=sys.stderr,
     )
+    if frozen_set and failed_count == 0 and inputs:
+        # Rerunning after a failure fills in only the missing files; the set is frozen once complete.
+        generator = {"model": args.model, **sampling, "meta_prompt_sha256": prompt_sets.text_sha256(meta_prompt)}
+        manifest = prompt_sets.freeze(args.prompt_set, generator=generator, inputs=inputs)
+        print(f"froze prompt set {args.prompt_set}: {manifest.relative_to(PROMPTS_DIR.parent.parent)}", file=sys.stderr)
     return 0 if failed_count == 0 else 1
 
 

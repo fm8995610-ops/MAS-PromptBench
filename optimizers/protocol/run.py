@@ -16,6 +16,9 @@ Artifacts (all JSON, relative paths only) under ``--out``:
 optimization.json) or ``test`` (needs selection.json); ``all`` runs whatever is
 missing. An interrupted optimization is never restarted silently.
 
+``--study`` admits the cells of one extension study (``studies.py``), such as the
+extension topologies or the second seed-prompt set (``--prompt-set P2``).
+
 Progress and errors are logged to stderr (``--log-level``, default
 ``$LOG_LEVEL`` or INFO; ``--quiet`` drops the progress lines); stdout carries
 only the one-line JSON summary.
@@ -42,7 +45,17 @@ from .adapter_output import json_safe
 from .artifacts import ArtifactStore, atomic_write_json, read_json, scrub_text
 from .budget import BudgetLedger
 from .cells import find_cell, parse_registry_key, registry_key, runner_condition_in_grid
-from .config import BUDGET, PROTOCOL_ID, TASK_MODELS, TASKS, normalize_task, protocol_hash, task_model_id
+from .config import (
+    BUDGET,
+    DEFAULT_PROMPT_SET,
+    PROMPT_SETS,
+    PROTOCOL_ID,
+    TASK_MODELS,
+    TASKS,
+    normalize_task,
+    protocol_hash,
+    task_model_id,
+)
 from .errors import (
     EvaluationError,
     JobError,
@@ -76,6 +89,7 @@ from .schema import (
     verify_sealed,
 )
 from .settings import ProtocolSettings
+from .studies import STUDIES, find_study_cell, runner_condition_in_study
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +109,8 @@ class JobOptions:
     framework: str | None = None
     team_size: int | None = None
     communication: str | None = None
+    prompt_set: str = DEFAULT_PROMPT_SET
+    study: str | None = None
     budget: int = BUDGET
     phase: str = "all"
     allow_any_cell: bool = False
@@ -136,21 +152,34 @@ def resolve_cell_args(options: JobOptions) -> dict[str, Any]:
         "communication": communication,
         "team_size": team_size,
         "task_model": task_model_id(options.model),
+        "prompt_set": options.prompt_set,
     }
 
 
-def grid_membership(method: str, args: Mapping[str, Any], allow_any_cell: bool) -> tuple[tuple[int, ...], bool]:
-    """(source tables, in grid). ``identity`` may run on any grid runtime condition."""
+def grid_membership(
+    method: str, args: Mapping[str, Any], allow_any_cell: bool, study: str | None = None
+) -> tuple[tuple[int, ...], bool, str | None]:
+    """(source tables, in grid, study). ``identity`` may run on any grid runtime condition.
+
+    The study is set only for a cell that exists in ``study`` alone; a cell the
+    study shares with the paper grid is that grid cell, with its source tables.
+    """
     if method == "identity":
-        return (), runner_condition_in_grid(**args)
+        if runner_condition_in_grid(**args):
+            return (), True, None
+        in_study = study is not None and runner_condition_in_study(study, **args)
+        return (), in_study, study if in_study else None
     cell = find_cell(method, **args)
-    if cell is None:
-        if not allow_any_cell:
-            raise JobError(
-                f"{method} {args} is not a cell of the experiment grid (use --allow-any-cell to run it anyway)"
-            )
-        return (), False
-    return cell.source_tables, True
+    if cell is not None:
+        return cell.source_tables, True, None
+    if study is not None and find_study_cell(study, method, **args) is not None:
+        return (), True, study
+    if not allow_any_cell:
+        hint = f"it is not in study {study!r} either" if study else "name its study with --study"
+        raise JobError(
+            f"{method} {args} is not a cell of the experiment grid ({hint}, or use --allow-any-cell to run it anyway)"
+        )
+    return (), False, None
 
 
 # Job
@@ -165,7 +194,9 @@ class Job:
         self.out = Path(options.out)
         self.store = ArtifactStore(self.out)
         args = resolve_cell_args(options)
-        self.source_tables, self.in_grid = grid_membership(options.method, args, options.allow_any_cell)
+        self.source_tables, self.in_grid, self.study = grid_membership(
+            options.method, args, options.allow_any_cell, options.study
+        )
         if not self.in_grid and not options.allow_any_cell:
             raise JobError(f"runtime condition {args} is not in the experiment grid")
         self.registry_key = registry_key(args["topology"], args["framework"], args["communication"], args["team_size"])
@@ -179,6 +210,7 @@ class Job:
             protocol_hash=protocol_hash(),
             budget=options.budget,
             source_tables=self.source_tables,
+            study=self.study,
             reflection_model=ProtocolSettings.from_env().reflection_model,
             **args,
         )
@@ -207,8 +239,8 @@ class Job:
 
     @property
     def identity(self) -> dict[str, Any]:
-        """The sealed ``job.json`` content."""
-        return {
+        """The sealed ``job.json`` content (with the study of an extension-study cell)."""
+        identity = {
             "schema": schema_name("job"),
             "protocol_id": PROTOCOL_ID,
             "cell": dict(self.cell.identity),
@@ -224,6 +256,9 @@ class Job:
             "condition_id": self.evaluator.condition_id,
             "split_sizes": {split: len(ids) for split, ids in self.data.split_ids.items()},
         }
+        if self.study is not None:
+            identity["study"] = self.study
+        return identity
 
     def _write_job_identity(self) -> None:
         path = self.out / "job.json"
@@ -469,7 +504,18 @@ class Job:
         self, envelope: Mapping[str, Any], selection: Mapping[str, Any], test: Mapping[str, Any]
     ) -> dict[str, Any]:
         cell = self.cell
-        return {
+        grid_cell = {
+            "method": cell.method,
+            "task": cell.task,
+            "topology": cell.topology,
+            "framework": cell.framework,
+            "communication": cell.communication,
+            "team_size": cell.team_size,
+            "task_model": cell.task_model,
+        }
+        if cell.prompt_set != DEFAULT_PROMPT_SET:
+            grid_cell["prompt_set"] = cell.prompt_set
+        result = {
             "schema": schema_name("job-result"),
             "protocol_id": PROTOCOL_ID,
             "status": "completed",
@@ -477,15 +523,7 @@ class Job:
             "cell": dict(cell.identity),
             "cell_id": cell.cell_id,
             "optimizer_seed": cell.optimizer_seed,
-            "grid_cell": {
-                "method": cell.method,
-                "task": cell.task,
-                "topology": cell.topology,
-                "framework": cell.framework,
-                "communication": cell.communication,
-                "team_size": cell.team_size,
-                "task_model": cell.task_model,
-            },
+            "grid_cell": grid_cell,
             "registry_key": self.registry_key,
             "source_tables": list(cell.source_tables),
             "condition_id": self.evaluator.condition_id,
@@ -517,6 +555,9 @@ class Job:
                 )
             },
         }
+        if self.study is not None:
+            result["study"] = self.study
+        return result
 
     def run(self) -> dict[str, Any]:
         """Run the requested phase(s); ``all`` runs whatever is missing."""
@@ -600,13 +641,21 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--topology",
         required=True,
-        help="base topology (single, independent, sequential, centralized, decentralized) "
+        help="base topology (single, independent, sequential, centralized, decentralized), "
+        "an extension topology (fan_out_fan_in, iterative_refinement; needs --study) "
         "or a registry key such as sequential_crewai, independent_r8, "
         "centralized_communications_structured_soft",
     )
     parser.add_argument("--framework", choices=("langgraph", "crewai", "autogen", "openai_agents"))
     parser.add_argument("--team-size", type=int, choices=(2, 4, 8, 10))
     parser.add_argument("--communication", choices=("freeform", "semi_structured", "structured_soft"))
+    parser.add_argument(
+        "--prompt-set",
+        choices=PROMPT_SETS,
+        default=DEFAULT_PROMPT_SET,
+        help="seed prompts: P1 (configs/prompts/, default) or the frozen P2 set (configs/prompt_sets/p2/)",
+    )
+    parser.add_argument("--study", choices=STUDIES, help="admit the cells of this extension study (studies.py)")
     parser.add_argument("--model", required=True, help=f"{sorted(TASK_MODELS)} or a full task-model ID")
     parser.add_argument("--seed", type=int, required=True, choices=(0, 1, 2))
     parser.add_argument(
@@ -647,6 +696,8 @@ def options_from_args(args: argparse.Namespace) -> JobOptions:
         framework=args.framework,
         team_size=args.team_size,
         communication=args.communication,
+        prompt_set=args.prompt_set,
+        study=args.study,
         budget=args.budget,
         phase=args.phase,
         allow_any_cell=args.allow_any_cell,

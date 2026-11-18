@@ -15,8 +15,10 @@ from typing import Any
 from .config import (
     BUDGET,
     COMMUNICATIONS,
+    DEFAULT_PROMPT_SET,
     DEFAULT_TASK_MODEL,
     OPTIMIZER_SEEDS,
+    PROMPT_SETS,
     PROTOCOL_ID,
     REFLECTION_MODEL_ID,
     TEAM_SIZES,
@@ -92,7 +94,11 @@ class CellSpec:
     ``task`` is the dataset key (gpqa, hotpotqa, math, lcb, apps, bfcl, swe,
     apibank, toolhop). The protocol budget is 600; smaller budgets are
     accepted for smoke runs and are reported as non-conformant, and so is a
-    reflection model other than the protocol's.
+    reflection model other than the protocol's. ``prompt_set`` names the seed
+    prompts (``core.prompt_sets``); only a set other than P1 enters the identity,
+    so P1 jobs keep the ``cell_id`` they had before prompt sets existed. ``study``
+    names the extension study (``studies.py``) a job was admitted under; like
+    ``source_tables`` it is not part of the identity.
     """
 
     method: str
@@ -109,6 +115,8 @@ class CellSpec:
     protocol_hash: str = ""
     budget: int = BUDGET
     source_tables: tuple[int, ...] = ()
+    prompt_set: str = DEFAULT_PROMPT_SET
+    study: str | None = None
 
     def __post_init__(self) -> None:
         if self.topology == "single" and self.team_size != 1:
@@ -121,6 +129,8 @@ class CellSpec:
             raise ValueError(f"invalid optimizer seed: {self.optimizer_seed}")
         if type(self.budget) is not int or not 0 < self.budget <= BUDGET:
             raise ValueError(f"budget must be an integer in 1..{BUDGET}")
+        if self.prompt_set not in PROMPT_SETS:
+            raise ValueError(f"invalid prompt set: {self.prompt_set}")
 
     @property
     def protocol_conformant(self) -> bool:
@@ -132,7 +142,7 @@ class CellSpec:
     @property
     def identity(self) -> Mapping[str, Any]:
         """Every field that defines the job (hashed into ``cell_id``)."""
-        return {
+        identity = {
             "protocol_id": self.protocol_id,
             "protocol_hash": self.protocol_hash,
             "method": self.method,
@@ -147,6 +157,9 @@ class CellSpec:
             "split_hash": self.split_hash,
             "budget": self.budget,
         }
+        if self.prompt_set != DEFAULT_PROMPT_SET:
+            identity["prompt_set"] = self.prompt_set
+        return identity
 
     @property
     def cell_id(self) -> str:

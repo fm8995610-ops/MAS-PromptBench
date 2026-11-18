@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from core.prompt_sets import DEFAULT_PROMPT_SET, PROMPT_SETS
+
 # Config
 PROTOCOL_ID = "mas-promptbench"
 BUDGET = 600
@@ -17,6 +19,8 @@ MAX_INFRASTRUCTURE_RETRIES = 2
 TEAM_SIZES = (2, 4, 8, 10)
 COMMUNICATIONS = ("freeform", "semi_structured", "structured_soft")
 TOPOLOGIES = ("single", "independent", "sequential", "centralized", "decentralized")
+# Topologies added after the paper grid; their cells exist only in the extension studies (studies.py).
+EXTENSION_TOPOLOGIES = ("fan_out_fan_in", "iterative_refinement")
 
 TASK_MODELS = {
     "qwen": "Qwen/Qwen3.5-9B",
@@ -104,10 +108,13 @@ def task_model_id(model: str) -> str:
 __all__ = [
     "BUDGET",
     "COMMUNICATIONS",
+    "DEFAULT_PROMPT_SET",
     "DEFAULT_TASK_MODEL",
+    "EXTENSION_TOPOLOGIES",
     "LEARNING_CURVE",
     "MAX_INFRASTRUCTURE_RETRIES",
     "OPTIMIZER_SEEDS",
+    "PROMPT_SETS",
     "PROTOCOL",
     "PROTOCOL_ID",
     "REFLECTION_MODEL_ID",
