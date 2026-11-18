@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../../assets/docs.css?v=20261022203713">
+  <link rel="stylesheet" href="../../assets/docs.css?v=20261118192931">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../../assets/mpb-transition.js?v=20261022203713"></script>
-  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261022203713">
+  <script src="../../assets/mpb-transition.js?v=20261118192931"></script>
+  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261118192931">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url="../.." data-version="20261022203713">
+<div class="site" data-base-url="../.." data-version="20261118192931">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -130,6 +130,8 @@
   <li><a class="nav-link" href="../../mas/sequential/">Sequential</a></li>
   <li><a class="nav-link" href="../../mas/centralized/">Centralized</a></li>
   <li><a class="nav-link" href="../../mas/decentralized/">Decentralized</a></li>
+  <li><a class="nav-link" href="../../mas/fan-out-fan-in/">Fan-out/Fan-in</a></li>
+  <li><a class="nav-link" href="../../mas/iterative-refinement/">Iterative Refinement</a></li>
   <li><a class="nav-link" href="../../mas/communication-protocols/">Communication Protocols</a></li>
   <li><a class="nav-link" href="../../mas/team-sizes/">Team Sizes</a></li>
 </ul>
@@ -214,7 +216,11 @@
 </tr>
 <tr>
 <td><code>grid_cell</code>, <code>registry_key</code>, <code>source_tables</code></td>
-<td>The grid configuration, the bridge key of its runtime, and the experiment tables that include it.</td>
+<td>The grid configuration (with <code>prompt_set</code> for a cell started from P2), the bridge key of its runtime, and the experiment tables that include it.</td>
+</tr>
+<tr>
+<td><code>study</code></td>
+<td>Only for a cell that exists in an <a href="../protocol/#extension-studies">extension study</a> alone: the study's name, also in <code>job.json</code>.</td>
 </tr>
 <tr>
 <td><code>optimizer_seed</code>, <code>condition_id</code></td>
@@ -271,7 +277,7 @@
 </tr>
 </tbody>
 </table>
-<p>Every bundle is stored as <code>roles</code> (role name to prompt text), <code>demos</code>, <code>metadata</code> and <code>bundle_sha256</code>. The deployed prompts are <code>deployed_bundle.roles</code>; MIPRO's demos are rendered into the role prompts when they run.</p>
+<p>Every bundle is stored as <code>roles</code> (role name to prompt text), <code>demos</code>, <code>metadata</code> and <code>bundle_sha256</code>. A seed bundle from P2 names the set and the SHA-256 of its <code>manifest.json</code> in <code>metadata</code>. The deployed prompts are <code>deployed_bundle.roles</code>; MIPRO's demos are rendered into the role prompts when they run.</p>
 <div class="language-bash highlight"><span class="filename">Print the deployed prompts</span><pre><span></span><code>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import json; s = json.load(open(&#39;runs/gepa/hotpotqa/centralized/qwen/0/selection.json&#39;)); \</span>
 <span class="s2">[print(f&#39;## {role}\n{text}\n&#39;) for role, text in s[&#39;deployed_bundle&#39;][&#39;roles&#39;].items()]&quot;</span>
 </code></pre></div>
@@ -286,7 +292,7 @@
 </ul>
 <p><code>test.json</code> holds the per-row test data behind <code>result.json</code>: <code>example_ids</code>, <code>baseline_scores</code>, <code>deployed_scores</code>, <code>baseline_status</code>, <code>deployed_status</code>, both means, <code>delta_pp</code>, <code>usage</code> and the IDs of the two test evaluations.</p>
 <h2 id="aggregate-summary">Aggregate summary<a class="headerlink" href="#aggregate-summary" title="Link to this section">#</a></h2>
-<p><code>python -m optimizers.protocol.aggregate ... --out summary.json</code> writes <code>schema</code>, <code>protocol_id</code>, <code>family</code>, <code>bootstrap_replicates</code> and one entry per cell in <code>cells</code>:</p>
+<p><code>python -m optimizers.protocol.aggregate ... --out summary.json</code> writes <code>schema</code>, <code>protocol_id</code>, <code>family</code>, <code>bootstrap_replicates</code> and one entry per cell in <code>cells</code> (with <code>--group-by</code>, also <code>group_by</code> and one entry per group of cells in <code>groups</code>: <code>group</code>, <code>n_cells</code>, <code>status</code>, and for a complete group <code>per_seed</code>, <code>macro_baseline</code>, <code>macro_deployed</code>, <code>mean_delta_pp</code> and <code>std_delta_pp</code>):</p>
 <table>
 <thead>
 <tr>
@@ -297,7 +303,7 @@
 <tbody>
 <tr>
 <td><code>cell</code>, <code>registry_key</code>, <code>source_tables</code></td>
-<td>Method, task, topology, framework, communication, team size and task model.</td>
+<td>Method, task, topology, framework, communication, team size and task model, and <code>prompt_set</code> for a P2 cell.</td>
 </tr>
 <tr>
 <td><code>status</code></td>
@@ -428,7 +434,7 @@
     svg: { fontCache: "global" }
   };
 </script>
-<script src="../../assets/docs.js?v=20261022203713" defer></script>
+<script src="../../assets/docs.js?v=20261118192931" defer></script>
 </div>
 </body>
 </html>

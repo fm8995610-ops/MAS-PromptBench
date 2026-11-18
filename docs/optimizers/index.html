@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../assets/docs.css?v=20261022203713">
+  <link rel="stylesheet" href="../assets/docs.css?v=20261118192931">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../assets/mpb-transition.js?v=20261022203713"></script>
-  <link rel="stylesheet" href="../assets/mpb-transition.css?v=20261022203713">
+  <script src="../assets/mpb-transition.js?v=20261118192931"></script>
+  <link rel="stylesheet" href="../assets/mpb-transition.css?v=20261118192931">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url=".." data-version="20261022203713">
+<div class="site" data-base-url=".." data-version="20261118192931">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -130,6 +130,8 @@
   <li><a class="nav-link" href="../mas/sequential/">Sequential</a></li>
   <li><a class="nav-link" href="../mas/centralized/">Centralized</a></li>
   <li><a class="nav-link" href="../mas/decentralized/">Decentralized</a></li>
+  <li><a class="nav-link" href="../mas/fan-out-fan-in/">Fan-out/Fan-in</a></li>
+  <li><a class="nav-link" href="../mas/iterative-refinement/">Iterative Refinement</a></li>
   <li><a class="nav-link" href="../mas/communication-protocols/">Communication Protocols</a></li>
   <li><a class="nav-link" href="../mas/team-sizes/">Team Sizes</a></li>
 </ul>
@@ -182,7 +184,7 @@
 <div><span>Optimizer seeds</span>0, 1, 2</div>
 </div>
 <h2 id="what-gets-optimized">What gets optimized<a class="headerlink" href="#what-gets-optimized" title="Link to this section">#</a></h2>
-<p>A multi-agent system <span class="arithmatex">\( M \)</span> is a topology plus a set of roles: a planner, a solver, a manager, a debater and so on. Each role has a system prompt, and the seed prompts live in <code>configs/prompts/&lt;topology&gt;/&lt;dataset&gt;/&lt;role&gt;.txt</code>. A method treats the joint set <span class="arithmatex">\( \pi = (\pi_1, \dots, \pi_K) \)</span> of role prompts as the only variable; the model, the topology wiring, the tools and the scorer stay fixed. MIPRO's few-shot demos are rendered into the role prompts, so they are part of <span class="arithmatex">\( \pi \)</span> too.</p>
+<p>A multi-agent system <span class="arithmatex">\( M \)</span> is a topology plus a set of roles: a planner, a solver, a manager, a debater and so on. Each role has a system prompt, and the seed prompts live in <code>configs/prompts/&lt;topology&gt;/&lt;dataset&gt;/&lt;role&gt;.txt</code> (a job started with <code>--prompt-set P2</code> takes them from the frozen second set in <code>configs/prompt_sets/p2/</code>). A method treats the joint set <span class="arithmatex">\( \pi = (\pi_1, \dots, \pi_K) \)</span> of role prompts as the only variable; the model, the topology wiring, the tools and the scorer stay fixed. MIPRO's few-shot demos are rendered into the role prompts, so they are part of <span class="arithmatex">\( \pi \)</span> too.</p>
 <p>The quantity of interest is the prompt-optimization gain on the held-out test split:</p>
 <div class="arithmatex">\[
 \Delta = \mathbb{E}_{(x, y) \sim \mathcal{D}_{\text{test}}}\left[\mu\big(M(x; \pi^{\text{dep}}), y\big) - \mu\big(M(x; \pi^0), y\big)\right]
@@ -261,11 +263,12 @@
 </table>
 <p>A grid cell is one (dataset, topology, framework, communication format, team size, task model) configuration of the experiment grid in <code>optimizers/protocol/cells.py</code>, run once per optimizer seed:</p>
 <ul>
-<li><strong>GEPA and MIPRO</strong> cover every dataset on all five topologies, in each topology's native framework and in LangGraph, plus the communication formats and team sizes on HotpotQA, LiveCodeBench and BFCL, and those three datasets with <code>meta-llama/Llama-3.1-8B-Instruct</code>.</li>
+<li><strong>GEPA and MIPRO</strong> cover every dataset on all five base topologies, in each topology's native framework and in LangGraph, plus the communication formats and team sizes on HotpotQA, LiveCodeBench and BFCL, and those three datasets with <code>meta-llama/Llama-3.1-8B-Instruct</code>.</li>
 <li><strong>MAPRO and MASPO</strong> cover the same cells except <code>single</code>.</li>
 <li><strong>HiveMind, MAMUT-GEPA, MASPOB and TAVO</strong> cover HotpotQA, LiveCodeBench and BFCL on the four multi-agent LangGraph topologies.</li>
 </ul>
 <p>The built-in <code>identity</code> method returns the seed prompts without a rollout; it runs on any grid configuration and gives the seed baseline of a cell. Any method runs on any registered pair with <code>--allow-any-cell</code>, as a non-conformant job.</p>
+<p>Four <a href="../evaluation/protocol/#extension-studies">extension studies</a> add conformant cells outside the grid, each run with <code>--study &lt;name&gt;</code>: GEPA, MIPRO, MAPRO and MASPO on the two extension topologies, <a href="../mas/fan-out-fan-in/">Fan-out/Fan-in</a> and <a href="../mas/iterative-refinement/">Iterative Refinement</a>, for all nine datasets (<code>new_topologies</code>) and on HotpotQA, LiveCodeBench and BFCL from the second seed-prompt set P2 (<code>prompt_set2</code>); GEPA, MIPRO and MASPO on MATH, SWE-bench and API-Bank with the three communication formats (<code>protocol_extension</code>) and with 8 and 10 agents (<code>team_size_extension</code>). With <code>--study</code>, <code>identity</code> also runs on their runtime conditions.</p>
 <h2 id="one-protocol-for-every-method">One protocol for every method<a class="headerlink" href="#one-protocol-for-every-method" title="Link to this section">#</a></h2>
 <p>Every method runs as a job of the protocol <code>mas-promptbench</code>, <code>python -m optimizers.protocol.run</code>:</p>
 <ol>
@@ -278,7 +281,7 @@
 <p>Every rollout runs through <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/bridge"><code>optimizers/bridge/</code></a>, which wraps the topology runners instead of re-implementing them, so an optimized prompt runs unchanged in the benchmark.</p>
 <ol>
 <li><strong>Adapter</strong> (<code>adapters/</code>). One class per (dataset, registry key) pair exposes the per-role prompts (<code>roles()</code>, <code>get_prompt()</code>, <code>set_prompt()</code>) and <code>run_example()</code>, one execution of the real runner. It patches the runner module's prompt loader, model client, endpoint and team size in a private copy of the module.</li>
-<li><strong>Registry</strong> (<code>registry.py</code>). Maps each dataset and key, such as <code>sequential_crewai</code> or <code>centralized_r8</code>, to its adapter class.</li>
+<li><strong>Registry</strong> (<code>registry.py</code>). Maps each dataset and key, such as <code>sequential_crewai</code>, <code>centralized_r8</code> or <code>fan_out_fan_in</code>, to its adapter class.</li>
 <li><strong>Programs</strong> (<code>programs.py</code>, <code>mipro_programs.py</code>). Register one DSPy predictor per role, so GEPA and MIPRO edit the role instructions through <code>named_predictors()</code>. The other methods pass their candidates to the protocol's runner, directly or through its <code>RunnerSession</code>, which runs the same adapter.</li>
 <li><strong>Metric</strong> (<code>datasets/&lt;dataset&gt;.py</code>). <code>load_all()</code> and <code>metric()</code>, which returns a 0 or 1 score and feedback text for reflection.</li>
 </ol>
@@ -408,7 +411,7 @@
   };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" defer></script>
-<script src="../assets/docs.js?v=20261022203713" defer></script>
+<script src="../assets/docs.js?v=20261118192931" defer></script>
 </div>
 </body>
 </html>

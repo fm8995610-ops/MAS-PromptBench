@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../../assets/docs.css?v=20261022203713">
+  <link rel="stylesheet" href="../../assets/docs.css?v=20261118192931">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../../assets/mpb-transition.js?v=20261022203713"></script>
-  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261022203713">
+  <script src="../../assets/mpb-transition.js?v=20261118192931"></script>
+  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261118192931">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url="../.." data-version="20261022203713">
+<div class="site" data-base-url="../.." data-version="20261118192931">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -130,6 +130,8 @@
   <li><a class="nav-link" href="../../mas/sequential/">Sequential</a></li>
   <li><a class="nav-link" href="../../mas/centralized/">Centralized</a></li>
   <li><a class="nav-link" href="../../mas/decentralized/">Decentralized</a></li>
+  <li><a class="nav-link" href="../../mas/fan-out-fan-in/">Fan-out/Fan-in</a></li>
+  <li><a class="nav-link" href="../../mas/iterative-refinement/">Iterative Refinement</a></li>
   <li><a class="nav-link" href="../../mas/communication-protocols/">Communication Protocols</a></li>
   <li><a class="nav-link" href="../../mas/team-sizes/">Team Sizes</a></li>
 </ul>
@@ -174,7 +176,7 @@
     </p>
     <article class="prose">
       <h1 id="command-line-flags">Command-Line Flags<a class="headerlink" href="#command-line-flags" title="Link to this section">#</a></h1>
-<p class="lede">Every command-line option of the runners, the run protocol, the aggregation, the prompt generator and the golden recorder, with its default in the code. Environment variables are on <a href="../environment/">Environment Variables</a>.</p>
+<p class="lede">Every command-line option of the runners, the run protocol, the extension-study listing, the aggregation, the prompt generator and the golden recorder, with its default in the code. Environment variables are on <a href="../environment/">Environment Variables</a>.</p>
 <h2 id="invoke-a-runner">Invoke a runner<a class="headerlink" href="#invoke-a-runner" title="Link to this section">#</a></h2>
 <p>Run every runner as a module from the repository root:</p>
 <div class="language-bash highlight"><span class="filename">Module form</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>topologies.single.hotpotqa.langgraph_hotpotqa<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
@@ -331,7 +333,7 @@
 <tr>
 <td><code>--topology</code></td>
 <td>required</td>
-<td>A base topology or a registry key such as <code>sequential_crewai</code>, <code>independent_r8</code> or <code>centralized_communications_structured_soft</code>.</td>
+<td>A base topology, an extension topology (<code>fan_out_fan_in</code>, <code>iterative_refinement</code>) or a registry key such as <code>sequential_crewai</code>, <code>independent_r8</code> or <code>centralized_communications_structured_soft</code>.</td>
 </tr>
 <tr>
 <td><code>--framework</code></td>
@@ -347,6 +349,16 @@
 <td><code>--communication</code></td>
 <td><code>freeform</code></td>
 <td><code>freeform</code>, <code>semi_structured</code> or <code>structured_soft</code>.</td>
+</tr>
+<tr>
+<td><code>--prompt-set</code></td>
+<td><code>P1</code></td>
+<td>Seed prompts: <code>P1</code> (<code>configs/prompts/</code>) or the frozen <code>P2</code> (<code>configs/prompt_sets/p2/</code>).</td>
+</tr>
+<tr>
+<td><code>--study</code></td>
+<td>none</td>
+<td>Admit the cells of one <a href="../../evaluation/protocol/#extension-studies">extension study</a>: <code>new_topologies</code>, <code>prompt_set2</code>, <code>protocol_extension</code> or <code>team_size_extension</code>.</td>
 </tr>
 <tr>
 <td><code>--model</code></td>
@@ -376,7 +388,7 @@
 <tr>
 <td><code>--allow-any-cell</code></td>
 <td>off</td>
-<td>Run a cell outside the experiment grid.</td>
+<td>Run a cell outside the experiment grid and the named study, as a non-conformant job.</td>
 </tr>
 <tr>
 <td><code>--task-endpoints</code></td>
@@ -421,18 +433,51 @@
 <td>CrewAI, AutoGen, OpenAI Agents SDK</td>
 </tr>
 <tr>
+<td><code>fan_out_fan_in</code>, <code>iterative_refinement</code></td>
+<td>all nine</td>
+<td>LangGraph, 4 agents, freeform only (<a href="../../mas/fan-out-fan-in/">Fan-out/Fan-in</a>, <a href="../../mas/iterative-refinement/">Iterative Refinement</a>)</td>
+</tr>
+<tr>
 <td><code>&lt;topology&gt;_r&lt;r&gt;</code></td>
-<td><code>hotpotqa</code>, <code>lcb</code>, <code>bfcl</code>, <code>apibank</code>, <code>toolhop</code></td>
-<td 10="10" 2_="2," 4_="4," 8_="8,"><a href="../../mas/team-sizes/">team size</a> r ∈</td>
+<td><code>hotpotqa</code>, <code>lcb</code>, <code>bfcl</code>, <code>math</code>, <code>swe</code>, <code>apibank</code>, <code>toolhop</code></td>
+<td 10 2_ 4_ 8_><a href="../../mas/team-sizes/">team size</a> r ∈</td>
 </tr>
 <tr>
 <td><code>&lt;topology&gt;_communications_&lt;format&gt;</code></td>
-<td><code>hotpotqa</code>, <code>lcb</code>, <code>bfcl</code>, <code>apibank</code>, <code>toolhop</code></td>
+<td><code>hotpotqa</code>, <code>lcb</code>, <code>bfcl</code>, <code>math</code>, <code>swe</code>, <code>apibank</code>, <code>toolhop</code></td>
 <td><a href="../../mas/communication-protocols/">communication format</a></td>
 </tr>
 </tbody>
 </table>
-<p>Here <code>&lt;topology&gt;</code> is <code>independent</code>, <code>sequential</code>, <code>centralized</code> or <code>decentralized</code>. The job exits with status 2 on a job, evaluation or installation error. Stdout carries only the one-line JSON summary.</p>
+<p>Here <code>&lt;topology&gt;</code> is <code>independent</code>, <code>sequential</code>, <code>centralized</code> or <code>decentralized</code>. The extension topologies take no other framework, team size or format; their cells, and the P2 cells, run with <code>--study</code>. The job exits with status 2 on a job, evaluation or installation error. Stdout carries only the one-line JSON summary.</p>
+<h2 id="extension-studies">Extension studies<a class="headerlink" href="#extension-studies" title="Link to this section">#</a></h2>
+<p><code>python -m optimizers.protocol.studies [STUDY]</code> prints one <code>optimizers.protocol.run</code> command per job of a study, without a model call.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>STUDY</code></td>
+<td>none</td>
+<td><code>new_topologies</code>, <code>prompt_set2</code>, <code>protocol_extension</code> or <code>team_size_extension</code>; without it, the counts are printed.</td>
+</tr>
+<tr>
+<td><code>--out-root</code></td>
+<td><code>runs</code></td>
+<td>Root of the jobs' <code>--out</code> folders: <code>&lt;out-root&gt;/&lt;method&gt;/&lt;task&gt;/&lt;registry key&gt;/[p2/]qwen/&lt;seed&gt;</code>.</td>
+</tr>
+<tr>
+<td><code>--counts</code></td>
+<td>off</td>
+<td>Print every study's configuration count, job count and the cells it shares with the grid.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="aggregate">Aggregate<a class="headerlink" href="#aggregate" title="Link to this section">#</a></h2>
 <p><code>python -m optimizers.protocol.aggregate ROOT [ROOT ...]</code> pairs the seeds of every cell found under the given job folders or roots.</p>
 <table>
@@ -470,6 +515,16 @@
 <td>Include smoke-budget, off-grid and other non-conformant jobs.</td>
 </tr>
 <tr>
+<td><code>--study</code></td>
+<td>none</td>
+<td>Report one extension study, its shared grid cells included; without it, study-only jobs are skipped.</td>
+</tr>
+<tr>
+<td><code>--group-by</code></td>
+<td>none</td>
+<td>Comma-separated fields of <code>method</code>, <code>task</code>, <code>topology</code>, <code>framework</code>, <code>communication</code>, <code>team_size</code>, <code>task_model</code>, <code>prompt_set</code>: one seed-level summary per group of cells.</td>
+</tr>
+<tr>
 <td><code>--log-level</code></td>
 <td><code>$LOG_LEVEL</code>, else <code>INFO</code></td>
 <td>Console level.</td>
@@ -478,7 +533,7 @@
 </table>
 <p>It prints a tab-separated table to stdout and exits with status 1 when it finds no job result. <a href="../../evaluation/outputs/#aggregate-summary">Read Run Outputs</a> explains the summary.</p>
 <h2 id="prompt-generation">Prompt generation<a class="headerlink" href="#prompt-generation" title="Link to this section">#</a></h2>
-<p><code>python configs/generate_role_prompts.py</code> writes the seed prompts in <code>configs/prompts/</code>; <a href="../../extending/add-dataset/#4-seed-prompts">Add a Dataset</a> explains how.</p>
+<p><code>python configs/generate_role_prompts.py</code> writes the seed prompts in <code>configs/prompts/</code> (P1); <a href="../../extending/add-dataset/#4-seed-prompts">Add a Dataset</a> explains how. With <code>--prompt-set P2</code> it writes <code>configs/prompt_sets/p2/</code> and, when no file failed, freezes the set with <code>manifest.json</code> (<a href="../../evaluation/protocol/#seed-prompt-sets">Seed-prompt sets</a>).</p>
 <table>
 <thead>
 <tr>
@@ -504,19 +559,29 @@
 <td>Generator model.</td>
 </tr>
 <tr>
+<td><code>--prompt-set</code></td>
+<td><code>P1</code></td>
+<td><code>P1</code> (<code>configs/prompts/</code>) or <code>P2</code> (<code>configs/prompt_sets/p2/</code>). A frozen set is never written again.</td>
+</tr>
+<tr>
 <td><code>--temperature</code></td>
-<td><code>0.0</code></td>
+<td><code>0.0</code> (P2: <code>1.0</code>)</td>
 <td>Sampling temperature.</td>
 </tr>
 <tr>
+<td><code>--top-p</code></td>
+<td>not sent (P2: <code>1.0</code>)</td>
+<td>Nucleus sampling.</td>
+</tr>
+<tr>
 <td><code>--seed</code></td>
-<td><code>42</code></td>
+<td><code>42</code> (P2: <code>1</code>)</td>
 <td>Request seed.</td>
 </tr>
 <tr>
 <td><code>--force</code></td>
 <td>off</td>
-<td>Overwrite existing prompt files.</td>
+<td>Overwrite existing prompt files (P1 only).</td>
 </tr>
 <tr>
 <td><code>--only</code></td>
@@ -598,6 +663,8 @@
       </li>
       <li><a href="#run-protocol">Run protocol</a>
       </li>
+      <li><a href="#extension-studies">Extension studies</a>
+      </li>
       <li><a href="#aggregate">Aggregate</a>
       </li>
       <li><a href="#prompt-generation">Prompt generation</a>
@@ -627,7 +694,7 @@
     svg: { fontCache: "global" }
   };
 </script>
-<script src="../../assets/docs.js?v=20261022203713" defer></script>
+<script src="../../assets/docs.js?v=20261118192931" defer></script>
 </div>
 </body>
 </html>

@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../../assets/docs.css?v=20261022203713">
+  <link rel="stylesheet" href="../../assets/docs.css?v=20261118192931">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../../assets/mpb-transition.js?v=20261022203713"></script>
-  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261022203713">
+  <script src="../../assets/mpb-transition.js?v=20261118192931"></script>
+  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261118192931">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url="../.." data-version="20261022203713">
+<div class="site" data-base-url="../.." data-version="20261118192931">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -130,6 +130,8 @@
   <li><a class="nav-link" href="../../mas/sequential/">Sequential</a></li>
   <li><a class="nav-link" href="../../mas/centralized/">Centralized</a></li>
   <li><a class="nav-link" href="../../mas/decentralized/">Decentralized</a></li>
+  <li><a class="nav-link" href="../../mas/fan-out-fan-in/">Fan-out/Fan-in</a></li>
+  <li><a class="nav-link" href="../../mas/iterative-refinement/">Iterative Refinement</a></li>
   <li><a class="nav-link" href="../../mas/communication-protocols/">Communication Protocols</a></li>
   <li><a class="nav-link" href="../../mas/team-sizes/">Team Sizes</a></li>
 </ul>
@@ -200,10 +202,11 @@
 </tr>
 </tbody>
 </table>
-<p>The existing variants follow the first row: the CrewAI, AutoGen and OpenAI Agents SDK runners read the prompts of <code>sequential/</code>, <code>centralized/</code> and <code>decentralized/</code>, and the bridge calls them <code>sequential_crewai</code>, <code>centralized_autogen</code> and <code>decentralized_openai_agents</code>. <a href="../../mas/topologies/">Workflow Topologies</a> describes the five shapes that exist today.</p>
+<p>The existing variants follow the first row: the CrewAI, AutoGen and OpenAI Agents SDK runners read the prompts of <code>sequential/</code>, <code>centralized/</code> and <code>decentralized/</code>, and the bridge calls them <code>sequential_crewai</code>, <code>centralized_autogen</code> and <code>decentralized_openai_agents</code>. <a href="../../mas/topologies/">Workflow Topologies</a> describes the seven shapes that exist today: the five base topologies and the two extension topologies, Fan-out/Fan-in and Iterative Refinement, which follow the second row.</p>
 <h2 id="1-write-one-runner-per-dataset">1. Write one runner per dataset<a class="headerlink" href="#1-write-one-runner-per-dataset" title="Link to this section">#</a></h2>
 <p>Add nine runners, one per dataset folder. Each wires its framework and takes everything else from <code>core</code>: the task module <code>core/tasks/&lt;ds&gt;.py</code> (loader, prompt text, tools, scorer, records), <code>core.prompts.role_prompt</code> for the seed prompt plus its output contract, <code>core.llm</code> for the model clients, <code>core.teams</code> for the team, and <code>core.cli.main</code> for the <a href="../../reference/cli/#runner-options">shared command line</a>. <a href="../add-dataset/#3-topology-runners">Add a Dataset</a> shows the module shape, and the runners of an existing topology are the closest template.</p>
 <p>Keep the module-level names the adapters patch: <code>_load_prompt</code> or <code>SYSTEM_PROMPT</code>, <code>_build_llm</code> or <code>_build_client</code>, <code>VLLM_BASE_URL</code>, <code>MODEL_ID</code>, <code>N_AGENTS</code> and <code>N_ROUNDS</code> where the team shape is configurable, <code>_RECURSION_LIMIT</code>, <code>_OUTPUT_FORMAT_NUDGE</code>, and <code>solve</code>, <code>run_batch</code> and <code>main</code>. Read them at call time so a patched value takes effect.</p>
+<p>A topology with one graph for every dataset can share it instead, as the extension topologies do. <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/core/workflows.py"><code>core/workflows.py</code></a> builds both LangGraph graphs and asks the runner for one agent turn at a time (<code>call(request) -&gt; Turn</code>); <code>topologies/workflows/&lt;ds&gt;.py</code> implements that turn once per dataset for both topologies; and each entry <code>topologies/&lt;topo&gt;/&lt;ds&gt;/langgraph_&lt;ds&gt;.py</code> is one <code>variant.load(globals(), "topologies.workflows.&lt;ds&gt;", TOPOLOGY="&lt;topo&gt;")</code> call. A new <code>TOPOLOGY</code> value must be in <code>TOPOLOGIES</code> in <code>core/variant.py</code>.</p>
 <p>For token and call counts, pass the framework's output through the matching extractor in <code>core/telemetry.py</code> (<code>langchain_telemetry</code>, <code>langchain_ensemble_telemetry</code>, <code>crewai_telemetry</code>, <code>autogen_telemetry</code>, or <code>openai_sdk_accumulate</code> per call), then <code>normalize</code>.</p>
 <p>Pattern demos sit next to the runners. No runner imports them:</p>
 <table>
@@ -236,10 +239,10 @@
 <h2 id="2-define-the-team-and-the-prompts">2. Define the team and the prompts<a class="headerlink" href="#2-define-the-team-and-the-prompts" title="Link to this section">#</a></h2>
 <p>A framework variant reuses its topology's team spec and prompts, so skip to step 3. For a new topology:</p>
 <ol>
-<li><strong>Team.</strong> Add a <code>&lt;topo&gt;:</code> entry to each <code>configs/teams/&lt;ds&gt;.yaml</code> and a builder for it in <code>_FIELDS</code> in <code>core/teams.py</code>, which turns the YAML into a <code>TeamSpec</code> for r ∈ {2, 4, 8, 10}. The <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/teams/README.md">team-spec README</a> documents the existing schemas.</li>
+<li><strong>Team.</strong> Add a <code>&lt;topo&gt;:</code> entry to each <code>configs/teams/&lt;ds&gt;.yaml</code> and a builder for it in <code>_FIELDS</code> in <code>core/teams.py</code>, which turns the YAML into a <code>TeamSpec</code> for r ∈ {2, 4, 8, 10}. A team of one fixed shape goes into <code>FIXED_TEAMS</code> instead, its roles in team order with their <code>tools</code>, and exists only at r = 4. The <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/teams/README.md">team-spec README</a> documents the existing schemas.</li>
 <li><strong>Roles.</strong> Add a block to <code>configs/prompts/roles.yaml</code> with a <code>description</code> of the topology and, under <code>benchmarks</code>, one entry per dataset listing <code>&lt;role&gt;: "&lt;job description&gt;"</code>. Add <code>&lt;topo&gt;:</code> to <code>configs/prompts/tools.yaml</code> with a tool list per dataset.</li>
 <li><strong>Prompts.</strong> Run <code>python configs/generate_role_prompts.py --only &lt;topo&gt;</code> to write <code>configs/prompts/&lt;topo&gt;/&lt;ds&gt;/&lt;role&gt;.txt</code>; <a href="../add-dataset/#4-seed-prompts">Add a Dataset</a> describes the generator.</li>
-<li><strong>Contract.</strong> Teach <code>output_contract()</code> in <code>core/output_contracts.py</code> which roles produce the final answer. It recognizes only <code>single</code>, <code>independent</code>, <code>sequential</code>, <code>sequential_crewai</code>, <code>centralized</code>, <code>centralized_autogen</code>, <code>decentralized</code> and <code>decentralized_openai_agents</code>; any other name gets no contract. Make the same change in <code>optimizers/bridge/output_contracts.py</code>.</li>
+<li><strong>Contract.</strong> Teach <code>output_contract()</code> in <code>core/output_contracts.py</code> which roles produce the final answer. It recognizes <code>single</code>, <code>independent</code>, <code>sequential</code>, <code>sequential_crewai</code>, <code>centralized</code>, <code>centralized_autogen</code>, <code>decentralized</code> and <code>decentralized_openai_agents</code>, and the topologies in <code>EXTENSION_FINAL_ROLES</code> (<code>fan_out_fan_in</code>: <code>coordinator</code>; <code>iterative_refinement</code>: <code>generator</code>); any other name gets no contract. Make the same change in <code>optimizers/bridge/output_contracts.py</code>.</li>
 </ol>
 <h2 id="3-add-it-to-the-launchers">3. Add it to the launchers<a class="headerlink" href="#3-add-it-to-the-launchers" title="Link to this section">#</a></h2>
 <p><code>scripts/run_topologies.sh</code> lists runner folders as <code>path:framework</code> pairs in <code>TOPOS</code> and skips any module that does not exist:</p>
@@ -259,14 +262,15 @@
 </code></pre></div>
 <div class="language-python highlight"><span class="filename">optimizers/bridge/registry.py</span><pre><span></span><code><span class="s2">&quot;sequential_crewai&quot;</span><span class="p">:</span> <span class="s2">&quot;optimizers.bridge.adapters.module_math:SequentialCrewAIMATHAdapter&quot;</span><span class="p">,</span>
 </code></pre></div>
-<p>For a new topology, also set <code>prompt_topology</code> (the prompt folder) and <code>roles_</code> (the role files to load). Two places key on names:</p>
+<p>For a new topology, also set <code>prompt_topology</code> (the prompt folder) and <code>roles_</code> (the role files to load), as <code>FanOutFanInMATHAdapter</code> does. The API-Bank and ToolHop adapter classes are generated from <code>CORE_TOPOLOGIES</code> and <code>CORE_CLASS_NAMES</code> in their <code>module_&lt;ds&gt;.py</code>, with the runner path in <code>_TOPOLOGY_MODULES</code> of <code>module_tooluse_common.py</code>. Two places key on names:</p>
 <ul>
 <li>The <code>framework</code> attribute picks the client the adapter injects into <code>_build_llm</code> and <code>_build_client</code> (<code>patched_module</code> in <code>adapters/module_common.py</code>). A new framework needs its own branch there.</li>
 <li><code>default_adapter_kwargs</code> in <code>optimizers/protocol/runner.py</code> passes the team size as <code>n_agents</code> to <code>independent</code> and <code>decentralized</code> adapters and <code>n_rounds=2</code> to <code>decentralized</code> ones. Add your topology if its team shape is configurable.</li>
 </ul>
 <p>Registry values are import strings, so a framework is imported only when its pair is requested. The <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/bridge/README.md#adding-a-pair">bridge README</a> has the full checklist and the <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/bridge/templates/adapter_template.py">adapter template</a>.</p>
 <h2 id="5-run-it-through-the-protocol">5. Run it through the protocol<a class="headerlink" href="#5-run-it-through-the-protocol" title="Link to this section">#</a></h2>
-<p><code>optimizers/protocol/cells.py</code> maps a cell to a bridge key: <code>registry_key()</code> and <code>parse_registry_key()</code> know the five topologies (<code>TOPOLOGIES</code> in <code>config.py</code>) and the three framework keys in <code>FRAMEWORK_KEYS</code>. Teach them your name; a framework also goes into the <code>--framework</code> choices in <code>run.py</code>. The experiment grid (<code>build_grid</code>) and its frozen sizes (<code>EXPECTED_COUNTS</code>) describe the published experiments, so a new pair runs with <code>--allow-any-cell</code> and is reported as non-conformant.</p>
+<p><code>optimizers/protocol/cells.py</code> maps a cell to a bridge key: <code>registry_key()</code> and <code>parse_registry_key()</code> know the five base topologies (<code>TOPOLOGIES</code> in <code>config.py</code>), the extension topologies (<code>EXTENSION_TOPOLOGIES</code>, LangGraph with four agents and freeform messages only) and the three framework keys in <code>FRAMEWORK_KEYS</code>. Teach them your name; a framework also goes into the <code>--framework</code> choices in <code>run.py</code>. The experiment grid (<code>build_grid</code>) and its frozen sizes (<code>EXPECTED_COUNTS</code>) describe the published experiments, so a new pair runs with <code>--allow-any-cell</code> and is reported as non-conformant. To run its cells as conformant jobs, add a study to <code>optimizers/protocol/studies.py</code>, as <code>new_topologies</code> does for the extension topologies, pin its size in <code>EXPECTED_STUDY_COUNTS</code> and pass <code>--study</code>.</p>
+<p>Some methods wire their search to the topology's roles and raise on a name they do not know: MAPRO's prompt graph (<code>build_prompt_graph</code> and <code>EXTENSION_GRAPHS</code> in <code>optimizers/mapro/native.py</code>) and MASPO's role order (<code>optimizers/maspo/integration.py</code>). GEPA lists each topology's frameworks in <code>SUPPORTED_FRAMEWORKS_BY_TOPOLOGY</code> (<code>optimizers/gepa/integration.py</code>).</p>
 <div class="language-bash highlight"><span class="filename">Smoke-test the pair</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span>gepa<span class="w"> </span>--dataset<span class="w"> </span>math<span class="w"> </span>--topology<span class="w"> </span>sequential_&lt;fw&gt;<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--budget<span class="w"> </span><span class="m">56</span><span class="w"> </span>--phase<span class="w"> </span>optimize<span class="w"> </span>--allow-any-cell<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--out<span class="w"> </span>runs/smoke/math_sequential_&lt;fw&gt;
@@ -278,7 +282,7 @@
 <li>New topology only: team specs and their <code>core/teams.py</code> builder, YAML entries and generated prompts, final roles in both <code>output_contracts.py</code> copies.</li>
 <li><code>TOPOS</code> in <code>scripts/run_topologies.sh</code>.</li>
 <li>Adapters and <code>DATASET_ADAPTERS</code> entries, plus <code>patched_module</code> and <code>default_adapter_kwargs</code> changes if needed.</li>
-<li>The protocol's cell mapping, a smoke demo and a <code>--batch --limit</code> slice per runner, a smoke job and golden cells.</li>
+<li>The protocol's cell mapping (and a study for conformant jobs), the method wiring if needed, a smoke demo and a <code>--batch --limit</code> slice per runner, a smoke job and golden cells.</li>
 </ol>
     </article>
     <nav class="pager" aria-label="Previous and next pages">
@@ -335,7 +339,7 @@
     svg: { fontCache: "global" }
   };
 </script>
-<script src="../../assets/docs.js?v=20261022203713" defer></script>
+<script src="../../assets/docs.js?v=20261118192931" defer></script>
 </div>
 </body>
 </html>

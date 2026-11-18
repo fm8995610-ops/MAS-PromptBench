@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../../assets/docs.css?v=20261022203713">
+  <link rel="stylesheet" href="../../assets/docs.css?v=20261118192931">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../../assets/mpb-transition.js?v=20261022203713"></script>
-  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261022203713">
+  <script src="../../assets/mpb-transition.js?v=20261118192931"></script>
+  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261118192931">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url="../.." data-version="20261022203713">
+<div class="site" data-base-url="../.." data-version="20261118192931">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -130,6 +130,8 @@
   <li><a class="nav-link" href="../../mas/sequential/">Sequential</a></li>
   <li><a class="nav-link" href="../../mas/centralized/">Centralized</a></li>
   <li><a class="nav-link" href="../../mas/decentralized/">Decentralized</a></li>
+  <li><a class="nav-link" href="../../mas/fan-out-fan-in/">Fan-out/Fan-in</a></li>
+  <li><a class="nav-link" href="../../mas/iterative-refinement/">Iterative Refinement</a></li>
   <li><a class="nav-link" href="../../mas/communication-protocols/">Communication Protocols</a></li>
   <li><a class="nav-link" href="../../mas/team-sizes/">Team Sizes</a></li>
 </ul>
@@ -219,9 +221,17 @@
 <td>Llama as the task model</td>
 <td><code>--model llama</code> (<code>meta-llama/Llama-3.1-8B-Instruct</code>; <code>qwen</code> is <code>Qwen/Qwen3.5-9B</code>)</td>
 </tr>
+<tr>
+<td>Fan-out/Fan-in or Iterative Refinement</td>
+<td><code>--topology fan_out_fan_in</code> or <code>--topology iterative_refinement</code>, with <code>--study new_topologies</code></td>
+</tr>
+<tr>
+<td>Seed prompts from the second set</td>
+<td><code>--prompt-set P2</code>, with <code>--study prompt_set2</code></td>
+</tr>
 </tbody>
 </table>
-<p>Team-size and communication runtimes exist for HotpotQA, LiveCodeBench, BFCL, API-Bank and ToolHop; <a href="../../reference/cli/#run-protocol">Command-Line Flags</a> lists every key. A cell outside a method's part of the experiment grid stops with an error unless you pass <code>--allow-any-cell</code>; <a href="../#the-eight-methods">Optimizers</a> says which cells each method covers.</p>
+<p>Team-size and communication runtimes exist for HotpotQA, LiveCodeBench, BFCL, MATH, SWE-bench, API-Bank and ToolHop; the extension topologies have neither. <a href="../../reference/cli/#run-protocol">Command-Line Flags</a> lists every key. A cell outside a method's part of the experiment grid stops with an error unless its <a href="#run-an-extension-study">extension study</a> admits it or you pass <code>--allow-any-cell</code>; <a href="../#the-eight-methods">Optimizers</a> says which cells each method covers.</p>
 <h2 id="run-a-job">Run a job<a class="headerlink" href="#run-a-job" title="Link to this section">#</a></h2>
 <div class="language-bash highlight"><span class="filename">One job</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span>mapro<span class="w"> </span>--dataset<span class="w"> </span>hotpotqa<span class="w"> </span>--topology<span class="w"> </span>centralized<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/mapro/hotpotqa/centralized/qwen/0
@@ -322,7 +332,7 @@
 <tbody>
 <tr>
 <td><code>method</code>, <code>task</code>, <code>runtime</code>, <code>model</code></td>
-<td>The cell; <code>runtime</code> is its registry key.</td>
+<td>The cell; <code>runtime</code> is its registry key, followed by <code>[P2]</code> for a cell started from P2.</td>
 </tr>
 <tr>
 <td><code>seeds</code></td>
@@ -350,13 +360,29 @@
 </tr>
 </tbody>
 </table>
-<p>One detail line per seed follows each cell. A cell with a missing seed or infrastructure-invalid test data prints as <code>incomplete</code> with the reason. Skipped files, such as non-conformant jobs, are logged as warnings.</p>
+<p>One detail line per seed follows each cell. A cell with a missing seed or infrastructure-invalid test data prints as <code>incomplete</code> with the reason. Skipped files, such as non-conformant jobs and the jobs of an extension study, are logged as warnings.</p>
 <ul>
 <li><code>--family</code> sets the Holm family: <code>task</code> (dataset × model, the default), <code>method</code> or <code>none</code>.</li>
 <li><code>--bootstrap</code> sets the replicates (10,000 by default).</li>
 <li><code>--include-nonconformant</code> adds smoke-budget and off-grid jobs.</li>
+<li><code>--study &lt;name&gt;</code> reports one <a href="#run-an-extension-study">extension study</a> instead of the grid.</li>
+<li><code>--group-by</code> adds one <code>group</code> line per group of cells that share the listed fields, for example <code>task,communication</code>: per seed the mean over the group's cells, then the mean and sample standard deviation of the three seed gains.</li>
 </ul>
 <p><code>--out</code> writes the full JSON summary; see <a href="../../evaluation/outputs/#aggregate-summary">Aggregate summary</a>.</p>
+<h2 id="run-an-extension-study">Run an extension study<a class="headerlink" href="#run-an-extension-study" title="Link to this section">#</a></h2>
+<p>Four <a href="../../evaluation/protocol/#extension-studies">extension studies</a> add cells outside the experiment grid: <code>new_topologies</code>, <code>prompt_set2</code>, <code>protocol_extension</code> and <code>team_size_extension</code>. A job runs a study's cell only when you name the study:</p>
+<div class="language-bash highlight"><span class="filename">One job of the new_topologies study</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span>mipro<span class="w"> </span>--dataset<span class="w"> </span>hotpotqa<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--topology<span class="w"> </span>fan_out_fan_in<span class="w"> </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--study<span class="w"> </span>new_topologies<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--out<span class="w"> </span>runs/new_topologies/mipro/hotpotqa/fan_out_fan_in/qwen/0
+</code></pre></div>
+<p><code>optimizers.protocol.studies</code> lists a study's jobs without calling a model: one <code>optimizers.protocol.run</code> command per job, each with <code>--study</code> and its own <code>--out</code> under <code>--out-root</code> (<code>&lt;out-root&gt;/&lt;method&gt;/&lt;task&gt;/&lt;registry key&gt;/[p2/]qwen/&lt;seed&gt;</code>). P2 cells also get <code>--prompt-set P2</code>.</p>
+<div class="language-bash highlight"><span class="filename">List the jobs, or the sizes of every study</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.studies<span class="w"> </span>prompt_set2<span class="w"> </span>--out-root<span class="w"> </span>runs/prompt_set2<span class="w"> </span>&gt;<span class="w"> </span>jobs.txt
+python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.studies<span class="w"> </span>--counts
+</code></pre></div>
+<p>The freeform, four-agent cells of <code>protocol_extension</code> and <code>team_size_extension</code> are grid cells, so their jobs are the grid jobs and their results serve both. Aggregate a study on its own, here with one summary per task and format:</p>
+<div class="language-bash highlight"><span class="filename">Aggregate the protocol_extension study</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.aggregate<span class="w"> </span>runs/<span class="w"> </span>--study<span class="w"> </span>protocol_extension<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--group-by<span class="w"> </span>task,communication<span class="w"> </span>--out<span class="w"> </span>runs/protocol_extension_summary.json
+</code></pre></div>
 <h2 id="spread-the-load">Spread the load<a class="headerlink" href="#spread-the-load" title="Link to this section">#</a></h2>
 <p>Every client an adapter builds takes the next entry of <code>TASK_ENDPOINTS</code>, round robin and thread-safe, so a job spreads its rollouts across replicas without sharding. <code>models/serve_qwen3_5_9b.sh</code> starts one replica per GPU on consecutive ports from 8000 (<code>serve_llama3_1_8b.sh</code> from 8100), so list each port. The reflection model is one endpoint; <code>serve_qwen3_5_122b.sh</code> serves it on port 8200 with tensor parallelism over 4 GPUs.</p>
     </article>
@@ -391,6 +417,8 @@
       </li>
       <li><a href="#aggregate-the-seeds">Aggregate the seeds</a>
       </li>
+      <li><a href="#run-an-extension-study">Run an extension study</a>
+      </li>
       <li><a href="#spread-the-load">Spread the load</a>
       </li>
     </ul>
@@ -416,7 +444,7 @@
     svg: { fontCache: "global" }
   };
 </script>
-<script src="../../assets/docs.js?v=20261022203713" defer></script>
+<script src="../../assets/docs.js?v=20261118192931" defer></script>
 </div>
 </body>
 </html>

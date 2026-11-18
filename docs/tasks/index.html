@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../assets/docs.css?v=20261022203713">
+  <link rel="stylesheet" href="../assets/docs.css?v=20261118192931">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../assets/mpb-transition.js?v=20261022203713"></script>
-  <link rel="stylesheet" href="../assets/mpb-transition.css?v=20261022203713">
+  <script src="../assets/mpb-transition.js?v=20261118192931"></script>
+  <link rel="stylesheet" href="../assets/mpb-transition.css?v=20261118192931">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url=".." data-version="20261022203713">
+<div class="site" data-base-url=".." data-version="20261118192931">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -130,6 +130,8 @@
   <li><a class="nav-link" href="../mas/sequential/">Sequential</a></li>
   <li><a class="nav-link" href="../mas/centralized/">Centralized</a></li>
   <li><a class="nav-link" href="../mas/decentralized/">Decentralized</a></li>
+  <li><a class="nav-link" href="../mas/fan-out-fan-in/">Fan-out/Fan-in</a></li>
+  <li><a class="nav-link" href="../mas/iterative-refinement/">Iterative Refinement</a></li>
   <li><a class="nav-link" href="../mas/communication-protocols/">Communication Protocols</a></li>
   <li><a class="nav-link" href="../mas/team-sizes/">Team Sizes</a></li>
 </ul>
@@ -346,14 +348,14 @@
 <p>Without <code>--batch</code>, the GPQA, HotpotQA, MATH, LiveCodeBench and APPS runners play a built-in demo; the BFCL, SWE-bench, ToolHop and API-Bank runners have none and run a small batch (5, 2, 5 and 2 instances). Every output file is emptied when a batch starts. Without <code>--out-dir</code> or <code>--out</code>, some runners write to their own folder under <code>results/</code> and others only print their scores, so pass one. Progress goes to stderr; set <code>LOG_LEVEL</code> to change how much. <a href="../reference/cli/">Command-Line Flags</a> lists every option.</p>
 <div class="admonition tip">
 <p class="admonition-title">Score the evaluation IDs</p>
-<p>For seven tasks the first instances are exactly the eval IDs, so <code>--limit</code> with the eval-ID count scores the reported set. BFCL and SWE-bench are samples: pass their IDs to <code>--only</code>, as their pages show. <code>scripts/run_topologies.sh</code> runs every topology on every task this way.</p>
+<p>For seven tasks the first instances are exactly the eval IDs, so <code>--limit</code> with the eval-ID count scores the reported set. BFCL and SWE-bench are samples: pass their IDs to <code>--only</code>, as their pages show. <code>scripts/run_topologies.sh</code> runs every base topology on every task this way.</p>
 </div>
 <h2 id="optimize-a-task">Optimize a task<a class="headerlink" href="#optimize-a-task" title="Link to this section">#</a></h2>
 <p>Every optimizer runs a task through one command, with the task's CLI name as <code>--dataset</code>:</p>
 <div class="language-bash highlight"><span class="filename">One optimizer job</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span>&lt;key&gt;<span class="w"> </span>--dataset<span class="w"> </span>&lt;task&gt;<span class="w"> </span>--topology<span class="w"> </span>&lt;topology&gt;<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/&lt;key&gt;/&lt;task&gt;/&lt;topology&gt;/qwen/0
 </code></pre></div>
-<p><code>&lt;key&gt;</code> is one of <code>gepa</code>, <code>mipro</code>, <code>mapro</code>, <code>maspo</code>, <code>hivemind</code>, <code>mamut_gepa</code>, <code>maspob</code> or <code>tavo</code>. The experiment grid pairs GEPA, MIPRO, MAPRO and MASPO with every task and every topology runner, in each of its frameworks (on Single, GEPA and MIPRO only), and all eight methods with the multi-agent LangGraph teams of HotpotQA, LiveCodeBench and BFCL. Other combinations need <code>--allow-any-cell</code> and are reported as non-conformant.</p>
+<p><code>&lt;key&gt;</code> is one of <code>gepa</code>, <code>mipro</code>, <code>mapro</code>, <code>maspo</code>, <code>hivemind</code>, <code>mamut_gepa</code>, <code>maspob</code> or <code>tavo</code>. The experiment grid pairs GEPA, MIPRO, MAPRO and MASPO with every task and every base-topology runner, in each of its frameworks (on Single, GEPA and MIPRO only), and all eight methods with the multi-agent LangGraph teams of HotpotQA, LiveCodeBench and BFCL. The <a href="../evaluation/protocol/#extension-studies">extension studies</a> add more cells, such as the two extension topologies on every task, run with <code>--study</code>. Other combinations need <code>--allow-any-cell</code> and are reported as non-conformant.</p>
 <p>During optimization, every rollout is scored 0 or 1 by the task's protocol metric. Most tasks use the runner's own scorer; HotpotQA uses exact match only, LiveCodeBench and APPS run only the first 3 tests, and SWE-bench uses a structural patch check. See <a href="../optimizers/running/">Run an Optimizer</a> and <a href="../evaluation/protocol/">Evaluation Protocol</a>.</p>
     </article>
     <nav class="pager" aria-label="Previous and next pages">
@@ -404,7 +406,7 @@
     svg: { fontCache: "global" }
   };
 </script>
-<script src="../assets/docs.js?v=20261022203713" defer></script>
+<script src="../assets/docs.js?v=20261118192931" defer></script>
 </div>
 </body>
 </html>

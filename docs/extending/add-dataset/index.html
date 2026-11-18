@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../../assets/docs.css?v=20261022203713">
+  <link rel="stylesheet" href="../../assets/docs.css?v=20261118192931">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../../assets/mpb-transition.js?v=20261022203713"></script>
-  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261022203713">
+  <script src="../../assets/mpb-transition.js?v=20261118192931"></script>
+  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261118192931">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url="../.." data-version="20261022203713">
+<div class="site" data-base-url="../.." data-version="20261118192931">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -130,6 +130,8 @@
   <li><a class="nav-link" href="../../mas/sequential/">Sequential</a></li>
   <li><a class="nav-link" href="../../mas/centralized/">Centralized</a></li>
   <li><a class="nav-link" href="../../mas/decentralized/">Decentralized</a></li>
+  <li><a class="nav-link" href="../../mas/fan-out-fan-in/">Fan-out/Fan-in</a></li>
+  <li><a class="nav-link" href="../../mas/iterative-refinement/">Iterative Refinement</a></li>
   <li><a class="nav-link" href="../../mas/communication-protocols/">Communication Protocols</a></li>
   <li><a class="nav-link" href="../../mas/team-sizes/">Team Sizes</a></li>
 </ul>
@@ -211,6 +213,11 @@
 <td>The framework wiring: graph, crew, group chat or debate.</td>
 </tr>
 <tr>
+<td>Extension topologies</td>
+<td><code>topologies/workflows/&lt;ds&gt;.py</code>, entries in <code>topologies/fan_out_fan_in/</code> and <code>topologies/iterative_refinement/</code></td>
+<td>One agent turn for the graphs of <code>core/workflows.py</code>.</td>
+</tr>
+<tr>
 <td>Team sizes</td>
 <td><code>teamsizes/&lt;topology&gt;/&lt;ds&gt;/&lt;ds&gt;_r&lt;r&gt;.py</code>, via <code>core/variant.py</code></td>
 <td>The LangGraph runner with another r.</td>
@@ -250,7 +257,7 @@ python<span class="w"> </span>-m<span class="w"> </span>communications.&lt;topol
 <li><strong>Tests</strong> go to <code>core/tasks/tests/test_&lt;ds&gt;.py</code>; tests of shared modules go to <code>tests/core/</code>.</li>
 </ul>
 <h2 id="2-team-spec">2. Team spec<a class="headerlink" href="#2-team-spec" title="Link to this section">#</a></h2>
-<p><code>configs/teams/&lt;ds&gt;.yaml</code> has one entry per multi-agent topology, following the <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/teams/README.md">schema</a>: a replicated role (<code>independent</code>, <code>decentralized</code>), the r stages (<code>sequential</code>), or a manager and its r - 1 workers (<code>centralized</code>). <code>recursion_limit</code> is the same at every r and is omitted when the agents make plain model calls. All text is sent to the model verbatim.</p>
+<p><code>configs/teams/&lt;ds&gt;.yaml</code> has one entry per multi-agent topology, following the <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/teams/README.md">schema</a>: a replicated role (<code>independent</code>, <code>decentralized</code>), the r stages (<code>sequential</code>), a manager and its r - 1 workers (<code>centralized</code>), or each role's <code>tools</code> in the one four-agent team of <code>fan_out_fan_in</code> and <code>iterative_refinement</code> (plus <code>max_rounds</code>). <code>recursion_limit</code> is the same at every r and is omitted when the agents make plain model calls. All text is sent to the model verbatim.</p>
 <h2 id="3-topology-runners">3. Topology runners<a class="headerlink" href="#3-topology-runners" title="Link to this section">#</a></h2>
 <p>Write one module per (topology, framework), eight in all. Each has this shape:</p>
 <div class="language-python highlight"><span class="filename">topologies/centralized/langgraph/<ds>/langgraph_<ds>.py (sketch)</span><pre><span></span><code><span class="n">TOPOLOGY</span> <span class="o">=</span> <span class="s2">&quot;centralized&quot;</span>
@@ -272,7 +279,7 @@ python<span class="w"> </span>-m<span class="w"> </span>communications.&lt;topol
     <span class="k">return</span> <span class="n">cli</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">argv</span><span class="p">,</span> <span class="n">description</span><span class="o">=...</span><span class="p">,</span> <span class="n">load_instances</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">load_instances</span><span class="p">,</span> <span class="n">run_batch</span><span class="o">=</span><span class="n">run_batch</span><span class="p">,</span>
                     <span class="n">demo</span><span class="o">=</span><span class="n">_canned_demo</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">SOURCE</span><span class="p">,</span> <span class="n">add_arguments</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">add_arguments</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/topologies/single/math/langgraph_math.py"><code>topologies/single/math/langgraph_math.py</code></a> is a complete single-agent example. The <code>core/llm.py</code> docstring lists the client builders for every runner style.</p>
+<p><a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/topologies/single/math/langgraph_math.py"><code>topologies/single/math/langgraph_math.py</code></a> is a complete single-agent example. For the two extension topologies, write one runner, <code>topologies/workflows/&lt;ds&gt;.py</code>, that reads <code>TOPOLOGY</code> from its preset globals and implements one agent turn (<code>call(request) -&gt; Turn</code>) for <code>core.workflows.run_team</code>, and two entries that run it with <code>TOPOLOGY</code> preset; <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/topologies/workflows/math.py"><code>topologies/workflows/math.py</code></a> is the shortest example. The <code>core/llm.py</code> docstring lists the client builders for every runner style.</p>
 <div class="admonition warning">
 <p class="admonition-title">Module attributes are an interface</p>
 <p>Read them at call time, keep their names, and keep when they are called (how many clients a row builds, when a prompt is loaded). The optimizer adapters patch or read <code>_load_prompt</code>, <code>SYSTEM_PROMPT</code>, <code>_build_llm</code>, <code>_build_client</code>, <code>VLLM_BASE_URL</code>, <code>MODEL_ID</code>, <code>N_AGENTS</code>, <code>N_ROUNDS</code>, <code>_RECURSION_LIMIT</code> and <code>_OUTPUT_FORMAT_NUDGE</code>. HiveMind patches <code>DELEGATION_TOOLS</code>, <code>DELEGATION_NAMES</code>, <code>MANAGER_TOOLS</code>, <code>_manager_tool_node</code> and <code>_MANAGER_TERMINATE_NUDGE</code> of the centralized LangGraph runners. The golden harness reads <code>solve</code>, <code>run_one</code>, <code>run_batch</code>, <code>load_instances</code> and the scorers.</p>
@@ -288,12 +295,13 @@ python<span class="w"> </span>-m<span class="w"> </span>communications.&lt;topol
 <p>Add the dataset to the three YAML files in <code>configs/prompts/</code>:</p>
 <ul>
 <li><code>domains.yaml</code>: one line, <code>&lt;ds&gt;: "..."</code>. The generator only visits datasets listed here.</li>
-<li><code>roles.yaml</code>: under <code>topologies.&lt;topology&gt;.benchmarks</code> for each of the five topologies, <code>&lt;ds&gt;:</code> with <code>&lt;role&gt;: "&lt;job description&gt;"</code>. Role names must match what the runners and the team spec load.</li>
+<li><code>roles.yaml</code>: under <code>topologies.&lt;topology&gt;.benchmarks</code> for each of the seven topologies, <code>&lt;ds&gt;:</code> with <code>&lt;role&gt;: "&lt;job description&gt;"</code>. Role names must match what the runners and the team spec load; the extension topologies use <code>coordinator</code> and <code>worker</code>, and <code>generator</code>, <code>critic_1</code>, <code>critic_2</code> and <code>verifier</code>.</li>
 <li><code>tools.yaml</code>: under each topology, <code>&lt;ds&gt;:</code> with the tool list. A missing entry becomes <code>None.</code>, which tells the prompt to use no tools.</li>
 </ul>
 <p>Then generate; existing files are skipped unless you pass <code>--force</code>:</p>
 <div class="language-bash highlight"><span class="filename">Write the new prompt files</span><pre><span></span><code>python<span class="w"> </span>configs/generate_role_prompts.py<span class="w"> </span>--only<span class="w"> </span>single/&lt;ds&gt;<span class="w"> </span>--only<span class="w"> </span>independent/&lt;ds&gt;<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--only<span class="w"> </span>sequential/&lt;ds&gt;<span class="w"> </span>--only<span class="w"> </span>centralized/&lt;ds&gt;<span class="w"> </span>--only<span class="w"> </span>decentralized/&lt;ds&gt;
+<span class="w">  </span>--only<span class="w"> </span>sequential/&lt;ds&gt;<span class="w"> </span>--only<span class="w"> </span>centralized/&lt;ds&gt;<span class="w"> </span>--only<span class="w"> </span>decentralized/&lt;ds&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--only<span class="w"> </span>fan_out_fan_in/&lt;ds&gt;<span class="w"> </span>--only<span class="w"> </span>iterative_refinement/&lt;ds&gt;
 </code></pre></div>
 <p>The generator defaults to <code>Qwen/Qwen3.5-122B-A10B-FP8</code> at <code>http://localhost:8200/v1</code>, temperature 0 and seed 42 (<a href="../../reference/cli/#prompt-generation">options</a>). The CrewAI, AutoGen and Agents SDK runners read the prompts of their topology folder.</p>
 <h2 id="5-output-contract">5. Output contract<a class="headerlink" href="#5-output-contract" title="Link to this section">#</a></h2>
@@ -302,7 +310,8 @@ python<span class="w"> </span>-m<span class="w"> </span>communications.&lt;topol
 <li><code>single</code> and <code>independent</code>: roles in <code>PRIMARY_FINAL_ROLES</code> (<code>solver</code>, <code>caller</code>, <code>coder</code>, <code>patcher</code>, <code>planner</code>);</li>
 <li><code>decentralized</code>: <code>debater</code>;</li>
 <li><code>sequential</code>: <code>SEQUENTIAL_FINAL_ROLES["&lt;ds&gt;"]</code>;</li>
-<li><code>centralized</code>: <code>CENTRALIZED_FINAL_ROLES_BY_DATASET["&lt;ds&gt;"]</code>.</li>
+<li><code>centralized</code>: <code>CENTRALIZED_FINAL_ROLES_BY_DATASET["&lt;ds&gt;"]</code>;</li>
+<li><code>fan_out_fan_in</code> and <code>iterative_refinement</code>: <code>coordinator</code> and <code>generator</code> for every dataset (<code>EXTENSION_FINAL_ROLES</code>), so nothing to add.</li>
 </ul>
 <p>The bridge adapters attach their own copy at execution time, so make the same entries in <code>optimizers/bridge/output_contracts.py</code>, whose contracts also carry the <code>PROTECTED FINAL OUTPUT CONTRACT:</code> header. <a href="../../evaluation/protocol/#output-contracts">Output contracts</a> explains how they are applied.</p>
 <h2 id="6-team-sizes">6. Team sizes<a class="headerlink" href="#6-team-sizes" title="Link to this section">#</a></h2>
@@ -342,7 +351,7 @@ python<span class="w"> </span>-m<span class="w"> </span>communications.&lt;topol
 <h2 id="9-optimizer-bridge">9. Optimizer bridge<a class="headerlink" href="#9-optimizer-bridge" title="Link to this section">#</a></h2>
 <ol>
 <li>Add <code>optimizers/bridge/datasets/&lt;ds&gt;.py</code> from <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/bridge/templates/dataset_template.py"><code>templates/dataset_template.py</code></a>: <code>load_all()</code> returns <code>dspy.Example</code>s with an <code>id</code> and a <code>task_instance</code> input, and <code>metric(example, prediction, ...)</code> returns <code>dspy.Prediction(score=..., feedback=...)</code>. The protocol imports the module by the dataset name.</li>
-<li>Add adapters under <code>optimizers/bridge/adapters/</code>, usually a <code>module_&lt;ds&gt;.py</code> whose classes subclass <code>ModuleAdapterBase</code> (<code>module_common.py</code>) as <code>module_lcb.py</code> does, and register them in <code>DATASET_ADAPTERS</code> in <code>optimizers/bridge/registry.py</code>. <a href="../add-topology/#4-bridge-adapters">Add a Topology</a> covers the adapter contract.</li>
+<li>Add adapters under <code>optimizers/bridge/adapters/</code>, usually a <code>module_&lt;ds&gt;.py</code> whose classes subclass <code>ModuleAdapterBase</code> (<code>module_common.py</code>) as <code>module_lcb.py</code> does, and register them in <code>DATASET_ADAPTERS</code> in <code>optimizers/bridge/registry.py</code>. The extension topologies register through <code>_EXTENSION_DATASET_PREFIXES</code> there, which expects <code>FanOutFanIn&lt;Prefix&gt;Adapter</code> and <code>IterativeRefinement&lt;Prefix&gt;Adapter</code> in <code>module_&lt;ds&gt;.py</code>. <a href="../add-topology/#4-bridge-adapters">Add a Topology</a> covers the adapter contract.</li>
 <li>A new dataset is outside the experiment grid, so protocol jobs on it need <code>--allow-any-cell</code> and are non-conformant. Run the adapter's <code>run_example()</code> on one example, then the optimization phase on a <a href="../../optimizers/running/#smoke-runs">smoke budget</a>, and check that <code>job.json</code>, <code>optimization.json</code> and <code>optimization/optimizer_result.json</code> exist under <code>--out</code>:</li>
 </ol>
 <div class="language-bash highlight"><span class="filename">Smoke-test the bridge</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span>gepa<span class="w"> </span>--dataset<span class="w"> </span>&lt;ds&gt;<span class="w"> </span>--topology<span class="w"> </span>single<span class="w"> </span>--model<span class="w"> </span>qwen<span class="w"> </span><span class="se">\</span>
@@ -360,7 +369,7 @@ ruff<span class="w"> </span>check<span class="w"> </span>&lt;files&gt;<span clas
 <h2 id="checklist">Checklist<a class="headerlink" href="#checklist" title="Link to this section">#</a></h2>
 <ol>
 <li><code>core/tasks/&lt;ds&gt;.py</code> with its tests, and <code>configs/teams/&lt;ds&gt;.yaml</code>.</li>
-<li>Eight topology runners, plus team-size and communication modules if you add those variants.</li>
+<li>Eight topology runners and the shared extension-topology runner with its two entries, plus team-size and communication modules if you add those variants.</li>
 <li>YAML entries and generated prompts under <code>configs/prompts/&lt;topology&gt;/&lt;ds&gt;/</code>.</li>
 <li>Contract and final roles in <code>core/output_contracts.py</code> and <code>optimizers/bridge/output_contracts.py</code>.</li>
 <li><code>&lt;ds&gt;_eval_ids.json</code> and <code>&lt;ds&gt;_splits.json</code> in <code>benchmarks/&lt;ds&gt;/</code>.</li>
@@ -432,7 +441,7 @@ ruff<span class="w"> </span>check<span class="w"> </span>&lt;files&gt;<span clas
     svg: { fontCache: "global" }
   };
 </script>
-<script src="../../assets/docs.js?v=20261022203713" defer></script>
+<script src="../../assets/docs.js?v=20261118192931" defer></script>
 </div>
 </body>
 </html>

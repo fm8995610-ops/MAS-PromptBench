@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../../assets/docs.css?v=20261022203713">
+  <link rel="stylesheet" href="../../assets/docs.css?v=20261118192931">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../../assets/mpb-transition.js?v=20261022203713"></script>
-  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261022203713">
+  <script src="../../assets/mpb-transition.js?v=20261118192931"></script>
+  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261118192931">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url="../.." data-version="20261022203713">
+<div class="site" data-base-url="../.." data-version="20261118192931">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -130,6 +130,8 @@
   <li><a class="nav-link" href="../sequential/">Sequential</a></li>
   <li><a class="nav-link" href="../centralized/">Centralized</a></li>
   <li><a class="nav-link" href="../decentralized/">Decentralized</a></li>
+  <li><a class="nav-link" href="../fan-out-fan-in/">Fan-out/Fan-in</a></li>
+  <li><a class="nav-link" href="../iterative-refinement/">Iterative Refinement</a></li>
   <li><a class="nav-link" href="../communication-protocols/">Communication Protocols</a></li>
   <li><a class="nav-link" href="../team-sizes/">Team Sizes</a></li>
 </ul>
@@ -174,7 +176,7 @@
     </p>
     <article class="prose">
       <h1 id="workflow-topologies">Workflow Topologies<a class="headerlink" href="#workflow-topologies" title="Link to this section">#</a></h1>
-<p class="lede">MAS-PromptBench runs every task under five ways of wiring agents together, from one agent to a peer debate. This page defines what a multi-agent system is in the benchmark, compares the five topologies and shows which frameworks implement each.</p>
+<p class="lede">MAS-PromptBench runs every task under five ways of wiring agents together, from one agent to a peer debate, plus two extension topologies with a fixed four-agent team. This page defines what a multi-agent system is in the benchmark, compares the topologies and shows which frameworks implement each.</p>
 <h2 id="how-a-multi-agent-system-is-modeled">How a multi-agent system is modeled<a class="headerlink" href="#how-a-multi-agent-system-is-modeled" title="Link to this section">#</a></h2>
 <p>A multi-agent system (MAS) in the benchmark has three parts:</p>
 <ul>
@@ -213,8 +215,8 @@
 </tr>
 </tbody>
 </table>
-<p>The seed prompts were written by an LLM from the role catalog in <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/prompts/roles.yaml"><code>configs/prompts/roles.yaml</code></a>, the domain and tool lists next to it, and the template <code>configs/prompts/meta_prompt.txt</code>. Optimizers read them and never overwrite them. A team spec, <code>configs/teams/&lt;dataset&gt;.yaml</code>, names each topology's roles, their tools and order, and the turn caps, for every team size; ToolHop and API-Bank fix their roles in code instead.</p>
-<h2 id="the-five-topologies">The five topologies<a class="headerlink" href="#the-five-topologies" title="Link to this section">#</a></h2>
+<p>The seed prompts were written by an LLM from the role catalog in <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/configs/prompts/roles.yaml"><code>configs/prompts/roles.yaml</code></a>, the domain and tool lists next to it, and the template <code>configs/prompts/meta_prompt.txt</code>. Optimizers read them and never overwrite them. A team spec, <code>configs/teams/&lt;dataset&gt;.yaml</code>, names each topology's roles, their tools and order, and the turn caps, for every team size; ToolHop and API-Bank fix their roles in code instead and declare only the two extension topologies.</p>
+<h2 id="the-five-base-topologies">The five base topologies<a class="headerlink" href="#the-five-base-topologies" title="Link to this section">#</a></h2>
 <table>
 <thead>
 <tr>
@@ -284,8 +286,49 @@
   Peers that debate over rounds and vote at the end.</li>
 </ul>
 </div>
+<h2 id="extension-topologies">Extension topologies<a class="headerlink" href="#extension-topologies" title="Link to this section">#</a></h2>
+<p>Two more topologies run on all nine datasets, on LangGraph only, each with one fixed four-agent team:</p>
+<table>
+<thead>
+<tr>
+<th>Topology</th>
+<th>Shape</th>
+<th>Who talks to whom</th>
+<th>Frameworks</th>
+<th>Team</th>
+<th>Protocol <code>--topology</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../fan-out-fan-in/">Fan-out/Fan-in</a></td>
+<td>Plan, parallel subtasks, synthesis</td>
+<td>Coordinator and each worker; workers never see each other</td>
+<td>LangGraph</td>
+<td>1 coordinator + 3 workers, 1 round</td>
+<td><code>fan_out_fan_in</code></td>
+</tr>
+<tr>
+<td><a href="../iterative-refinement/">Iterative Refinement</a></td>
+<td>Generate, review, verify, revise</td>
+<td>Critics and verifier read the generator's candidate; feedback goes back to the generator</td>
+<td>LangGraph</td>
+<td>generator + 2 critics + verifier, at most 3 rounds</td>
+<td><code>iterative_refinement</code></td>
+</tr>
+</tbody>
+</table>
+<p>They have no team-size or communication-format variants. Their optimizer cells are outside the experiment grid; the <code>new_topologies</code> <a href="../../evaluation/protocol/#extension-studies">extension study</a> runs them with <code>--study new_topologies</code>.</p>
+<div class="cards">
+<ul>
+<li><a href="../fan-out-fan-in/">Fan-out/Fan-in</a>
+  A coordinator splits the task, three workers solve the parts in parallel, the coordinator synthesizes.</li>
+<li><a href="../iterative-refinement/">Iterative Refinement</a>
+  A generator revises one candidate from two critics and a verifier for up to three rounds.</li>
+</ul>
+</div>
 <h2 id="framework-by-topology">Framework by topology<a class="headerlink" href="#framework-by-topology" title="Link to this section">#</a></h2>
-<p>Every topology runs on every one of the nine datasets: 72 runner modules in all. Single and Independent have one implementation each; Sequential, Centralized and Decentralized have two, so you can compare frameworks on the same task.</p>
+<p>Every topology runs on every one of the nine datasets. The five base topologies have 72 runner modules in all: Single and Independent have one implementation each; Sequential, Centralized and Decentralized have two, so you can compare frameworks on the same task. The two extension topologies add 18 LangGraph runners.</p>
 <table>
 <thead>
 <tr>
@@ -332,19 +375,33 @@
 <td></td>
 <td><code>decentralized/openai_agents/&lt;ds&gt;/openai_agents_&lt;ds&gt;.py</code></td>
 </tr>
+<tr>
+<td>Fan-out/Fan-in</td>
+<td><code>fan_out_fan_in/&lt;ds&gt;/langgraph_&lt;ds&gt;.py</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Iterative Refinement</td>
+<td><code>iterative_refinement/&lt;ds&gt;/langgraph_&lt;ds&gt;.py</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
 </tbody>
 </table>
-<p>Paths are under <code>topologies/</code>. <code>&lt;ds&gt;</code> is the dataset folder: <code>gpqa</code>, <code>hotpotqa</code>, <code>math</code>, <code>lcb</code>, <code>apps</code>, <code>swe</code>, <code>bfcl</code>, <code>toolhop</code> or <code>apibank</code>. The runners are thin: the command line, batch loop, model clients, team specs, prompts and one task module per dataset live in the shared <code>core/</code> package. See <a href="../../reference/repository/">Repository Map</a>.</p>
+<p>Paths are under <code>topologies/</code>. <code>&lt;ds&gt;</code> is the dataset folder: <code>gpqa</code>, <code>hotpotqa</code>, <code>math</code>, <code>lcb</code>, <code>apps</code>, <code>swe</code>, <code>bfcl</code>, <code>toolhop</code> or <code>apibank</code>. The runners are thin: the command line, batch loop, model clients, team specs, prompts and one task module per dataset live in the shared <code>core/</code> package. The extension runners are a few lines each: they run one shared runner per dataset, <code>topologies/workflows/&lt;ds&gt;.py</code>, with <code>TOPOLOGY</code> preset, and both graphs live in <code>core/workflows.py</code>. See <a href="../../reference/repository/">Repository Map</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">ToolHop and API-Bank</p>
-<p>The ToolHop and API-Bank runners call the endpoint through the <code>openai</code> client and build their topology in plain Python. Their CrewAI and AutoGen variants run the LangGraph runner's code under another <code>STYLE</code> label; the Agents SDK variant runs the SDK debate engine.</p>
+<p>The ToolHop and API-Bank runners call the endpoint through the <code>openai</code> client and build the five base topologies in plain Python. Their CrewAI and AutoGen variants run the LangGraph runner's code under another <code>STYLE</code> label; the Agents SDK variant runs the SDK debate engine. Under the extension topologies they run the LangGraph graphs of <code>core/workflows.py</code>, with one model call (API-Bank) or tool loop (ToolHop) per turn.</p>
 </div>
 <h2 id="run-a-topology">Run a topology<a class="headerlink" href="#run-a-topology" title="Link to this section">#</a></h2>
 <p>Run every command from the repository root, using the module form:</p>
 <div class="language-bash highlight"><span class="filename">Run one topology on 100 HotpotQA questions</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>topologies.centralized.autogen.hotpotqa.autogen_hotpotqa<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--out-dir<span class="w"> </span>results/topologies_baseline/centralized_autogen_hotpotqa
 </code></pre></div>
-<p>Every runner takes the same command line; the <a href="../../tasks/">task pages</a> list each dataset's extra options and how to select its eval IDs. To sweep all eight topology variants over all nine datasets on the eval IDs, run <code>scripts/run_topologies.sh</code>. It reads <code>VLLM_BASE_URL</code>, <code>MODEL_ID</code>, <code>DATASETS</code> and <code>OUT_ROOT</code> (default <code>results/topologies_baseline</code>) and runs each cell as its own process.</p>
+<p>Every runner takes the same command line; the <a href="../../tasks/">task pages</a> list each dataset's extra options and how to select its eval IDs. To sweep the eight variants of the five base topologies over all nine datasets on the eval IDs, run <code>scripts/run_topologies.sh</code>. It reads <code>VLLM_BASE_URL</code>, <code>MODEL_ID</code>, <code>DATASETS</code> and <code>OUT_ROOT</code> (default <code>results/topologies_baseline</code>) and runs each cell as its own process. It does not run the extension topologies; start their runners directly.</p>
     </article>
     <nav class="pager" aria-label="Previous and next pages">
       <a class="pager-link prev" href="../../tasks/api-bank/"><span><svg class="i" aria-hidden="true"><use href="#i-arrow-left"></use></svg>Previous</span><b>API-Bank</b></a>
@@ -365,7 +422,9 @@
     <ul>
       <li><a href="#how-a-multi-agent-system-is-modeled">How a multi-agent system is modeled</a>
       </li>
-      <li><a href="#the-five-topologies">The five topologies</a>
+      <li><a href="#the-five-base-topologies">The five base topologies</a>
+      </li>
+      <li><a href="#extension-topologies">Extension topologies</a>
       </li>
       <li><a href="#framework-by-topology">Framework by topology</a>
       </li>
@@ -395,7 +454,7 @@
   };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" defer></script>
-<script src="../../assets/docs.js?v=20261022203713" defer></script>
+<script src="../../assets/docs.js?v=20261118192931" defer></script>
 </div>
 </body>
 </html>

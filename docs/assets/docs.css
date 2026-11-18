@@ -43,6 +43,8 @@
   --t-sequential: #7b3fb0;
   --t-centralized: #e07b2a;
   --t-decentralized: #2a9d9d;
+  --t-fan_out_fan_in: #c2416b;
+  --t-iterative_refinement: #7a8a1c;
   /* code (dark in both themes, like the project page's BibTeX block) */
   --code-bg: #0f1b2d;
   --code-head: #16263d;
@@ -76,7 +78,7 @@
     --gain: #6aaaf0; --loss: #f0955a; --flat: #8391a5;
     --warn: #f0a34a; --warn-bg: #2a2114; --tip-bg: #13233b; --note-bg: #161f2e;
     --f-task: #9aa6b8; --f-topo: #cf7fd0; --f-proto: #f0a94a; --f-team: #66aedb; --f-opt: #ea8aa3;
-    --t-single: #7f9be6; --t-independent: #5cc797; --t-sequential: #b58ae0; --t-centralized: #f3a160; --t-decentralized: #5ccaca;
+    --t-single: #7f9be6; --t-independent: #5cc797; --t-sequential: #b58ae0; --t-centralized: #f3a160; --t-decentralized: #5ccaca; --t-fan_out_fan_in: #ec8fae; --t-iterative_refinement: #b7c956;
     --code-bg: #08111f; --code-head: #0f1c31; --code-ink: #e2ebf9; --code-muted: #7f97b8;
     --shadow: 0 8px 30px rgba(0, 0, 0, .35); --shadow-hover: 0 16px 44px rgba(0, 0, 0, .5);
     --scrim: rgba(0, 0, 0, .55); --strong-mix: 55%;
@@ -96,7 +98,7 @@
   --gain: #6aaaf0; --loss: #f0955a; --flat: #8391a5;
   --warn: #f0a34a; --warn-bg: #2a2114; --tip-bg: #13233b; --note-bg: #161f2e;
   --f-task: #9aa6b8; --f-topo: #cf7fd0; --f-proto: #f0a94a; --f-team: #66aedb; --f-opt: #ea8aa3;
-  --t-single: #7f9be6; --t-independent: #5cc797; --t-sequential: #b58ae0; --t-centralized: #f3a160; --t-decentralized: #5ccaca;
+  --t-single: #7f9be6; --t-independent: #5cc797; --t-sequential: #b58ae0; --t-centralized: #f3a160; --t-decentralized: #5ccaca; --t-fan_out_fan_in: #ec8fae; --t-iterative_refinement: #b7c956;
   --code-bg: #08111f; --code-head: #0f1c31; --code-ink: #e2ebf9; --code-muted: #7f97b8;
   --shadow: 0 8px 30px rgba(0, 0, 0, .35); --shadow-hover: 0 16px 44px rgba(0, 0, 0, .5);
   --scrim: rgba(0, 0, 0, .55); --strong-mix: 55%;

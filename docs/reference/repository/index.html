@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../../assets/docs.css?v=20261022203713">
+  <link rel="stylesheet" href="../../assets/docs.css?v=20261118192931">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../../assets/mpb-transition.js?v=20261022203713"></script>
-  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261022203713">
+  <script src="../../assets/mpb-transition.js?v=20261118192931"></script>
+  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261118192931">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url="../.." data-version="20261022203713">
+<div class="site" data-base-url="../.." data-version="20261118192931">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -130,6 +130,8 @@
   <li><a class="nav-link" href="../../mas/sequential/">Sequential</a></li>
   <li><a class="nav-link" href="../../mas/centralized/">Centralized</a></li>
   <li><a class="nav-link" href="../../mas/decentralized/">Decentralized</a></li>
+  <li><a class="nav-link" href="../../mas/fan-out-fan-in/">Fan-out/Fan-in</a></li>
+  <li><a class="nav-link" href="../../mas/iterative-refinement/">Iterative Refinement</a></li>
   <li><a class="nav-link" href="../../mas/communication-protocols/">Communication Protocols</a></li>
   <li><a class="nav-link" href="../../mas/team-sizes/">Team Sizes</a></li>
 </ul>
@@ -186,11 +188,13 @@
 │   └── apibank/apibank_upstream/           # vendored API-Bank source
 ├── configs/
 │   ├── generate_role_prompts.py     # writes the seed prompts with an LLM
-│   ├── prompts/&lt;topology&gt;/&lt;dataset&gt;/&lt;role&gt;.txt
+│   ├── prompts/&lt;topology&gt;/&lt;dataset&gt;/&lt;role&gt;.txt   # seed prompts (P1)
+│   ├── prompt_sets/p2/              # the frozen second seed-prompt set and its manifest.json
 │   └── teams/&lt;dataset&gt;.yaml         # team specs per topology and team size
 ├── core/                            # code shared by every runner
 │   └── tasks/&lt;dataset&gt;.py           # one task module per dataset
 ├── topologies/&lt;topology&gt;/[&lt;framework&gt;/]&lt;dataset&gt;/&lt;framework&gt;_&lt;dataset&gt;.py
+├── topologies/workflows/&lt;dataset&gt;.py   # shared runner of the two extension topologies
 ├── teamsizes/&lt;topology&gt;/&lt;dataset&gt;/&lt;dataset&gt;_r&lt;r&gt;.py
 ├── communications/&lt;topology&gt;/&lt;dataset&gt;/&lt;dataset&gt;_&lt;format&gt;.py
 ├── optimizers/
@@ -269,12 +273,16 @@
 <td>Endpoint and decoding, read at call time; chat-client builders for every framework.</td>
 </tr>
 <tr>
-<td><code>prompts.py</code>, <code>output_contracts.py</code></td>
-<td>A role's seed prompt plus its protected final-output contract.</td>
+<td><code>prompts.py</code>, <code>output_contracts.py</code>, <code>prompt_sets.py</code></td>
+<td>A role's seed prompt plus its protected final-output contract; the seed-prompt sets P1 and the frozen P2, checked against its manifest.</td>
 </tr>
 <tr>
 <td><code>teams.py</code>, <code>variant.py</code></td>
-<td>Team specs per (topology, dataset, r); running a runner's source with a preset <code>TEAM_SIZE</code>, <code>TOPOLOGY</code>, <code>STYLE</code> or <code>COMMUNICATION_FORMAT</code>.</td>
+<td>Team specs per (topology, dataset, r), and the fixed four-agent teams of the extension topologies (<code>FIXED_TEAMS</code>); running a runner's source with a preset <code>TEAM_SIZE</code>, <code>TOPOLOGY</code>, <code>STYLE</code> or <code>COMMUNICATION_FORMAT</code>.</td>
+</tr>
+<tr>
+<td><code>workflows.py</code></td>
+<td>The LangGraph graphs of Fan-out/Fan-in and Iterative Refinement; a runner supplies one agent turn.</td>
 </tr>
 <tr>
 <td><code>communication.py</code></td>
@@ -298,15 +306,16 @@
 </tr>
 <tr>
 <td><code>paths.py</code></td>
-<td>Repository folders: the root, <code>configs/</code>, <code>configs/prompts/</code>, <code>benchmarks/</code> and <code>results/</code>.</td>
+<td>Repository folders: the root, <code>configs/</code>, <code>configs/prompts/</code>, <code>configs/prompt_sets/</code>, <code>benchmarks/</code> and <code>results/</code>.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="runners">Runners<a class="headerlink" href="#runners" title="Link to this section">#</a></h2>
 <ul>
 <li><strong>Topologies.</strong> <code>topologies/&lt;topology&gt;/[&lt;framework&gt;/]&lt;dataset&gt;/&lt;framework&gt;_&lt;dataset&gt;.py</code>. <code>single</code> and <code>independent</code> are LangGraph only; <code>sequential</code> adds CrewAI, <code>centralized</code> AutoGen and <code>decentralized</code> the OpenAI Agents SDK. A runner wires its framework and takes everything else from <code>core</code>.</li>
+<li><strong>Extension topologies.</strong> <code>topologies/fan_out_fan_in/&lt;dataset&gt;/langgraph_&lt;dataset&gt;.py</code> and <code>topologies/iterative_refinement/&lt;dataset&gt;/langgraph_&lt;dataset&gt;.py</code> run the shared runner <code>topologies/workflows/&lt;dataset&gt;.py</code> with <code>TOPOLOGY</code> preset (<code>core.variant.load</code>); the graphs are in <code>core/workflows.py</code>.</li>
 <li><strong>Team sizes.</strong> <code>teamsizes/&lt;topology&gt;/&lt;dataset&gt;/&lt;dataset&gt;_r&lt;r&gt;.py</code> runs the LangGraph runner's source with <code>TEAM_SIZE=r</code> (<code>core.variant.load</code>). API-Bank and ToolHop vote over r replicas instead (<code>teamsizes/apibank_common.py</code>, <code>toolhop_common.py</code>).</li>
-<li><strong>Communication formats.</strong> <code>communications/&lt;topology&gt;/&lt;dataset&gt;/&lt;dataset&gt;_&lt;format&gt;.py</code> loads the LangGraph runner as its own module with <code>COMMUNICATION_FORMAT</code> preset (<code>core.variant.module</code>).</li>
+<li><strong>Communication formats.</strong> <code>communications/&lt;topology&gt;/&lt;dataset&gt;/&lt;dataset&gt;_&lt;format&gt;.py</code> loads the LangGraph runner as its own module with <code>COMMUNICATION_FORMAT</code> preset (<code>core.variant.module</code>), for seven datasets (not GPQA or APPS).</li>
 </ul>
 <h2 id="one-task-through-a-runner">One task through a runner<a class="headerlink" href="#one-task-through-a-runner" title="Link to this section">#</a></h2>
 <div class="language-bash highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>topologies.centralized.langgraph.hotpotqa.langgraph_hotpotqa<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">5</span>
@@ -324,7 +333,7 @@
 <span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/x
 </code></pre></div>
 <ol>
-<li><strong>Job setup.</strong> Check the cell against the grid (<code>cells.py</code>), load the fixed splits (test rows stay locked until selection), and build the adapter, the metric scorer and the seed bundle (each role's shipped prompt). <code>job.json</code> seals the job's identity.</li>
+<li><strong>Job setup.</strong> Check the cell against the grid (<code>cells.py</code>) or the study named with <code>--study</code> (<code>studies.py</code>), load the fixed splits (test rows stay locked until selection), and build the adapter, the metric scorer and the seed bundle (each role's shipped prompt, or its prompt in the frozen P2 set with <code>--prompt-set P2</code>). <code>job.json</code> seals the job's identity.</li>
 <li><strong>Optimize.</strong> The method gets a <code>ProtocolRunner</code>, a <code>BudgetLedger</code> of 600 usable rollouts and the train and validation rows; it returns its incumbent bundle (<code>optimization.json</code>).</li>
 <li><strong>One rollout.</strong> Install the bundle's prompts, set <code>MODEL_ID</code>, <code>REQUEST_SEED</code> and the phase decoding, and call <code>adapter.run_example</code>, which runs the runner's solve code in a private copy of its module (<code>import_isolated_real_module</code>). The dataset metric scores the prediction. Infrastructure failures are retried up to twice and never charged.</li>
 <li><strong>Final validation.</strong> Uncharged and greedy, with paired request seeds. The incumbent is deployed only if its validation mean is strictly higher than the seed bundle's; <code>selection.json</code> locks the decision.</li>
@@ -350,7 +359,7 @@
 <tr>
 <td>A team</td>
 <td><code>configs/teams/&lt;dataset&gt;.yaml</code></td>
-<td>API-Bank and ToolHop fix their roles in code.</td>
+<td>API-Bank and ToolHop fix their roles in code, except under the two extension topologies.</td>
 </tr>
 <tr>
 <td>The required final-answer format</td>
@@ -386,6 +395,16 @@
 <td>The experiment grid</td>
 <td><code>optimizers/protocol/cells.py</code></td>
 <td>Jobs outside it need <code>--allow-any-cell</code> and are non-conformant.</td>
+</tr>
+<tr>
+<td>The extension studies</td>
+<td><code>optimizers/protocol/studies.py</code></td>
+<td>Each study's cells, run with <code>--study</code>; <code>EXPECTED_STUDY_COUNTS</code> pins their sizes.</td>
+</tr>
+<tr>
+<td>The second seed-prompt set</td>
+<td><code>configs/prompt_sets/p2/</code></td>
+<td>Frozen by <code>manifest.json</code>: an edited file is rejected when the set loads.</td>
 </tr>
 <tr>
 <td>A baseline sweep grid</td>
@@ -463,7 +482,7 @@
     svg: { fontCache: "global" }
   };
 </script>
-<script src="../../assets/docs.js?v=20261022203713" defer></script>
+<script src="../../assets/docs.js?v=20261118192931" defer></script>
 </div>
 </body>
 </html>

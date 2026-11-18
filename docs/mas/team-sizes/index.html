@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../../assets/docs.css?v=20261022203713">
+  <link rel="stylesheet" href="../../assets/docs.css?v=20261118192931">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../../assets/mpb-transition.js?v=20261022203713"></script>
-  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261022203713">
+  <script src="../../assets/mpb-transition.js?v=20261118192931"></script>
+  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261118192931">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url="../.." data-version="20261022203713">
+<div class="site" data-base-url="../.." data-version="20261118192931">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -130,6 +130,8 @@
   <li><a class="nav-link" href="../sequential/">Sequential</a></li>
   <li><a class="nav-link" href="../centralized/">Centralized</a></li>
   <li><a class="nav-link" href="../decentralized/">Decentralized</a></li>
+  <li><a class="nav-link" href="../fan-out-fan-in/">Fan-out/Fan-in</a></li>
+  <li><a class="nav-link" href="../iterative-refinement/">Iterative Refinement</a></li>
   <li><a class="nav-link" href="../communication-protocols/">Communication Protocols</a></li>
   <li><a class="nav-link is-active" href="./" aria-current="page">Team Sizes</a></li>
 </ul>
@@ -182,7 +184,7 @@
 <div><span>Runners</span>144</div>
 </div>
 <h2 id="what-n-changes">What n changes<a class="headerlink" href="#what-n-changes" title="Link to this section">#</a></h2>
-<p>Single is excluded: one agent has no team size. For the other four topologies, <code>n = 4</code> is the baseline: the team of the LangGraph runners in <code>topologies/</code>.</p>
+<p>Single is excluded: one agent has no team size. So are the two extension topologies, <a href="../fan-out-fan-in/">Fan-out/Fan-in</a> and <a href="../iterative-refinement/">Iterative Refinement</a>, which have one fixed four-agent team. For the other four topologies, <code>n = 4</code> is the baseline: the team of the LangGraph runners in <code>topologies/</code>.</p>
 <table>
 <thead>
 <tr>
@@ -268,7 +270,7 @@
 </div>
 <div class="admonition note">
 <p class="admonition-title">ToolHop and API-Bank</p>
-<p>These two datasets have no team spec. For them every team-size runner goes through a shared wrapper (<code>teamsizes/toolhop_common.py</code>, <code>teamsizes/apibank_common.py</code>). It runs n seeded copies of the topology's answering role (<code>solver</code>, <code>verifier</code>, <code>manager</code> or <code>debater</code>) and majority-votes their answers, for all four topologies. The optimizer adapters for these team sizes run the real topology at size n instead.</p>
+<p>These two datasets have no team spec for the four multi-agent topologies; theirs declares only the two extension topologies. For them every team-size runner goes through a shared wrapper (<code>teamsizes/toolhop_common.py</code>, <code>teamsizes/apibank_common.py</code>). It runs n seeded copies of the topology's answering role (<code>solver</code>, <code>verifier</code>, <code>manager</code> or <code>debater</code>) and majority-votes their answers, for all four topologies. The optimizer adapters for these team sizes run the real topology at size n instead.</p>
 </div>
 <h2 id="files">Files<a class="headerlink" href="#files" title="Link to this section">#</a></h2>
 <p>Runners follow <code>teamsizes/&lt;topology&gt;/&lt;dataset&gt;/&lt;dataset&gt;_r&lt;N&gt;.py</code>, for every topology, all nine datasets and N in 2, 4, 8, 10; for example, <code>teamsizes/centralized/hotpotqa/hotpotqa_r8.py</code>. Each file is a few lines: it runs the topology's LangGraph runner from <code>topologies/</code> with the size-N team preset (<code>core/variant.py</code>), or the ToolHop and API-Bank wrapper.</p>
@@ -303,7 +305,7 @@ python<span class="w"> </span>-m<span class="w"> </span>teamsizes.decentralized.
 </code></pre></div>
 <p>It writes each cell to <code>results/teamsizes/r&lt;N&gt;/&lt;topology&gt;_&lt;dataset&gt;/</code> (<code>OUT_ROOT</code> changes the root; BFCL gets one subfolder per category). BFCL and SWE-bench run their eval IDs; the other datasets use the same limits as the topology sweep.</p>
 <h2 id="optimize-a-size">Optimize a size<a class="headerlink" href="#optimize-a-size" title="Link to this section">#</a></h2>
-<p>Pass <code>--team-size N</code> to the run protocol, or use the key <code>&lt;topology&gt;_r&lt;N&gt;</code>. The bridge has team-size adapters for HotpotQA, LiveCodeBench, BFCL, ToolHop and API-Bank; the experiment grid covers HotpotQA, LiveCodeBench and BFCL with GEPA, MIPRO, MAPRO and MASPO, and other cells need <code>--allow-any-cell</code>. Decentralized jobs keep 2 rounds at every size. For example, MIPRO on a Centralized team of 8:</p>
+<p>Pass <code>--team-size N</code> to the run protocol, or use the key <code>&lt;topology&gt;_r&lt;N&gt;</code>. The bridge has team-size adapters for HotpotQA, LiveCodeBench, BFCL, MATH, SWE-bench, ToolHop and API-Bank. The experiment grid covers HotpotQA, LiveCodeBench and BFCL with GEPA, MIPRO, MAPRO and MASPO; the <code>team_size_extension</code> <a href="../../evaluation/protocol/#extension-studies">extension study</a> covers MATH, SWE-bench and API-Bank at n = 4, 8 and 10 with GEPA, MIPRO and MASPO (<code>--study team_size_extension</code>); other cells need <code>--allow-any-cell</code>. Decentralized jobs keep 2 rounds at every size. For example, MIPRO on a Centralized team of 8:</p>
 <div class="language-bash highlight"><span class="filename">MIPRO on Centralized, 8 agents · HotpotQA</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span>mipro<span class="w"> </span>--dataset<span class="w"> </span>hotpotqa<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--topology<span class="w"> </span>centralized<span class="w"> </span>--team-size<span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/mipro/hotpotqa/centralized_r8/qwen/0
@@ -360,7 +362,7 @@ python<span class="w"> </span>-m<span class="w"> </span>teamsizes.decentralized.
     svg: { fontCache: "global" }
   };
 </script>
-<script src="../../assets/docs.js?v=20261022203713" defer></script>
+<script src="../../assets/docs.js?v=20261118192931" defer></script>
 </div>
 </body>
 </html>

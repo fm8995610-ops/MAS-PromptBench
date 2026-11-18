@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../../assets/docs.css?v=20261022203713">
+  <link rel="stylesheet" href="../../assets/docs.css?v=20261118192931">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../../assets/mpb-transition.js?v=20261022203713"></script>
-  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261022203713">
+  <script src="../../assets/mpb-transition.js?v=20261118192931"></script>
+  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261118192931">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url="../.." data-version="20261022203713">
+<div class="site" data-base-url="../.." data-version="20261118192931">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -130,6 +130,8 @@
   <li><a class="nav-link" href="../../mas/sequential/">Sequential</a></li>
   <li><a class="nav-link" href="../../mas/centralized/">Centralized</a></li>
   <li><a class="nav-link" href="../../mas/decentralized/">Decentralized</a></li>
+  <li><a class="nav-link" href="../../mas/fan-out-fan-in/">Fan-out/Fan-in</a></li>
+  <li><a class="nav-link" href="../../mas/iterative-refinement/">Iterative Refinement</a></li>
   <li><a class="nav-link" href="../../mas/communication-protocols/">Communication Protocols</a></li>
   <li><a class="nav-link" href="../../mas/team-sizes/">Team Sizes</a></li>
 </ul>
@@ -331,7 +333,7 @@ python<span class="w"> </span>-m<span class="w"> </span>topologies.single.hotpot
 </table>
 <p><code>test</code> is the evaluation-ID set, in the same order. <code>train</code> and <code>validation</code> are drawn with <code>split_seed</code> 0 from the remaining pool and never overlap it, so optimization never sees a reported instance. A job's identity includes a hash of the splits, and test rows are released only after the selection is sealed.</p>
 <h2 id="one-job-three-phases">One job, three phases<a class="headerlink" href="#one-job-three-phases" title="Link to this section">#</a></h2>
-<p>A job is one method, one cell and one optimizer seed in {0, 1, 2}. A cell is (task, topology, framework, communication format, team size, task model).</p>
+<p>A job is one method, one cell and one optimizer seed in {0, 1, 2}. A cell is (task, topology, framework, communication format, team size, task model); a cell started from the second seed-prompt set also names it (<a href="#seed-prompt-sets">Seed-prompt sets</a>).</p>
 <ol>
 <li><strong>Optimize.</strong> The method gets the train and validation rows, the frozen seed bundle and a budget of 600 usable full-system rollouts, and returns its incumbent bundle.</li>
 <li><strong>Final validation.</strong> Uncharged and greedy. The seed and the incumbent run on the full validation split with paired per-item request seeds. The incumbent is deployed only if its validation mean is strictly higher; a tie, a regression, an unusable record or an infrastructure-invalid optimization keeps the seed bundle. The decision is sealed in <code>selection.json</code> before any test row is loaded.</li>
@@ -344,8 +346,85 @@ python<span class="w"> </span>-m<span class="w"> </span>topologies.single.hotpot
 <li><strong>Usable</strong> rollouts end in <code>success</code> or <code>semantic_failure</code>, which includes wrong or malformed answers. Only these are charged.</li>
 <li><strong>Infrastructure failures</strong> are an exception before a scored observation (connection error, timeout, 5xx, BadRequest), transport-error text, no model call, or a scorer exception. They are never charged, are retried twice with the same request seed, and then return unusable.</li>
 <li>Batches reserve budget before dispatch and are trimmed at the cap, so a job never overshoots 600.</li>
-<li>A <code>--budget</code> other than 600, an off-grid cell or another reflection model makes a job non-conformant; aggregation skips it by default.</li>
+<li>A <code>--budget</code> other than 600, an off-grid cell (outside the grid and not admitted by its <a href="#extension-studies">extension study</a>) or another reflection model makes a job non-conformant; aggregation skips it by default.</li>
 </ul>
+<h2 id="seed-prompt-sets">Seed-prompt sets<a class="headerlink" href="#seed-prompt-sets" title="Link to this section">#</a></h2>
+<p>A job's seed bundle comes from one of two seed-prompt sets (<a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/core/prompt_sets.py"><code>core/prompt_sets.py</code></a>):</p>
+<table>
+<thead>
+<tr>
+<th>Set</th>
+<th>Files</th>
+<th>How it was generated</th>
+<th>Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>P1</code> (default)</td>
+<td><code>configs/prompts/&lt;topology&gt;/&lt;dataset&gt;/&lt;role&gt;.txt</code></td>
+<td>temperature 0, seed 42</td>
+<td>every topology, dataset and role; the set the runners load</td>
+</tr>
+<tr>
+<td><code>P2</code></td>
+<td><code>configs/prompt_sets/p2/&lt;topology&gt;/&lt;dataset&gt;/&lt;role&gt;.txt</code></td>
+<td>temperature 1.0, top-p 1.0, seed 1</td>
+<td>the four multi-agent topologies on HotpotQA, LiveCodeBench and BFCL (30 prompts)</td>
+</tr>
+</tbody>
+</table>
+<p>Both sets come from the same meta prompt and the same role, tool and domain catalogs, written by <code>Qwen/Qwen3.5-122B-A10B-FP8</code> (<a href="../../reference/cli/#prompt-generation">Prompt generation</a>). P2 was generated once and frozen: <code>manifest.json</code> records the generation settings and, per prompt file, the SHA-256 of its generator input and of its text. Loading the set checks every file against the manifest, so an edited set is rejected, and the generator refuses to write a frozen set again.</p>
+<p><code>run --prompt-set P2</code> starts the seed bundle, and so the baseline, from P2. The prompt set enters a job's identity only when it is not P1, so P1 jobs keep the <code>cell_id</code> they had before prompt sets existed; aggregation keeps P2 cells apart from P1 cells.</p>
+<h2 id="extension-studies">Extension studies<a class="headerlink" href="#extension-studies" title="Link to this section">#</a></h2>
+<p>Four studies in <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/optimizers/protocol/studies.py"><code>optimizers/protocol/studies.py</code></a> add cells outside the experiment grid, all on LangGraph with <code>Qwen/Qwen3.5-9B</code> and optimizer seeds 0 to 2:</p>
+<table>
+<thead>
+<tr>
+<th>Study</th>
+<th>Methods</th>
+<th>Tasks</th>
+<th>Runtimes</th>
+<th style="text-align: right;">Configurations</th>
+<th style="text-align: right;">Jobs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>new_topologies</code></td>
+<td>GEPA, MIPRO, MAPRO, MASPO</td>
+<td>all nine</td>
+<td><a href="../../mas/fan-out-fan-in/">Fan-out/Fan-in</a> and <a href="../../mas/iterative-refinement/">Iterative Refinement</a>, 4 agents</td>
+<td style="text-align: right;">72</td>
+<td style="text-align: right;">216</td>
+</tr>
+<tr>
+<td><code>prompt_set2</code></td>
+<td>GEPA, MIPRO, MAPRO, MASPO</td>
+<td>HotpotQA, LiveCodeBench, BFCL</td>
+<td>the four multi-agent topologies, 4 agents, from P2</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">144</td>
+</tr>
+<tr>
+<td><code>protocol_extension</code></td>
+<td>GEPA, MIPRO, MASPO</td>
+<td>MATH, SWE-bench, API-Bank</td>
+<td>the four multi-agent topologies × three communication formats, 4 agents</td>
+<td style="text-align: right;">108</td>
+<td style="text-align: right;">324</td>
+</tr>
+<tr>
+<td><code>team_size_extension</code></td>
+<td>GEPA, MIPRO, MASPO</td>
+<td>MATH, SWE-bench, API-Bank</td>
+<td>the four multi-agent topologies, freeform, 4, 8 and 10 agents</td>
+<td style="text-align: right;">108</td>
+<td style="text-align: right;">324</td>
+</tr>
+</tbody>
+</table>
+<p>A job runs a study's cell only when the study is named with <code>--study</code>, and such a job is conformant. The freeform, four-agent cells of the last two studies (36 each) are grid cells: run with <code>--study</code>, they are the very grid jobs, with their source tables, so their results are shared. Only study-only jobs record <code>study</code> in <code>job.json</code> and <code>result.json</code>. The studies do not add to the experiment grid itself (<code>build_grid</code>: 612 configurations, 1,836 jobs).</p>
 <h2 id="decoding-and-seeds">Decoding and seeds<a class="headerlink" href="#decoding-and-seeds" title="Link to this section">#</a></h2>
 <table>
 <thead>
@@ -451,7 +530,7 @@ python<span class="w"> </span>-m<span class="w"> </span>topologies.single.hotpot
 </table>
 <p>The bridge's APPS loader keeps only <code>interview</code> problems; all APPS evaluation IDs are <code>interview</code>. Every metric also returns feedback text, which reflective methods read. Task details are on the <a href="../../tasks/">task pages</a>.</p>
 <h2 id="output-contracts">Output contracts<a class="headerlink" href="#output-contracts" title="Link to this section">#</a></h2>
-<p><code>core/output_contracts.py</code> fixes the final answer format per dataset. The role that emits the answer gets a <code>PROTECTED FINAL OUTPUT CONTRACT</code> block before its prompt and a reminder after it. That role is the solver-type role in Single and Independent, the <code>debater</code> in Decentralized, the last stage in Sequential (for example <code>writer</code> for HotpotQA) and the manager plus the answer-producing workers in Centralized.</p>
+<p><code>core/output_contracts.py</code> fixes the final answer format per dataset. The role that emits the answer gets a <code>PROTECTED FINAL OUTPUT CONTRACT</code> block before its prompt and a reminder after it. That role is the solver-type role in Single and Independent, the <code>debater</code> in Decentralized, the last stage in Sequential (for example <code>writer</code> for HotpotQA), the manager plus the answer-producing workers in Centralized, the <code>coordinator</code> in Fan-out/Fan-in and the <code>generator</code> in Iterative Refinement.</p>
 <table>
 <thead>
 <tr>
@@ -505,7 +584,7 @@ python<span class="w"> </span>-m<span class="w"> </span>topologies.single.hotpot
 </ul>
 <p>Counts are totals for the row across every agent and round, so they grow with team size and debate rounds. Protocol records carry their own usage per component (task, judge, reflection) in the job artifacts.</p>
 <h2 id="statistics">Statistics<a class="headerlink" href="#statistics" title="Link to this section">#</a></h2>
-<p><code>optimizers.protocol.aggregate</code> pairs the three optimizer seeds of each cell. Per seed it reports the seed and deployed test means and their difference; across seeds, the mean and standard deviation of the difference, a seed-stratified paired bootstrap 95% interval (10,000 replicates) and, for binary scores, an exact McNemar test per seed with Holm correction inside a family (dataset × model by default). A cell is complete only when all three seeds have valid test data. See <a href="../../optimizers/running/#aggregate-the-seeds">Aggregate the seeds</a>.</p>
+<p><code>optimizers.protocol.aggregate</code> pairs the three optimizer seeds of each cell. Per seed it reports the seed and deployed test means and their difference; across seeds, the mean and standard deviation of the difference, a seed-stratified paired bootstrap 95% interval (10,000 replicates) and, for binary scores, an exact McNemar test per seed with Holm correction inside a family (dataset × model by default). A cell is complete only when all three seeds have valid test data. By default it reports the grid and skips study-only jobs; <code>--study &lt;name&gt;</code> reports one extension study instead, shared grid cells included, and <code>--group-by</code> adds seed-level summaries over groups of cells. See <a href="../../optimizers/running/#aggregate-the-seeds">Aggregate the seeds</a>.</p>
     </article>
     <nav class="pager" aria-label="Previous and next pages">
       <a class="pager-link prev" href="../../optimizers/running/"><span><svg class="i" aria-hidden="true"><use href="#i-arrow-left"></use></svg>Previous</span><b>Run an Optimizer</b></a>
@@ -531,6 +610,10 @@ python<span class="w"> </span>-m<span class="w"> </span>topologies.single.hotpot
       <li><a href="#one-job-three-phases">One job, three phases</a>
         <ul><li><a href="#budget-and-charging">Budget and charging</a></li>
         </ul>
+      </li>
+      <li><a href="#seed-prompt-sets">Seed-prompt sets</a>
+      </li>
+      <li><a href="#extension-studies">Extension studies</a>
       </li>
       <li><a href="#decoding-and-seeds">Decoding and seeds</a>
       </li>
@@ -565,7 +648,7 @@ python<span class="w"> </span>-m<span class="w"> </span>topologies.single.hotpot
     svg: { fontCache: "global" }
   };
 </script>
-<script src="../../assets/docs.js?v=20261022203713" defer></script>
+<script src="../../assets/docs.js?v=20261118192931" defer></script>
 </div>
 </body>
 </html>

@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../../assets/docs.css?v=20261022203713">
+  <link rel="stylesheet" href="../../assets/docs.css?v=20261118192931">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../../assets/mpb-transition.js?v=20261022203713"></script>
-  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261022203713">
+  <script src="../../assets/mpb-transition.js?v=20261118192931"></script>
+  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261118192931">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url="../.." data-version="20261022203713">
+<div class="site" data-base-url="../.." data-version="20261118192931">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -130,6 +130,8 @@
   <li><a class="nav-link" href="../../mas/sequential/">Sequential</a></li>
   <li><a class="nav-link" href="../../mas/centralized/">Centralized</a></li>
   <li><a class="nav-link" href="../../mas/decentralized/">Decentralized</a></li>
+  <li><a class="nav-link" href="../../mas/fan-out-fan-in/">Fan-out/Fan-in</a></li>
+  <li><a class="nav-link" href="../../mas/iterative-refinement/">Iterative Refinement</a></li>
   <li><a class="nav-link" href="../../mas/communication-protocols/">Communication Protocols</a></li>
   <li><a class="nav-link" href="../../mas/team-sizes/">Team Sizes</a></li>
 </ul>
@@ -184,7 +186,7 @@
 <li><span class="arithmatex">\( G \)</span> is the <strong>workflow topology</strong>: who sends work to whom.</li>
 <li><span class="arithmatex">\( P \)</span> is the <strong>communication protocol</strong>: the format of the messages agents exchange.</li>
 </ul>
-<p>Model weights never change. Optimization edits only the joint set of role prompts <span class="arithmatex">\( \pi \)</span>. The seed prompts <span class="arithmatex">\( \pi^0 \)</span> live in <code>configs/prompts/&lt;topology&gt;/&lt;dataset&gt;/&lt;role&gt;.txt</code>, and no optimizer writes to them.</p>
+<p>Model weights never change. Optimization edits only the joint set of role prompts <span class="arithmatex">\( \pi \)</span>. The seed prompts <span class="arithmatex">\( \pi^0 \)</span> live in <code>configs/prompts/&lt;topology&gt;/&lt;dataset&gt;/&lt;role&gt;.txt</code>, and no optimizer writes to them. A second, frozen seed set, P2 in <code>configs/prompt_sets/p2/</code>, starts the jobs of the <code>prompt_set2</code> <a href="../../evaluation/protocol/#seed-prompt-sets">extension study</a>.</p>
 <h2 id="the-prompt-optimization-gain">The prompt-optimization gain<a class="headerlink" href="#the-prompt-optimization-gain" title="Link to this section">#</a></h2>
 <p>For a configuration <span class="arithmatex">\( (\mathcal{T}, G, n, P) \)</span> (task, topology, team size, protocol), the benchmark reports the gain of the deployed prompts <span class="arithmatex">\( \hat{\pi} \)</span> over the seed prompts <span class="arithmatex">\( \pi^0 \)</span> on the task's held-out test split:</p>
 <div class="arithmatex">\[
@@ -198,7 +200,7 @@
 <li><a href="../../tasks/">Task</a>
   Nine datasets in three domains: reasoning, coding and tool calling.</li>
 <li><a href="../../mas/topologies/">Workflow topology</a>
-  Single, Independent, Sequential, Centralized and Decentralized, on four frameworks.</li>
+  Single, Independent, Sequential, Centralized and Decentralized, on four frameworks, plus Fan-out/Fan-in and Iterative Refinement on LangGraph.</li>
 <li><a href="../../mas/communication-protocols/">Communication protocol</a>
   Freeform, Semi-structured or Structured messages between agents.</li>
 <li><a href="../../mas/team-sizes/">Team size</a>
@@ -209,13 +211,15 @@
 <h2 id="vocabulary">Vocabulary<a class="headerlink" href="#vocabulary" title="Link to this section">#</a></h2>
 <dl>
 <dt>Cell</dt>
-<dd>One runtime configuration: task, topology, framework, communication format, team size and task model, such as <em>BFCL · Sequential (CrewAI) · freeform · 4 agents · Qwen3.5-9B</em>.</dd>
+<dd>One runtime configuration: task, topology, framework, communication format, team size and task model (and the seed-prompt set, when it is P2), such as <em>BFCL · Sequential (CrewAI) · freeform · 4 agents · Qwen3.5-9B</em>.</dd>
 <dt>Job</dt>
 <dd>One optimizer on one cell with one optimizer seed (0, 1 or 2). It optimizes, selects on validation and scores seed and deployed prompts on the same test examples.</dd>
 <dt>Runner</dt>
 <dd>The Python module that runs one cell, for example <code>topologies.sequential.crewai.bfcl.crewai_bfcl</code>. Every runner has a batch mode; five datasets also have a smoke demo.</dd>
 <dt>Role and seed prompt</dt>
 <dd>A position in the topology (stage, worker, manager, peer) and the system-prompt file it starts from.</dd>
+<dt>Extension study</dt>
+<dd>A named set of cells outside the experiment grid, such as the two extension topologies on every dataset, run with <code>--study &lt;name&gt;</code>. See <a href="../../evaluation/protocol/#extension-studies">Extension studies</a>.</dd>
 <dt>Splits and eval IDs</dt>
 <dd>Fixed <code>train</code>, <code>validation</code> and <code>test</code> IDs per dataset in <code>benchmarks/&lt;dataset&gt;/&lt;dataset&gt;_splits.json</code>. <code>test</code> is the evaluation set, also listed in <code>&lt;dataset&gt;_eval_ids.json</code>; <code>train</code> and <code>validation</code> never overlap it. See <a href="../../evaluation/protocol/">Evaluation Protocol</a>.</dd>
 </dl>
@@ -282,7 +286,7 @@
   };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" defer></script>
-<script src="../../assets/docs.js?v=20261022203713" defer></script>
+<script src="../../assets/docs.js?v=20261118192931" defer></script>
 </div>
 </body>
 </html>

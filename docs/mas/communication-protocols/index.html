@@ -12,10 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,700;1,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../../assets/docs.css?v=20261022203713">
+  <link rel="stylesheet" href="../../assets/docs.css?v=20261118192931">
   <!-- page transition to and from the project page ("Short glide, ordered") -->
-  <script src="../../assets/mpb-transition.js?v=20261022203713"></script>
-  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261022203713">
+  <script src="../../assets/mpb-transition.js?v=20261118192931"></script>
+  <link rel="stylesheet" href="../../assets/mpb-transition.css?v=20261118192931">
   <script>
     /* Apply a stored theme before first paint. "system" stores nothing. Hosts that
        sandbox each page (the anonymous mirror) block storage, so the tab's
@@ -31,7 +31,7 @@
   <link rel="expect" href="#mpb-title" blocking="render">
 </head>
 <body>
-<div class="site" data-base-url="../.." data-version="20261022203713">
+<div class="site" data-base-url="../.." data-version="20261118192931">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -130,6 +130,8 @@
   <li><a class="nav-link" href="../sequential/">Sequential</a></li>
   <li><a class="nav-link" href="../centralized/">Centralized</a></li>
   <li><a class="nav-link" href="../decentralized/">Decentralized</a></li>
+  <li><a class="nav-link" href="../fan-out-fan-in/">Fan-out/Fan-in</a></li>
+  <li><a class="nav-link" href="../iterative-refinement/">Iterative Refinement</a></li>
   <li><a class="nav-link is-active" href="./" aria-current="page">Communication Protocols</a></li>
   <li><a class="nav-link" href="../team-sizes/">Team Sizes</a></li>
 </ul>
@@ -178,15 +180,15 @@
 <div class="facts">
 <div><span>Formats</span>3</div>
 <div><span>Topologies</span>4</div>
-<div><span>Datasets</span>6</div>
-<div><span>Runners</span>72</div>
+<div><span>Datasets</span>7</div>
+<div><span>Runners</span>84</div>
 </div>
 <h2 id="what-a-format-changes">What a format changes<a class="headerlink" href="#what-a-format-changes" title="Link to this section">#</a></h2>
 <p>A format governs only the inter-agent hand-off: the report an agent passes to the next stage, the manager, a peer or the aggregator. The model, topology, roles, tools and scorer stay the same, and the scorer-facing final answer keeps its usual form after the report.</p>
 <p>Each topology runner applies the format itself through its communication policy, defined in <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/core/communication.py"><code>core/communication.py</code></a>, in two places:</p>
 <ol>
 <li><strong>In the prompts.</strong> A format contract is appended to every agent's system prompt, telling it how to write its report and to put the final artifact after it.</li>
-<li><strong>In the hand-offs.</strong> Before a receiver reads another agent's output, the runner re-renders that text in the chosen format, so the receiver always gets a well-formed message. The HotpotQA and LiveCodeBench runners, the Sequential and Centralized BFCL runners, and the ToolHop and API-Bank runners do this; the SWE-bench runners and the Decentralized BFCL runner use the prompt contract only.</li>
+<li><strong>In the hand-offs.</strong> Before a receiver reads another agent's output, the runner re-renders that text in the chosen format, so the receiver always gets a well-formed message. The HotpotQA and LiveCodeBench runners, the Sequential and Centralized BFCL runners, and the ToolHop and API-Bank runners do this; the MATH and SWE-bench runners and the Decentralized BFCL runner use the prompt contract only, so their agents write the format themselves and hand-offs pass on as written.</li>
 </ol>
 <p>In Independent, replicas never exchange messages, so only the prompt contract applies there. Malformed reports are never rejected or re-prompted.</p>
 <h2 id="the-three-formats">The three formats<a class="headerlink" href="#the-three-formats" title="Link to this section">#</a></h2>
@@ -290,6 +292,12 @@ Answer: Arthur&#39;s Magazine
 <td>fenced <code>json</code> call list</td>
 </tr>
 <tr>
+<td>MATH</td>
+<td><code>[PROBLEM_PLAN]</code>, <code>[DERIVATION]</code>, <code>[CHECKS]</code>, <code>[ANSWER_CANDIDATE]</code></td>
+<td><code>problem_plan</code>, <code>derivation</code>, <code>checks</code>, <code>answer_candidate</code></td>
+<td><code>\boxed{...}</code></td>
+</tr>
+<tr>
 <td>ToolHop</td>
 <td><code>[TOOL_CHAIN]</code>, <code>[OBSERVATIONS]</code>, <code>[ANSWER_CANDIDATE]</code></td>
 <td><code>tool_chain</code>, <code>observations</code>, <code>answer_candidate</code></td>
@@ -313,14 +321,14 @@ Answer: Arthur&#39;s Magazine
 <p>Runners exist for every combination of:</p>
 <ul>
 <li><strong>Topologies:</strong> <code>independent</code>, <code>sequential</code>, <code>centralized</code>, <code>decentralized</code>. Each runs the LangGraph runner of that topology.</li>
-<li><strong>Datasets:</strong> <code>hotpotqa</code>, <code>lcb</code>, <code>bfcl</code>, <code>toolhop</code>, <code>apibank</code>, <code>swe</code>.</li>
+<li><strong>Datasets:</strong> <code>hotpotqa</code>, <code>math</code>, <code>lcb</code>, <code>bfcl</code>, <code>toolhop</code>, <code>apibank</code>, <code>swe</code>.</li>
 <li><strong>Formats:</strong> <code>freeform</code>, <code>semi_structured</code>, <code>structured_soft</code>.</li>
 </ul>
 <p>The path pattern is <code>communications/&lt;topology&gt;/&lt;dataset&gt;/&lt;dataset&gt;_&lt;format&gt;.py</code>. Each file is a few lines: it calls <code>install</code> from <a href="https://anonymous.4open.science/r/MAS-PromptBench-Codebase/communications/communication_formats.py"><code>communications/communication_formats.py</code></a>, which loads the topology runner as a module of its own with the format preset, records its hand-offs and scores its reports.</p>
 <h2 id="run-a-cell">Run a cell<a class="headerlink" href="#run-a-cell" title="Link to this section">#</a></h2>
 <div class="language-bash highlight"><span class="filename">Centralized HotpotQA with Structured messages</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>communications.centralized.hotpotqa.hotpotqa_structured_soft<span class="w"> </span>--batch<span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span>
 </code></pre></div>
-<p>All 72 runners share the runners' command line (<code>--batch</code>, <code>--limit</code>, <code>--offset</code>, <code>--only</code>, <code>--out-dir</code>, <code>--out</code>); the BFCL runners add <code>--category</code>. They have no demo, and without <code>--limit</code> they run every row. Results go to <code>results/communications_baseline/&lt;topology&gt;_&lt;dataset&gt;_&lt;format&gt;/results.jsonl</code> (BFCL: one subfolder per category) unless you pass <code>--out-dir</code> or <code>--out</code>, and the file is emptied first. ToolHop cells need <code>export TOOLHOP_ALLOW_DATASET_EXEC=1</code>.</p>
+<p>All 84 runners share the runners' command line (<code>--batch</code>, <code>--limit</code>, <code>--offset</code>, <code>--only</code>, <code>--out-dir</code>, <code>--out</code>); the BFCL runners add <code>--category</code>. They have no demo, and without <code>--limit</code> they run every row. Results go to <code>results/communications_baseline/&lt;topology&gt;_&lt;dataset&gt;_&lt;format&gt;/results.jsonl</code> (BFCL: one subfolder per category) unless you pass <code>--out-dir</code> or <code>--out</code>, and the file is emptied first. ToolHop cells need <code>export TOOLHOP_ALLOW_DATASET_EXEC=1</code>.</p>
 <p>Each row holds the dataset's usual score fields plus <code>communication_format</code>, the parsed reports and the rendered hand-offs (<code>communication_inflight_handoffs</code>). The parse metrics judge each agent's own text against the format: <code>communication_parse_rate</code> is the share of reports that parse as written, and <code>communication_all_parse_ok</code> is true when all do. The re-rendered reports always parse; their rate is reported separately as <code>communication_render_parse_rate</code>.</p>
 <h2 id="run-the-sweep">Run the sweep<a class="headerlink" href="#run-the-sweep" title="Link to this section">#</a></h2>
 <p><code>scripts/run_communications.sh</code> runs each selected cell as its own process, at the default output path. Choose cells with <code>TOPOLOGIES</code>, <code>DATASETS</code> and <code>FORMATS</code> (all values by default):</p>
@@ -329,9 +337,9 @@ Answer: Arthur&#39;s Magazine
 <span class="nv">FORMATS</span><span class="o">=</span><span class="s2">&quot;freeform structured_soft&quot;</span><span class="w"> </span><span class="se">\</span>
 bash<span class="w"> </span>scripts/run_communications.sh
 </code></pre></div>
-<p>The script runs BFCL and SWE-bench on their eval IDs (BFCL one category at a time) and the other datasets with fixed limits (HotpotQA, ToolHop and API-Bank 100, LiveCodeBench 50). It sets <code>TOOLHOP_ALLOW_DATASET_EXEC=1</code> unless you set it, and reads <code>VLLM_BASE_URL</code> and <code>MODEL_ID</code> like every runner.</p>
+<p>The script runs BFCL and SWE-bench on their eval IDs (BFCL one category at a time) and the other datasets with fixed limits (HotpotQA, MATH, ToolHop and API-Bank 100, LiveCodeBench 50). MATH is not in the default <code>DATASETS</code>; list it to sweep it, for example <code>DATASETS="math"</code>. It sets <code>TOOLHOP_ALLOW_DATASET_EXEC=1</code> unless you set it, and reads <code>VLLM_BASE_URL</code> and <code>MODEL_ID</code> like every runner.</p>
 <h2 id="optimize-a-cell">Optimize a cell<a class="headerlink" href="#optimize-a-cell" title="Link to this section">#</a></h2>
-<p>Pass <code>--communication &lt;format&gt;</code> to the run protocol, or use the key <code>&lt;topology&gt;_communications_&lt;format&gt;</code>. The bridge has adapters for HotpotQA, LiveCodeBench, BFCL, ToolHop and API-Bank; the experiment grid covers HotpotQA, LiveCodeBench and BFCL with GEPA, MIPRO, MAPRO and MASPO, and other cells need <code>--allow-any-cell</code>. For example, MASPO on Sequential LiveCodeBench with Structured messages:</p>
+<p>Pass <code>--communication &lt;format&gt;</code> to the run protocol, or use the key <code>&lt;topology&gt;_communications_&lt;format&gt;</code>. The bridge has adapters for HotpotQA, LiveCodeBench, BFCL, MATH, SWE-bench, ToolHop and API-Bank. The experiment grid covers HotpotQA, LiveCodeBench and BFCL with GEPA, MIPRO, MAPRO and MASPO; the <code>protocol_extension</code> <a href="../../evaluation/protocol/#extension-studies">extension study</a> covers MATH, SWE-bench and API-Bank with GEPA, MIPRO and MASPO (<code>--study protocol_extension</code>); other cells need <code>--allow-any-cell</code>. The extension topologies have no format variants. For example, MASPO on Sequential LiveCodeBench with Structured messages:</p>
 <div class="language-bash highlight"><span class="filename">MASPO on Sequential · LiveCodeBench · Structured</span><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>optimizers.protocol.run<span class="w"> </span>--method<span class="w"> </span>maspo<span class="w"> </span>--dataset<span class="w"> </span>lcb<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--topology<span class="w"> </span>sequential<span class="w"> </span>--communication<span class="w"> </span>structured_soft<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--model<span class="w"> </span>qwen<span class="w"> </span>--seed<span class="w"> </span><span class="m">0</span><span class="w"> </span>--out<span class="w"> </span>runs/maspo/lcb/sequential_structured_soft/qwen/0
@@ -339,7 +347,7 @@ bash<span class="w"> </span>scripts/run_communications.sh
 <p>See <a href="../../optimizers/running/">Run an Optimizer</a>.</p>
     </article>
     <nav class="pager" aria-label="Previous and next pages">
-      <a class="pager-link prev" href="../decentralized/"><span><svg class="i" aria-hidden="true"><use href="#i-arrow-left"></use></svg>Previous</span><b>Decentralized</b></a>
+      <a class="pager-link prev" href="../iterative-refinement/"><span><svg class="i" aria-hidden="true"><use href="#i-arrow-left"></use></svg>Previous</span><b>Iterative Refinement</b></a>
       <a class="pager-link next" href="../team-sizes/"><span>Next<svg class="i" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span><b>Team Sizes</b></a>
     </nav>
 
@@ -390,7 +398,7 @@ bash<span class="w"> </span>scripts/run_communications.sh
     svg: { fontCache: "global" }
   };
 </script>
-<script src="../../assets/docs.js?v=20261022203713" defer></script>
+<script src="../../assets/docs.js?v=20261118192931" defer></script>
 </div>
 </body>
 </html>
