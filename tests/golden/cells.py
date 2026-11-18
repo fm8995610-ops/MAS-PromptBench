@@ -18,6 +18,9 @@ DATASETS = ("gpqa", "hotpotqa", "math", "lcb", "apps", "bfcl", "swe", "apibank",
 OPTIMIZERS = ("gepa", "mipro")
 TEAM_SIZES = (2, 4, 8, 10)
 FORMATS = ("freeform", "semi_structured", "structured_soft")
+EXTENSION_TOPOLOGIES = ("fan_out_fan_in", "iterative_refinement")
+# Topologies whose agents call the model in parallel: their cells compare requests in canonical order.
+CONCURRENT_TOPOLOGIES = ("independent", "decentralized", *EXTENSION_TOPOLOGIES)
 
 AREAS = (
     "topologies",
@@ -172,7 +175,7 @@ def registry_keys() -> dict[str, tuple[str, ...]]:
 
 
 def _base_topology(key: str) -> str:
-    return key.split("_", 1)[0]
+    return key if key in EXTENSION_TOPOLOGIES else key.split("_", 1)[0]
 
 
 def registry_cells() -> list[dict]:
@@ -275,7 +278,7 @@ def all_cells() -> list[dict]:
     )
     for cell in cells:
         topology = cell.get("topology")
-        cell["concurrent"] = bool(cell.get("concurrent")) or topology in ("independent", "decentralized")
+        cell["concurrent"] = bool(cell.get("concurrent")) or topology in CONCURRENT_TOPOLOGIES
         cell["fast"] = cell["id"] in FAST_CELLS
     ids = [cell["id"] for cell in cells]
     if len(ids) != len(set(ids)):

@@ -742,7 +742,10 @@ def _requests(cell: dict) -> tuple[list, str]:
 
 def run_cell(cell: dict) -> dict:
     global SERVER
-    scrub.configure({str(TMP / "home"): "<cell-home>", str(TMP): "<tmp>", str(SESSION): "<session>"})
+    # The harness root also covers cell paths that a runner clips mid-path (a long cell id).
+    scrub.configure(
+        {str(TMP / "home"): "<cell-home>", str(TMP): "<tmp>", str(SESSION): "<session>", str(TMP.parent): "<golden>"}
+    )
     netguard.install()
     started = time.time()
     snapshot: dict[str, Any] = {"id": cell["id"], "kind": cell["kind"]}

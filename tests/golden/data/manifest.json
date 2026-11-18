@@ -1,6 +1,6 @@
 {
  "agents_sdk": "decentralized/openai_agents turns use the harness stand-in (tests/golden/sdk_fake.py); the OpenAI Agents SDK request format itself is not covered",
- "cells": 790,
+ "cells": 950,
  "fast_cells": [
   "cli/topologies/single",
   "communications/sequential/bfcl/structured_soft",
@@ -23,18 +23,18 @@
   "topologies/single/langgraph/gpqa"
  ],
  "golden_bytes": {
-  "cli.json.gz": 12327,
-  "communications.json.gz": 196604,
+  "cli.json.gz": 12805,
+  "communications.json.gz": 210001,
   "datasets.json.gz": 24157,
-  "methods.json.gz": 619910,
-  "prompts.json.gz": 122727,
-  "registry.json.gz": 949198,
+  "methods.json.gz": 620045,
+  "prompts.json.gz": 196583,
+  "registry.json.gz": 1343116,
   "scorers.json.gz": 13003,
-  "static.json.gz": 2854,
+  "static.json.gz": 2911,
   "teamsizes.json.gz": 219985,
   "topologies.json.gz": 192177
  },
- "golden_bytes_total": 2352942,
+ "golden_bytes_total": 2834783,
  "last_full_record_seconds": 475.1,
  "not_ok": [],
  "partially_skipped": {
@@ -149,11 +149,11 @@
  },
  "per_area": {
   "cli": 13,
-  "communications": 72,
+  "communications": 84,
   "datasets": 18,
   "methods": 18,
   "prompts": 18,
-  "registry": 424,
+  "registry": 572,
   "scorers": 10,
   "static": 1,
   "teamsizes": 144,
@@ -161,6 +161,6 @@
  },
  "record_command": "python -m tests.golden.record --force",
  "status": {
-  "ok": 790
+  "ok": 950
  }
 }
